@@ -234,8 +234,12 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
     if es_short:
         filtro = (
-            "scale=1080:1920:force_original_aspect_ratio=increase,"
+            "split=2[blur][img];"
+            "[blur]scale=1080:1920:force_original_aspect_ratio=increase,"
             "crop=1080:1920,"
+            "boxblur=20:20[bg];"
+            "[img]scale=1080:-1[fg];"
+            "[bg][fg]overlay=(W-w)/2:(H-h)/2,"
             "format=yuv420p,"
             f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=42:"
             "x=(w-text_w)/2:y=h-160:"
