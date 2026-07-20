@@ -23,6 +23,14 @@ TEMAS_ES = [
     "mantra ganesha para el trabajo exito y prosperidad economica",
     "musica espiritual Ganesha para meditar y atraer paz interior",
     "frecuencias binaurales para activar la abundancia mientras duermes",
+    "mantra poderoso para sanar el corazon y atraer amor divino",
+    "musica tibetana cuencos para limpiar el aura y atraer paz",
+    "afirmaciones de riqueza y exito para escuchar cada manana",
+    "ganesha mantra para superar obstaculos y lograr tus metas",
+    "frecuencias de sanacion para dormir profundo y despertar renovado",
+    "meditacion de 10 minutos para activar la abundancia interior",
+    "musica relajante de Ganesha para reducir el estres y ansiedad",
+    "mantra de la prosperidad para atraer dinero en 21 dias",
 ]
 
 TEMAS_EN = [
@@ -34,6 +42,14 @@ TEMAS_EN = [
     "528hz miracle tone Ganesha blessing abundance wealth",
     "Ganesha mantra for success luck and divine protection",
     "Deep meditation music Ganesha 432hz sleep healing",
+    "Ganesha frequency to attract love peace and abundance",
+    "741hz cleansing frequency remove toxins and negative energy",
+    "Ganesha powerful chant for financial abundance and success",
+    "963hz frequency activate pineal gland spiritual awakening",
+    "Ganesha morning mantra for positive energy and good luck",
+    "852hz return to spiritual order Ganesha meditation music",
+    "Tibetan singing bowls with Ganesha mantra deep healing",
+    "Ganesha sleep music remove obstacles while you sleep 8 hours",
 ]
 
 TEMAS_SHORTS_ES = [
@@ -46,6 +62,11 @@ TEMAS_SHORTS_ES = [
     "Mantra sagrado para atraer dinero rapido",
     "Ganesha elimina toda energia negativa ahora",
     "Mantra de prosperidad Om Ganesha 528hz",
+    "Frecuencia 432hz activa tu prosperidad ahora",
+    "Ganesha te abre los caminos hacia el exito",
+    "Escucha este mantra y cambia tu vida hoy",
+    "528hz la frecuencia del milagro y la abundancia",
+    "Ganesha blessing activa en 60 segundos",
 ]
 
 TEMAS_SHORTS_EN = [
@@ -55,9 +76,13 @@ TEMAS_SHORTS_EN = [
     "Om Gan Ganapataye Namaha infinite power",
     "Ganesha blessing money prosperity now",
     "528hz Ganesha miracle frequency activate",
+    "Ganesha opens your path to success today",
+    "Listen to this mantra and change your life",
+    "432hz activate your prosperity right now",
+    "Ganesha protection shield activate now",
 ]
 
-EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥"]
+EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
 
 def telegram(mensaje):
     try:
@@ -92,6 +117,14 @@ def get_musicas():
             todas.append(p)
     return todas
 
+def limpiar_texto(texto):
+    if not texto:
+        return ""
+    texto = texto.replace('*', '').replace('_', '').replace('`', '')
+    texto = texto.replace('**', '').replace('__', '')
+    texto = ' '.join(texto.split())
+    return texto.strip()
+
 def extraer_campo(contenido, campo, siguiente=None):
     try:
         if campo + ':' not in contenido:
@@ -111,17 +144,18 @@ def generar_guion(tema, lang='es'):
     if lang == 'es':
         prompt = f"""Eres experto en contenido espiritual de YouTube en espanol latino.
 Genera contenido VIRAL para un video sobre: {tema}
-Sin tildes ni caracteres especiales.
-Responde EXACTAMENTE en este formato:
-TITULO: {emoji} [titulo maximo 60 caracteres]
-DESCRIPCION: [500 palabras con keywords, beneficios, CTA, link youtube.com/@SpiritualWave888]
+Sin tildes ni caracteres especiales ni asteriscos ni markdown.
+Responde EXACTAMENTE en este formato sin simbolos extra:
+TITULO: {emoji} [titulo maximo 60 caracteres, impactante con numero o pregunta]
+DESCRIPCION: [500 palabras con keywords espirituales, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
 TAGS: [30 hashtags separados por espacios]"""
     else:
         prompt = f"""You are a viral spiritual YouTube expert.
 Generate content for: {tema}
+No asterisks, no markdown, no special symbols.
 Reply EXACTLY in this format:
-TITULO: {emoji} [title maximum 60 characters]
-DESCRIPCION: [500 words with keywords, benefits, CTA, link youtube.com/@SpiritualWave888]
+TITULO: {emoji} [title maximum 60 characters, with number or question]
+DESCRIPCION: [500 words with spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
 TAGS: [30 hashtags separated by spaces]"""
 
     r = requests.post(
@@ -130,10 +164,19 @@ TAGS: [30 hashtags separated by spaces]"""
         json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000}
     )
     contenido = r.json()['choices'][0]['message']['content']
-    titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or tema[:60]
+
+    titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
+    titulo = limpiar_texto(titulo)
+    if len(titulo) > 65:
+        titulo = titulo[:65].strip()
+
     descripcion = extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or f"Video sobre {tema}"
+    descripcion = limpiar_texto(descripcion)
+
     tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz #Abundancia"
-    return titulo.strip(), descripcion.strip(), tags.strip()
+    tags = limpiar_texto(tags)
+
+    return titulo, descripcion, tags
 
 def generar_thumbnail(titulo, variante=1):
     print(f"Generando thumbnail HD variante {variante}...")
@@ -173,7 +216,7 @@ def generar_thumbnail(titulo, variante=1):
         w = bbox[2] - bbox[0]
         draw.text(((img.width-w)//2, 78), sub, fill=(200, 180, 100), font=font_pequeno)
 
-        titulo_clean = titulo.replace('#Shorts','').strip()[:50]
+        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:50]
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
@@ -216,7 +259,7 @@ def montar_video(titulo, duracion=3600, es_short=False):
         return None
 
     musica = random.choice(musicas)
-    titulo_clean = titulo[:45].replace("'","").replace('"','').replace(':','-').replace('#','')
+    titulo_clean = limpiar_texto(titulo)[:45].replace("'","").replace('"','').replace(':','-').replace('#','')
     lista_path = '/tmp/lista_short.txt' if es_short else '/tmp/lista.txt'
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
 
@@ -279,7 +322,7 @@ def montar_video(titulo, duracion=3600, es_short=False):
     return None
 
 def agregar_capitulos(descripcion, duracion_min):
-    caps = "\n\n CAPITULOS:\n00:00 - Introduccion y bienvenida\n"
+    caps = "\n\nCAPITULOS:\n00:00 - Introduccion y bienvenida\n"
     paso = duracion_min // 5
     temas_caps = ["Mantra principal", "Meditacion profunda", "Afirmaciones de abundancia", "Cierre y bendicion"]
     for i, tema_cap in enumerate(temas_caps):
@@ -327,6 +370,39 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                 print("  Thumbnail HD OK")
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
+
+        try:
+            duracion_seg = duracion_min * 60
+            start_ms = str((duracion_seg - 20) * 1000)
+            youtube.videoEndscreens().insert(
+                videoId=video_id,
+                body={
+                    "elements": [
+                        {
+                            "type": "VIDEO",
+                            "endgameElementStyle": {
+                                "image": {},
+                                "position": {"cornerPosition": "TOP_LEFT"}
+                            },
+                            "videoid": {"videoId": "recent"},
+                            "startOffsetMs": start_ms,
+                            "durationMs": "15000"
+                        },
+                        {
+                            "type": "SUBSCRIBE",
+                            "endgameElementStyle": {
+                                "image": {},
+                                "position": {"cornerPosition": "BOTTOM_RIGHT"}
+                            },
+                            "startOffsetMs": start_ms,
+                            "durationMs": "15000"
+                        }
+                    ]
+                }
+            ).execute()
+            print("  End screen OK")
+        except Exception as e:
+            print(f"  End screen error: {e}")
 
     return video_id, url
 
