@@ -31,6 +31,16 @@ TEMAS_ES = [
     "meditacion de 10 minutos para activar la abundancia interior",
     "musica relajante de Ganesha para reducir el estres y ansiedad",
     "mantra de la prosperidad para atraer dinero en 21 dias",
+    "musica 963hz para despertar la conciencia y conectar con lo divino",
+    "mantra sagrado para limpiar el karma y atraer bendiciones",
+    "frecuencias 741hz para eliminar toxinas y pensamientos negativos",
+    "meditacion guiada para manifestar tus suenos y metas en 2026",
+    "musica para dormir con Ganesha y despertar con abundancia",
+    "mantra de Lakshmi y Ganesha para atraer riqueza y prosperidad",
+    "afirmaciones positivas en espanol para reprogramar tu mente",
+    "musica de sanacion cuantica para equilibrar los chakras",
+    "ganesha mantra para proteger el hogar y atraer armonia familiar",
+    "frecuencias del universo para conectar con tu proposito de vida",
 ]
 
 TEMAS_EN = [
@@ -50,6 +60,20 @@ TEMAS_EN = [
     "852hz return to spiritual order Ganesha meditation music",
     "Tibetan singing bowls with Ganesha mantra deep healing",
     "Ganesha sleep music remove obstacles while you sleep 8 hours",
+    "528hz DNA repair frequency Ganesha blessing meditation",
+    "Ganesha mantra for career success and financial freedom",
+    "432hz nature frequency Ganesha meditation stress relief",
+    "Om Namah Shivaya Ganesha powerful healing mantra 528hz",
+    "Ganesha abundance frequency attract money while you sleep",
+    "396hz liberation from fear and guilt Ganesha meditation",
+    "Ganesha mantra for students success and mental clarity",
+    "639hz harmonious relationships Ganesha divine frequency",
+    "Ganesha 1000 names chant for ultimate blessing and protection",
+    "174hz pain relief frequency Ganesha healing meditation music",
+    "Ganesha mantra for new beginnings and fresh start 2026",
+    "285hz cellular healing Ganesha frequency tissue regeneration",
+    "Ganesha divine music for yoga and deep meditation practice",
+    "Solfeggio frequencies complete set Ganesha healing music",
 ]
 
 TEMAS_SHORTS_ES = [
@@ -67,6 +91,12 @@ TEMAS_SHORTS_ES = [
     "Escucha este mantra y cambia tu vida hoy",
     "528hz la frecuencia del milagro y la abundancia",
     "Ganesha blessing activa en 60 segundos",
+    "Mantra de Ganesha para el dinero en 1 minuto",
+    "La frecuencia que atrae abundancia mientras duermes",
+    "Om Ganesha activa tu suerte ahora mismo",
+    "Elimina bloqueos con este mantra de 60 segundos",
+    "Ganesha abre puertas imposibles con este mantra",
+    "528hz sana tu cuerpo y atrae prosperidad hoy",
 ]
 
 TEMAS_SHORTS_EN = [
@@ -80,6 +110,11 @@ TEMAS_SHORTS_EN = [
     "Listen to this mantra and change your life",
     "432hz activate your prosperity right now",
     "Ganesha protection shield activate now",
+    "60 seconds Ganesha mantra for instant luck",
+    "528hz the frequency that attracts abundance",
+    "Ganesha removes your blocks in 60 seconds",
+    "This mantra opens impossible doors now",
+    "Heal your body attract money 528hz now",
 ]
 
 EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
@@ -190,14 +225,15 @@ def generar_thumbnail(titulo, variante=1):
 
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
-        d.rectangle([(0, img.height-260), (img.width, img.height)], fill=(0, 0, 0, 190))
-        d.rectangle([(0, 0), (img.width, 100)], fill=(0, 0, 0, 170))
+        d.rectangle([(0, img.height-300), (img.width, img.height)], fill=(0, 0, 0, 210))
+        d.rectangle([(0, 0), (img.width, 110)], fill=(0, 0, 0, 180))
+        d.rectangle([(0, 0), (img.width-1, img.height-1)], outline=(201, 168, 76), width=12)
         img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
 
         draw = ImageDraw.Draw(img)
 
         try:
-            font_grande = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 80)
+            font_grande = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 72)
             font_medio = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 42)
             font_pequeno = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
         except:
@@ -208,13 +244,13 @@ def generar_thumbnail(titulo, variante=1):
         canal = 'SpiritualWave'
         bbox = draw.textbbox((0, 0), canal, font=font_medio)
         w = bbox[2] - bbox[0]
-        draw.text(((img.width-w)//2+3, 32), canal, fill=(0, 0, 0), font=font_medio)
+        draw.text(((img.width-w)//2+4, 34), canal, fill=(100, 80, 0), font=font_medio)
         draw.text(((img.width-w)//2, 30), canal, fill=(255, 215, 0), font=font_medio)
 
         sub = 'Mantras & Frecuencias Divinas'
         bbox = draw.textbbox((0, 0), sub, font=font_pequeno)
         w = bbox[2] - bbox[0]
-        draw.text(((img.width-w)//2, 78), sub, fill=(200, 180, 100), font=font_pequeno)
+        draw.text(((img.width-w)//2, 80), sub, fill=(220, 195, 120), font=font_pequeno)
 
         titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:50]
         palabras = titulo_clean.split()
@@ -223,7 +259,7 @@ def generar_thumbnail(titulo, variante=1):
         for p in palabras:
             test = linea + " " + p if linea else p
             bbox_test = draw.textbbox((0, 0), test, font=font_grande)
-            if bbox_test[2] - bbox_test[0] < img.width - 100:
+            if bbox_test[2] - bbox_test[0] < img.width - 80:
                 linea = test
             else:
                 if linea:
@@ -232,17 +268,22 @@ def generar_thumbnail(titulo, variante=1):
         if linea:
             lineas.append(linea)
 
-        y = img.height - 250
+        total_lines = min(len(lineas), 3)
+        line_height = 90
+        total_height = total_lines * line_height
+        y = img.height - 280 + (280 - total_height) // 2
+
         for linea in lineas[:3]:
             bbox = draw.textbbox((0, 0), linea, font=font_grande)
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
-            draw.text((x+4, y+4), linea, fill=(0, 0, 0), font=font_grande)
+            for dx, dy in [(-3,3),(3,3),(3,-3),(-3,-3),(0,4),(4,0),(0,-4),(-4,0)]:
+                draw.text((x+dx, y+dy), linea, fill=(0, 0, 0), font=font_grande)
             draw.text((x, y), linea, fill=(255, 255, 255), font=font_grande)
-            y += 88
+            y += line_height
 
         path = f'/tmp/thumbnail_{variante}.jpg'
-        img.save(path, 'JPEG', quality=97)
+        img.save(path, 'JPEG', quality=98)
         print(f"  Thumbnail HD OK")
         return path
     except Exception as e:
@@ -411,38 +452,41 @@ print("\n=== SPIRITUALWAVE AUTO PRODUCER HD ===")
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 resultados = []
 
-telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando 4 videos HD...")
+telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando 5 videos HD...")
 
 try:
+    # Video 1h espanol
     tema_es = random.choice(TEMAS_ES)
-    print(f"\n[VIDEO ES] {tema_es}")
+    print(f"\n[VIDEO ES 1H] {tema_es}")
     titulo_es, desc_es, tags_es = generar_guion(tema_es, 'es')
     video_es = montar_video(titulo_es, duracion=3600)
     if video_es:
         vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1)
-        resultados.append({'tipo': 'VIDEO ES', 'titulo': titulo_es, 'url': url})
-        telegram(f"✅ <b>Video ES subido</b>\n🎬 {titulo_es}\n🔗 {url}")
+        resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
+        telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
 
+    # Video 1h ingles
     tema_en = random.choice(TEMAS_EN)
-    print(f"\n[VIDEO EN] {tema_en}")
+    print(f"\n[VIDEO EN 1H] {tema_en}")
     titulo_en, desc_en, tags_en = generar_guion(tema_en, 'en')
     video_en = montar_video(titulo_en, duracion=3600)
     if video_en:
         vid_id, url = subir_youtube(video_en, titulo_en, desc_en, tags_en, duracion_min=60, variante=2)
-        resultados.append({'tipo': 'VIDEO EN', 'titulo': titulo_en, 'url': url})
-        telegram(f"✅ <b>Video EN subido</b>\n🎬 {titulo_en}\n🔗 {url}")
+        resultados.append({'tipo': 'VIDEO EN 1H', 'titulo': titulo_en, 'url': url})
+        telegram(f"✅ <b>Video EN 1H subido</b>\n🎬 {titulo_en}\n🔗 {url}")
 
-    # Video 3 horas para maximizar watch time
+    # Video 3h ingles para watch time
     tema_3h = random.choice(TEMAS_EN)
-    titulo_3h = f"3 Hours Ganesha Meditation Music - {titulo_en[:30]}"
-    titulo_3h = limpiar_texto(titulo_3h)
+    titulo_3h, desc_3h, tags_3h = generar_guion(tema_3h, 'en')
+    titulo_3h = f"3 Hours {limpiar_texto(titulo_3h)}"[:65]
     print(f"\n[VIDEO 3H] {titulo_3h}")
     video_3h = montar_video(titulo_3h, duracion=10800)
     if video_3h:
-        vid_id, url = subir_youtube(video_3h, titulo_3h, desc_en, tags_en, duracion_min=180, variante=3)
+        vid_id, url = subir_youtube(video_3h, titulo_3h, desc_3h, tags_3h, duracion_min=180, variante=3)
         resultados.append({'tipo': 'VIDEO 3H', 'titulo': titulo_3h, 'url': url})
         telegram(f"✅ <b>Video 3H subido</b>\n🎬 {titulo_3h}\n🔗 {url}")
 
+    # Short espanol
     tema_short_es = random.choice(TEMAS_SHORTS_ES)
     print(f"\n[SHORT ES] {tema_short_es}")
     short_es = montar_video(tema_short_es, es_short=True)
@@ -451,6 +495,7 @@ try:
         resultados.append({'tipo': 'SHORT ES', 'titulo': tema_short_es, 'url': url})
         telegram(f"✅ <b>Short ES subido</b>\n🎬 {tema_short_es}\n🔗 {url}")
 
+    # Short ingles
     tema_short_en = random.choice(TEMAS_SHORTS_EN)
     print(f"\n[SHORT EN] {tema_short_en}")
     short_en = montar_video(tema_short_en, es_short=True)
