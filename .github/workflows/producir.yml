@@ -1,0 +1,36 @@
+name: SpiritualWave Auto Producer
+
+on:
+  schedule:
+    - cron: '0 14 * * *'
+    - cron: '0 18 * * *'
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  producir-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
+        pip install requests gtts google-api-python-client google-auth-oauthlib Pillow
+
+    - name: Generar y subir video
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python scripts/pipeline_cloud.py
