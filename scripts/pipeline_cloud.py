@@ -432,6 +432,17 @@ try:
         resultados.append({'tipo': 'VIDEO EN', 'titulo': titulo_en, 'url': url})
         telegram(f"✅ <b>Video EN subido</b>\n🎬 {titulo_en}\n🔗 {url}")
 
+    # Video 3 horas para maximizar watch time
+    tema_3h = random.choice(TEMAS_EN)
+    titulo_3h = f"3 Hours Ganesha Meditation Music - {titulo_en[:30]}"
+    titulo_3h = limpiar_texto(titulo_3h)
+    print(f"\n[VIDEO 3H] {titulo_3h}")
+    video_3h = montar_video(titulo_3h, duracion=10800)
+    if video_3h:
+        vid_id, url = subir_youtube(video_3h, titulo_3h, desc_en, tags_en, duracion_min=180, variante=3)
+        resultados.append({'tipo': 'VIDEO 3H', 'titulo': titulo_3h, 'url': url})
+        telegram(f"✅ <b>Video 3H subido</b>\n🎬 {titulo_3h}\n🔗 {url}")
+
     tema_short_es = random.choice(TEMAS_SHORTS_ES)
     print(f"\n[SHORT ES] {tema_short_es}")
     short_es = montar_video(tema_short_es, es_short=True)
