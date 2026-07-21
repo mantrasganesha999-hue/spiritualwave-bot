@@ -2,7 +2,7 @@ import requests, subprocess, os, random, base64, pickle, io, json
 from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 GROQ_KEY = os.environ.get('GROQ_API_KEY')
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
@@ -214,7 +214,7 @@ TAGS: [30 hashtags separated by spaces]"""
     return titulo, descripcion, tags
 
 def generar_thumbnail(titulo, variante=1):
-    print(f"Generando thumbnail HD variante {variante}...")
+    print(f"Generando thumbnail profesional variante {variante}...")
     try:
         imagenes = get_imagenes()
         if not imagenes:
@@ -223,43 +223,73 @@ def generar_thumbnail(titulo, variante=1):
         img_path = imagenes[variante % len(imagenes)]
         img = Image.open(img_path).resize((1920, 1080)).convert('RGB')
 
+        # Aumentar saturacion y brillo para imagen mas vibrante
+        enhancer = ImageEnhance.Color(img)
+        img = enhancer.enhance(1.3)
+        enhancer = ImageEnhance.Contrast(img)
+        img = enhancer.enhance(1.1)
+
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
-        d.rectangle([(0, img.height-300), (img.width, img.height)], fill=(0, 0, 0, 210))
-        d.rectangle([(0, 0), (img.width, 110)], fill=(0, 0, 0, 180))
-        d.rectangle([(0, 0), (img.width-1, img.height-1)], outline=(201, 168, 76), width=12)
-        img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
 
+        # Gradiente oscuro en parte inferior
+        for i in range(350):
+            alpha = int(220 * (i / 350))
+            d.rectangle(
+                [(0, img.height - 350 + i), (img.width, img.height - 349 + i)],
+                fill=(0, 0, 0, alpha)
+            )
+
+        # Franja oscura superior
+        d.rectangle([(0, 0), (img.width, 120)], fill=(0, 0, 0, 185))
+
+        # Borde dorado brillante grueso
+        for thickness in range(8):
+            color_val = max(150, 201 - thickness * 10)
+            d.rectangle(
+                [(thickness, thickness), (img.width-1-thickness, img.height-1-thickness)],
+                outline=(color_val, int(color_val * 0.83), int(color_val * 0.37)),
+                width=1
+            )
+
+        img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(img)
 
         try:
-            font_grande = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 72)
-            font_medio = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 42)
-            font_pequeno = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
+            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 88)
+            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 44)
+            font_sub = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 30)
         except:
-            font_grande = ImageFont.load_default()
-            font_medio = ImageFont.load_default()
-            font_pequeno = ImageFont.load_default()
+            font_titulo = ImageFont.load_default()
+            font_canal = ImageFont.load_default()
+            font_sub = ImageFont.load_default()
 
+        # Nombre canal arriba centrado en dorado brillante
         canal = 'SpiritualWave'
-        bbox = draw.textbbox((0, 0), canal, font=font_medio)
+        bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
-        draw.text(((img.width-w)//2+4, 34), canal, fill=(100, 80, 0), font=font_medio)
-        draw.text(((img.width-w)//2, 30), canal, fill=(255, 215, 0), font=font_medio)
+        cx = (img.width - w) // 2
+        # Sombra dorada oscura
+        draw.text((cx+5, 35), canal, fill=(80, 60, 0), font=font_canal)
+        draw.text((cx+3, 33), canal, fill=(120, 90, 0), font=font_canal)
+        # Texto dorado brillante
+        draw.text((cx, 30), canal, fill=(255, 220, 50), font=font_canal)
 
+        # Subtitulo
         sub = 'Mantras & Frecuencias Divinas'
-        bbox = draw.textbbox((0, 0), sub, font=font_pequeno)
+        bbox = draw.textbbox((0, 0), sub, font=font_sub)
         w = bbox[2] - bbox[0]
-        draw.text(((img.width-w)//2, 80), sub, fill=(220, 195, 120), font=font_pequeno)
+        draw.text(((img.width-w)//2, 85), sub, fill=(230, 200, 130), font=font_sub)
 
-        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:50]
+        # Titulo principal — dividir en lineas
+        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:55]
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
         for p in palabras:
             test = linea + " " + p if linea else p
-            bbox_test = draw.textbbox((0, 0), test, font=font_grande)
-            if bbox_test[2] - bbox_test[0] < img.width - 80:
+            bbox_test = draw.textbbox((0, 0), test, font=font_titulo)
+            if bbox_test[2] - bbox_test[0] < img.width - 60:
                 linea = test
             else:
                 if linea:
@@ -269,22 +299,26 @@ def generar_thumbnail(titulo, variante=1):
             lineas.append(linea)
 
         total_lines = min(len(lineas), 3)
-        line_height = 90
+        line_height = 100
         total_height = total_lines * line_height
-        y = img.height - 280 + (280 - total_height) // 2
+        y_start = img.height - 330 + (330 - total_height) // 2
 
         for linea in lineas[:3]:
-            bbox = draw.textbbox((0, 0), linea, font=font_grande)
+            bbox = draw.textbbox((0, 0), linea, font=font_titulo)
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
-            for dx, dy in [(-3,3),(3,3),(3,-3),(-3,-3),(0,4),(4,0),(0,-4),(-4,0)]:
-                draw.text((x+dx, y+dy), linea, fill=(0, 0, 0), font=font_grande)
-            draw.text((x, y), linea, fill=(255, 255, 255), font=font_grande)
-            y += line_height
+
+            # Sombra multiple para efecto glow negro
+            for dx, dy in [(-4,4),(4,4),(4,-4),(-4,-4),(0,5),(5,0),(0,-5),(-5,0),(-3,3),(3,3),(3,-3),(-3,-3)]:
+                draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
+
+            # Texto blanco puro brillante
+            draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
+            y_start += line_height
 
         path = f'/tmp/thumbnail_{variante}.jpg'
         img.save(path, 'JPEG', quality=98)
-        print(f"  Thumbnail HD OK")
+        print(f"  Thumbnail profesional OK")
         return path
     except Exception as e:
         print(f"  Thumbnail error: {e}")
@@ -318,18 +352,14 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
     if es_short:
         filtro = (
-            "split=2[blur][img];"
-            "[blur]scale=1080:1920:force_original_aspect_ratio=increase,"
+            "scale=1080:1920:force_original_aspect_ratio=increase,"
             "crop=1080:1920,"
-            "boxblur=20:20[bg];"
-            "[img]scale=1080:-1[fg];"
-            "[bg][fg]overlay=(W-w)/2:(H-h)/2,"
             "format=yuv420p,"
-            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=42:"
-            "x=(w-text_w)/2:y=h-160:"
-            "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
-            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=30:"
-            "x=(w-text_w)/2:y=80:shadowcolor=black:shadowx=2:shadowy=2"
+            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=44:"
+            "x=(w-text_w)/2:y=h-150:"
+            "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
+            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=32:"
+            "x=(w-text_w)/2:y=70:shadowcolor=black:shadowx=3:shadowy=3"
         )
         t = '58'
     else:
@@ -408,7 +438,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                     videoId=video_id,
                     media_body=MediaFileUpload(thumb, mimetype='image/jpeg')
                 ).execute()
-                print("  Thumbnail HD OK")
+                print("  Thumbnail OK")
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
 
@@ -455,7 +485,6 @@ resultados = []
 telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando 5 videos HD...")
 
 try:
-    # Video 1h espanol
     tema_es = random.choice(TEMAS_ES)
     print(f"\n[VIDEO ES 1H] {tema_es}")
     titulo_es, desc_es, tags_es = generar_guion(tema_es, 'es')
@@ -465,7 +494,6 @@ try:
         resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
         telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
 
-    # Video 1h ingles
     tema_en = random.choice(TEMAS_EN)
     print(f"\n[VIDEO EN 1H] {tema_en}")
     titulo_en, desc_en, tags_en = generar_guion(tema_en, 'en')
@@ -475,7 +503,6 @@ try:
         resultados.append({'tipo': 'VIDEO EN 1H', 'titulo': titulo_en, 'url': url})
         telegram(f"✅ <b>Video EN 1H subido</b>\n🎬 {titulo_en}\n🔗 {url}")
 
-    # Video 3h ingles para watch time
     tema_3h = random.choice(TEMAS_EN)
     titulo_3h, desc_3h, tags_3h = generar_guion(tema_3h, 'en')
     titulo_3h = f"3 Hours {limpiar_texto(titulo_3h)}"[:65]
@@ -486,7 +513,6 @@ try:
         resultados.append({'tipo': 'VIDEO 3H', 'titulo': titulo_3h, 'url': url})
         telegram(f"✅ <b>Video 3H subido</b>\n🎬 {titulo_3h}\n🔗 {url}")
 
-    # Short espanol
     tema_short_es = random.choice(TEMAS_SHORTS_ES)
     print(f"\n[SHORT ES] {tema_short_es}")
     short_es = montar_video(tema_short_es, es_short=True)
@@ -495,7 +521,6 @@ try:
         resultados.append({'tipo': 'SHORT ES', 'titulo': tema_short_es, 'url': url})
         telegram(f"✅ <b>Short ES subido</b>\n🎬 {tema_short_es}\n🔗 {url}")
 
-    # Short ingles
     tema_short_en = random.choice(TEMAS_SHORTS_EN)
     print(f"\n[SHORT EN] {tema_short_en}")
     short_en = montar_video(tema_short_en, es_short=True)
