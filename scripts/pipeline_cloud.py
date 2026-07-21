@@ -41,6 +41,14 @@ TEMAS_ES = [
     "musica de sanacion cuantica para equilibrar los chakras",
     "ganesha mantra para proteger el hogar y atraer armonia familiar",
     "frecuencias del universo para conectar con tu proposito de vida",
+    "mantra de Ganesha para emprendedores que buscan su primer cliente",
+    "mantra de Ganesha para estudiantes antes de un examen importante",
+    "mantra de Ganesha para madres solteras que buscan estabilidad",
+    "mantra de Ganesha para quienes buscan trabajo urgente",
+    "mantra de Ganesha para sanar deudas y salir de crisis financiera",
+    "mantra de Ganesha para artistas y creativos que buscan inspiracion",
+    "mantra de Ganesha para quienes empiezan un negocio nuevo",
+    "mantra de Ganesha para parejas que buscan reconciliacion",
 ]
 
 TEMAS_EN = [
@@ -74,6 +82,14 @@ TEMAS_EN = [
     "285hz cellular healing Ganesha frequency tissue regeneration",
     "Ganesha divine music for yoga and deep meditation practice",
     "Solfeggio frequencies complete set Ganesha healing music",
+    "Ganesha mantra for entrepreneurs seeking their first client",
+    "Ganesha mantra for students before an important exam",
+    "Ganesha mantra for single mothers seeking stability",
+    "Ganesha mantra for urgent job search success",
+    "Ganesha mantra to heal debt and financial crisis",
+    "Ganesha mantra for artists and creatives seeking inspiration",
+    "Ganesha mantra for those starting a new business",
+    "Ganesha mantra for couples seeking reconciliation",
 ]
 
 TEMAS_SHORTS_ES = [
