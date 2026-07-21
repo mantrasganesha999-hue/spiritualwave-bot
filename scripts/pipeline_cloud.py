@@ -77,44 +77,49 @@ TEMAS_EN = [
 ]
 
 TEMAS_SHORTS_ES = [
-    "Ganesha mantra para abundancia instantanea",
-    "528hz frecuencia milagro activa ahora",
-    "Om Gan Ganapataye Namaha poder infinito",
-    "Mantra Ganesha elimina obstaculos hoy",
-    "Activa tu abundancia con Ganesha ahora",
-    "Ganesha te protege y bendice hoy",
-    "Mantra sagrado para atraer dinero rapido",
-    "Ganesha elimina toda energia negativa ahora",
-    "Mantra de prosperidad Om Ganesha 528hz",
-    "Frecuencia 432hz activa tu prosperidad ahora",
-    "Ganesha te abre los caminos hacia el exito",
-    "Escucha este mantra y cambia tu vida hoy",
-    "528hz la frecuencia del milagro y la abundancia",
-    "Ganesha blessing activa en 60 segundos",
-    "Mantra de Ganesha para el dinero en 1 minuto",
-    "La frecuencia que atrae abundancia mientras duermes",
-    "Om Ganesha activa tu suerte ahora mismo",
-    "Elimina bloqueos con este mantra de 60 segundos",
-    "Ganesha abre puertas imposibles con este mantra",
-    "528hz sana tu cuerpo y atrae prosperidad hoy",
+    "Por que Ganesha elimina obstaculos al instante",
+    "Que pasa si repites este mantra 21 veces",
+    "Como atraer dinero en 60 segundos con Ganesha",
+    "El error que comete el 90 porciento al pedir abundancia",
+    "Por que 528hz cambia tu cerebro en un minuto",
+    "Que significa realmente Om Gan Ganapataye Namaha",
+    "Como saber si Ganesha ya escucho tu peticion",
+    "El mantra que los ricos repiten cada manana",
+    "Por que debes escuchar esto antes de dormir",
+    "Como eliminar la mala suerte en 60 segundos",
+    "Que frecuencia usar cuando todo sale mal",
+    "El secreto de Ganesha que nadie te conto",
+    "Como manifestar dinero mientras duermes",
+    "Por que este mantra abre puertas cerradas",
+    "Que hacer cuando sientes bloqueada tu abundancia",
+    "Como activar tu suerte con este audio",
+    "El ritual de 60 segundos para atraer prosperidad",
+    "Por que Ganesha es el dios mas poderoso para el dinero",
+    "Que pasa si escuchas 528hz siete dias seguidos",
+    "Como limpiar tu energia en un minuto",
 ]
 
 TEMAS_SHORTS_EN = [
-    "Ganesha abundance mantra 528hz miracle",
-    "Remove obstacles Ganesha powerful chant now",
-    "Divine Ganesha frequency activate abundance",
-    "Om Gan Ganapataye Namaha infinite power",
-    "Ganesha blessing money prosperity now",
-    "528hz Ganesha miracle frequency activate",
-    "Ganesha opens your path to success today",
-    "Listen to this mantra and change your life",
-    "432hz activate your prosperity right now",
-    "Ganesha protection shield activate now",
-    "60 seconds Ganesha mantra for instant luck",
-    "528hz the frequency that attracts abundance",
-    "Ganesha removes your blocks in 60 seconds",
-    "This mantra opens impossible doors now",
-    "Heal your body attract money 528hz now",
+    "Why Ganesha removes obstacles instantly",
+    "What happens if you repeat this mantra 21 times",
+    "How to attract money in 60 seconds with Ganesha",
+    "The mistake 90 percent make when asking for abundance",
+    "Why 528hz changes your brain in one minute",
+    "What Om Gan Ganapataye Namaha really means",
+    "How to know if Ganesha already heard your request",
+    "The mantra rich people repeat every morning",
+    "Why you should listen to this before sleeping",
+    "How to remove bad luck in 60 seconds",
+    "What frequency to use when everything goes wrong",
+    "The Ganesha secret nobody told you",
+    "How to manifest money while you sleep",
+    "Why this mantra opens closed doors",
+    "What to do when you feel blocked from abundance",
+    "How to activate your luck with this audio",
+    "The 60 second ritual to attract prosperity",
+    "Why Ganesha is the most powerful god for money",
+    "What happens if you listen to 528hz for 7 days",
+    "How to clean your energy in one minute",
 ]
 
 EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
@@ -153,6 +158,43 @@ def get_musicas():
             todas.append(p)
             todas.append(p)
     return todas
+
+def verificar_salud():
+    print("Verificando salud del sistema...")
+    problemas = []
+
+    imagenes = get_imagenes()
+    if len(imagenes) < 10:
+        problemas.append(f"Solo {len(imagenes)} imagenes disponibles")
+
+    musicas = get_musicas()
+    if len(musicas) < 5:
+        problemas.append(f"Solo {len(musicas)} musicas disponibles")
+
+    if not GROQ_KEY:
+        problemas.append("GROQ_API_KEY no configurada")
+
+    if not YOUTUBE_TOKEN_B64:
+        problemas.append("YOUTUBE_TOKEN no configurado")
+    else:
+        try:
+            token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
+            creds = pickle.loads(token_data)
+            if creds.expired and not creds.refresh_token:
+                problemas.append("Token de YouTube expirado sin refresh disponible")
+        except Exception as e:
+            problemas.append(f"Token de YouTube corrupto: {str(e)[:50]}")
+
+    if problemas:
+        msg = "⚠️ <b>Chequeo de salud - Problemas detectados</b>\n\n"
+        for p in problemas:
+            msg += f"❌ {p}\n"
+        telegram(msg)
+        print("PROBLEMAS DETECTADOS:", problemas)
+    else:
+        print("Sistema saludable, todo OK")
+
+    return len(problemas) == 0
 
 def limpiar_texto(texto):
     if not texto:
@@ -317,6 +359,100 @@ def generar_thumbnail(titulo, variante=1):
         print(f"  Thumbnail error: {e}")
         return None
 
+def generar_thumbnail_short(titulo, variante=1):
+    print(f"Generando thumbnail SHORT variante {variante}...")
+    try:
+        imagenes = get_imagenes()
+        if not imagenes:
+            return None
+
+        img_path = imagenes[variante % len(imagenes)]
+        img = Image.open(img_path)
+        w, h = img.size
+        target_ratio = 1080/1920
+        if w/h > target_ratio:
+            new_w = int(h * target_ratio)
+            left = (w - new_w) // 2
+            img = img.crop((left, 0, left + new_w, h))
+        else:
+            new_h = int(w / target_ratio)
+            top = (h - new_h) // 2
+            img = img.crop((0, top, w, top + new_h))
+        img = img.resize((1080, 1920)).convert('RGB')
+
+        enhancer = ImageEnhance.Color(img)
+        img = enhancer.enhance(1.35)
+        enhancer = ImageEnhance.Contrast(img)
+        img = enhancer.enhance(1.15)
+
+        overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+        d = ImageDraw.Draw(overlay)
+        for i in range(500):
+            alpha = int(230 * (i / 500))
+            d.rectangle([(0, img.height - 500 + i), (img.width, img.height - 499 + i)], fill=(0, 0, 0, alpha))
+        d.rectangle([(0, 0), (img.width, 160)], fill=(0, 0, 0, 190))
+        for thickness in range(6):
+            color_val = max(150, 201 - thickness * 10)
+            d.rectangle(
+                [(thickness, thickness), (img.width-1-thickness, img.height-1-thickness)],
+                outline=(color_val, int(color_val * 0.83), int(color_val * 0.37)),
+                width=1
+            )
+        img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
+        draw = ImageDraw.Draw(img)
+
+        try:
+            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 68)
+            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 46)
+        except:
+            font_titulo = ImageFont.load_default()
+            font_canal = ImageFont.load_default()
+
+        canal = 'SpiritualWave'
+        bbox = draw.textbbox((0, 0), canal, font=font_canal)
+        w = bbox[2] - bbox[0]
+        cx = (img.width - w) // 2
+        draw.text((cx+4, 44), canal, fill=(100, 75, 0), font=font_canal)
+        draw.text((cx, 40), canal, fill=(255, 220, 50), font=font_canal)
+
+        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:60]
+        palabras = titulo_clean.split()
+        lineas = []
+        linea = ""
+        for p in palabras:
+            test = linea + " " + p if linea else p
+            bbox_test = draw.textbbox((0, 0), test, font=font_titulo)
+            if bbox_test[2] - bbox_test[0] < img.width - 60:
+                linea = test
+            else:
+                if linea:
+                    lineas.append(linea)
+                linea = p
+        if linea:
+            lineas.append(linea)
+
+        total_lines = min(len(lineas), 4)
+        line_height = 80
+        total_height = total_lines * line_height
+        y_start = img.height - 470 + (470 - total_height) // 2
+
+        for linea in lineas[:4]:
+            bbox = draw.textbbox((0, 0), linea, font=font_titulo)
+            w = bbox[2] - bbox[0]
+            x = (img.width - w) // 2
+            for dx, dy in [(-3,3),(3,3),(3,-3),(-3,-3),(0,4),(4,0),(0,-4),(-4,0)]:
+                draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
+            draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
+            y_start += line_height
+
+        path = f'/tmp/thumbnail_short_{variante}.jpg'
+        img.save(path, 'JPEG', quality=98)
+        print(f"  Thumbnail Short OK")
+        return path
+    except Exception as e:
+        print(f"  Thumbnail Short error: {e}")
+        return None
+
 def montar_video(titulo, duracion=3600, es_short=False):
     print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
     imagenes = get_imagenes()
@@ -396,6 +532,45 @@ def agregar_capitulos(descripcion, duracion_min):
     caps += f"Activa la campana para no perderte nada\n"
     return descripcion + caps
 
+def agregar_a_playlist(youtube, video_id, playlist_nombre):
+    try:
+        playlists = youtube.playlists().list(
+            part='snippet', mine=True, maxResults=50
+        ).execute()
+
+        playlist_id = None
+        for pl in playlists.get('items', []):
+            if pl['snippet']['title'] == playlist_nombre:
+                playlist_id = pl['id']
+                break
+
+        if not playlist_id:
+            resp = youtube.playlists().insert(
+                part='snippet,status',
+                body={
+                    'snippet': {
+                        'title': playlist_nombre,
+                        'description': f'Videos de {playlist_nombre} - SpiritualWave'
+                    },
+                    'status': {'privacyStatus': 'public'}
+                }
+            ).execute()
+            playlist_id = resp['id']
+            print(f"  Playlist creada: {playlist_nombre}")
+
+        youtube.playlistItems().insert(
+            part='snippet',
+            body={
+                'snippet': {
+                    'playlistId': playlist_id,
+                    'resourceId': {'kind': 'youtube#video', 'videoId': video_id}
+                }
+            }
+        ).execute()
+        print(f"  Agregado a playlist: {playlist_nombre}")
+    except Exception as e:
+        print(f"  Playlist error: {e}")
+
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1, playlist_nombre=None):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
@@ -423,7 +598,18 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"  SUBIDO: {url}")
 
-    if not es_short:
+    if es_short:
+        thumb = generar_thumbnail_short(titulo, variante)
+        if thumb:
+            try:
+                youtube.thumbnails().set(
+                    videoId=video_id,
+                    media_body=MediaFileUpload(thumb, mimetype='image/jpeg')
+                ).execute()
+                print("  Thumbnail Short OK")
+            except Exception as e:
+                print(f"  Thumbnail Short error: {e}")
+    else:
         thumb = generar_thumbnail(titulo, variante)
         if thumb:
             try:
@@ -480,7 +666,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 
     return video_id, url
 
-def montar_video_directo(titulo, duracion=6300):
+def montar_video_directo(titulo, duracion=6000):
     print(f"Montando video para directo {duracion//60}min...")
     imagenes = get_imagenes()
     musicas = get_musicas()
@@ -527,44 +713,6 @@ def montar_video_directo(titulo, duracion=6300):
         return salida
     print(f"  Error: {result.stderr[-300:]}")
     return None
-def agregar_a_playlist(youtube, video_id, playlist_nombre):
-    try:
-        playlists = youtube.playlists().list(
-            part='snippet', mine=True, maxResults=50
-        ).execute()
-
-        playlist_id = None
-        for pl in playlists.get('items', []):
-            if pl['snippet']['title'] == playlist_nombre:
-                playlist_id = pl['id']
-                break
-
-        if not playlist_id:
-            resp = youtube.playlists().insert(
-                part='snippet,status',
-                body={
-                    'snippet': {
-                        'title': playlist_nombre,
-                        'description': f'Videos de {playlist_nombre} - SpiritualWave'
-                    },
-                    'status': {'privacyStatus': 'public'}
-                }
-            ).execute()
-            playlist_id = resp['id']
-            print(f"  Playlist creada: {playlist_nombre}")
-
-        youtube.playlistItems().insert(
-            part='snippet',
-            body={
-                'snippet': {
-                    'playlistId': playlist_id,
-                    'resourceId': {'kind': 'youtube#video', 'videoId': video_id}
-                }
-            }
-        ).execute()
-        print(f"  Agregado a playlist: {playlist_nombre}")
-    except Exception as e:
-        print(f"  Playlist error: {e}")
 
 def crear_directo_youtube(titulo, descripcion, video_path):
     print("Creando transmision en vivo...")
@@ -615,8 +763,8 @@ def crear_directo_youtube(titulo, descripcion, video_path):
             '-pix_fmt', 'yuv420p', '-g', '60', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100',
             '-f', 'flv', f'{rtmp_url}/{stream_key}'
         ]
-        print("  Iniciando stream RTMP (esto tomara el tiempo del video)...")
-        subprocess.run(cmd, timeout=6200)
+        print("  Iniciando stream RTMP...")
+        subprocess.run(cmd, timeout=6100)
 
         print("  Stream finalizado")
         return broadcast_id
@@ -629,6 +777,8 @@ print("\n=== SPIRITUALWAVE AUTO PRODUCER HD ===")
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 resultados = []
 
+verificar_salud()
+
 telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido + directo...")
 
 try:
@@ -640,29 +790,40 @@ try:
         vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1, playlist_nombre="Mantras de Ganesha")
         resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
         telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en video ES: {str(e)[:150]}")
+    print(f"Error video ES: {e}")
 
+try:
     tema_short_es = random.choice(TEMAS_SHORTS_ES)
     print(f"\n[SHORT ES] {tema_short_es}")
     short_es = montar_video(tema_short_es, es_short=True)
     if short_es:
-        vid_id, url = subir_youtube(short_es, tema_short_es, f"🙏 {tema_short_es}\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz", "#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz #SpiritualWave", es_short=True)
+        vid_id, url = subir_youtube(short_es, tema_short_es, f"🙏 {tema_short_es}\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz", "#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz #SpiritualWave", es_short=True, variante=2)
         resultados.append({'tipo': 'SHORT ES', 'titulo': tema_short_es, 'url': url})
         telegram(f"✅ <b>Short ES subido</b>\n🎬 {tema_short_es}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en Short ES: {str(e)[:150]}")
+    print(f"Error Short ES: {e}")
 
+try:
     tema_short_en = random.choice(TEMAS_SHORTS_EN)
     print(f"\n[SHORT EN] {tema_short_en}")
     short_en = montar_video(tema_short_en, es_short=True)
     if short_en:
-        vid_id, url = subir_youtube(short_en, tema_short_en, f"🙏 {tema_short_en}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz", "#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz #SpiritualWave", es_short=True)
+        vid_id, url = subir_youtube(short_en, tema_short_en, f"🙏 {tema_short_en}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz", "#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz #SpiritualWave", es_short=True, variante=3)
         resultados.append({'tipo': 'SHORT EN', 'titulo': tema_short_en, 'url': url})
         telegram(f"✅ <b>Short EN subido</b>\n🎬 {tema_short_en}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en Short EN: {str(e)[:150]}")
+    print(f"Error Short EN: {e}")
 
-    resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
-    for r in resultados:
-        resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
-    telegram(resumen)
+resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
+for r in resultados:
+    resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
+telegram(resumen)
 
-    # Transmision en vivo (usa el tiempo restante del job)
+try:
     titulo_live = "🔱 Ganesha 528Hz Live - Musica Espiritual - SpiritualWave"
     desc_live = "Transmision en vivo de musica espiritual con mantras de Ganesha y frecuencias 528hz.\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Ganesha #Live #528hz #Meditacion"
 
@@ -673,9 +834,11 @@ try:
         if broadcast_id:
             telegram(f"🔴 <b>Directo finalizado</b>\n🔗 https://www.youtube.com/watch?v={broadcast_id}")
         else:
-            telegram("⚠️ Error creando el directo")
-
+            telegram("⚠️ El directo fallo pero los videos ya se subieron correctamente")
+    else:
+        telegram("⚠️ No se pudo generar el video para el directo")
 except Exception as e:
-    telegram(f"❌ <b>ERROR</b>\n📅 {fecha}\n⚠️ {str(e)[:200]}")
-    print(f"ERROR: {e}")
-    raise
+    telegram(f"⚠️ <b>Error en el directo (no afecta videos ya subidos)</b>\n{str(e)[:200]}")
+    print(f"Error directo: {e}")
+
+print("\n=== PROCESO FINALIZADO ===")
