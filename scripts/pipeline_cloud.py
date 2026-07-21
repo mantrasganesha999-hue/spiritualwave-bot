@@ -2,7 +2,7 @@ import requests, subprocess, os, random, base64, pickle, io, json
 from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 GROQ_KEY = os.environ.get('GROQ_API_KEY')
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
@@ -119,6 +119,8 @@ TEMAS_SHORTS_EN = [
 
 EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
 
+VIDEOS_SUBIDOS_HOY = []
+
 def telegram(mensaje):
     try:
         requests.post(
@@ -223,7 +225,6 @@ def generar_thumbnail(titulo, variante=1):
         img_path = imagenes[variante % len(imagenes)]
         img = Image.open(img_path).resize((1920, 1080)).convert('RGB')
 
-        # Aumentar saturacion y brillo para imagen mas vibrante
         enhancer = ImageEnhance.Color(img)
         img = enhancer.enhance(1.3)
         enhancer = ImageEnhance.Contrast(img)
@@ -232,7 +233,6 @@ def generar_thumbnail(titulo, variante=1):
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
 
-        # Gradiente oscuro en parte inferior
         for i in range(350):
             alpha = int(220 * (i / 350))
             d.rectangle(
@@ -240,10 +240,8 @@ def generar_thumbnail(titulo, variante=1):
                 fill=(0, 0, 0, alpha)
             )
 
-        # Franja oscura superior
         d.rectangle([(0, 0), (img.width, 120)], fill=(0, 0, 0, 185))
 
-        # Borde dorado brillante grueso
         for thickness in range(8):
             color_val = max(150, 201 - thickness * 10)
             d.rectangle(
@@ -264,24 +262,19 @@ def generar_thumbnail(titulo, variante=1):
             font_canal = ImageFont.load_default()
             font_sub = ImageFont.load_default()
 
-        # Nombre canal arriba centrado en dorado brillante
         canal = 'SpiritualWave'
         bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
         cx = (img.width - w) // 2
-        # Sombra dorada oscura
         draw.text((cx+5, 35), canal, fill=(80, 60, 0), font=font_canal)
         draw.text((cx+3, 33), canal, fill=(120, 90, 0), font=font_canal)
-        # Texto dorado brillante
         draw.text((cx, 30), canal, fill=(255, 220, 50), font=font_canal)
 
-        # Subtitulo
         sub = 'Mantras & Frecuencias Divinas'
         bbox = draw.textbbox((0, 0), sub, font=font_sub)
         w = bbox[2] - bbox[0]
         draw.text(((img.width-w)//2, 85), sub, fill=(230, 200, 130), font=font_sub)
 
-        # Titulo principal — dividir en lineas
         titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:55]
         palabras = titulo_clean.split()
         lineas = []
@@ -308,11 +301,9 @@ def generar_thumbnail(titulo, variante=1):
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
 
-            # Sombra multiple para efecto glow negro
             for dx, dy in [(-4,4),(4,4),(4,-4),(-4,-4),(0,5),(5,0),(0,-5),(-5,0),(-3,3),(3,3),(3,-3),(-3,-3)]:
                 draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
 
-            # Texto blanco puro brillante
             draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
             y_start += line_height
 
@@ -403,6 +394,23 @@ def agregar_capitulos(descripcion, duracion_min):
     caps += f"Activa la campana para no perderte nada\n"
     return descripcion + caps
 
+def agregar_card(youtube, video_id, video_relacionado_id):
+    try:
+        if not video_relacionado_id:
+            return
+        youtube.videos().update(
+            part='snippet',
+            body={
+                'id': video_id,
+                'snippet': {
+                    'categoryId': '22',
+                }
+            }
+        ).execute()
+        print("  Card procesada")
+    except Exception as e:
+        print(f"  Card error: {e}")
+
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
@@ -474,6 +482,26 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             print("  End screen OK")
         except Exception as e:
             print(f"  End screen error: {e}")
+
+        # Agregar card apuntando a video anterior del dia
+        if VIDEOS_SUBIDOS_HOY:
+            try:
+                video_anterior = VIDEOS_SUBIDOS_HOY[-1]
+                youtube.cards().insert(
+                    videoId=video_id,
+                    body={
+                        "card": {
+                            "videoIdCard": {
+                                "videoId": video_anterior
+                            }
+                        }
+                    }
+                ).execute()
+                print("  Card OK")
+            except Exception as e:
+                print(f"  Card error: {e}")
+
+        VIDEOS_SUBIDOS_HOY.append(video_id)
 
     return video_id, url
 
