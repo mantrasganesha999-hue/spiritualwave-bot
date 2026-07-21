@@ -1,0 +1,34 @@
+name: SpiritualWave Sleep Music
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  producir-sleep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
+        pip install requests google-api-python-client google-auth-oauthlib Pillow
+
+    - name: Generar video sleep 8 horas
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python scripts/pipeline_sleep.py
