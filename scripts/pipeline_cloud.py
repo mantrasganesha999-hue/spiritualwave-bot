@@ -912,7 +912,6 @@ except Exception as e:
     print(f"Error PT: {e}")
 
 try:
-    try:
     festival = detectar_festival_hindu()
     if festival:
         tema_hi = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026"
