@@ -137,6 +137,29 @@ TEMAS_SHORTS_EN = [
     "What happens if you listen to 528hz for 7 days",
     "How to clean your energy in one minute",
 ]
+DIAS_SERIE_21 = [
+    "Dia 1: Reconoce que mereces la abundancia que pides",
+    "Dia 2: Repite el mantra Om Gan Ganapataye con fe total",
+    "Dia 3: Visualiza a Ganesha eliminando tus obstaculos",
+    "Dia 4: Agradece por lo que ya tienes en tu vida",
+    "Dia 5: Suelta el control y confia en el proceso divino",
+    "Dia 6: Escribe tres deseos que quieres manifestar",
+    "Dia 7: Medita en silencio 10 minutos con Ganesha",
+    "Dia 8: Perdona a quien te ha hecho dano",
+    "Dia 9: Actua como si ya tuvieras lo que deseas",
+    "Dia 10: Comparte tu abundancia con alguien mas",
+    "Dia 11: Elimina un pensamiento negativo hoy",
+    "Dia 12: Conecta con la naturaleza y su energia",
+    "Dia 13: Repite afirmaciones de merecimiento",
+    "Dia 14: Celebra tus pequenos logros de este mes",
+    "Dia 15: Pide ayuda a Ganesha para tu proposito",
+    "Dia 16: Libera el miedo al fracaso definitivamente",
+    "Dia 17: Confia en tu intuicion y sigue tu camino",
+    "Dia 18: Bendice tu dinero y tus finanzas",
+    "Dia 19: Rodeate de energia positiva y personas afines",
+    "Dia 20: Prepara tu mente para recibir milagros",
+    "Dia 21: Celebra tu transformacion y nueva abundancia",
+]
 
 EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
 
@@ -803,7 +826,20 @@ resultados = []
 verificar_salud()
 
 telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido + directo...")
+def obtener_dia_serie():
+    archivo_estado = os.path.join(BASE, 'serie_dia.txt')
+    try:
+        with open(archivo_estado, 'r') as f:
+            dia_actual = int(f.read().strip())
+    except:
+        dia_actual = 0
 
+    dia_actual = (dia_actual % 21) + 1
+
+    with open(archivo_estado, 'w') as f:
+        f.write(str(dia_actual))
+
+    return dia_actual
 try:
     tema_es = random.choice(TEMAS_ES)
     print(f"\n[VIDEO ES 1H] {tema_es}")
@@ -841,6 +877,40 @@ except Exception as e:
     telegram(f"⚠️ Error en Short EN: {str(e)[:150]}")
     print(f"Error Short EN: {e}")
 
+try:
+    dia_serie = obtener_dia_serie()
+    tema_serie = DIAS_SERIE_21[dia_serie - 1]
+    titulo_serie = f"21 Dias con Ganesha - Dia {dia_serie}/21"
+    print(f"\n[SERIE 21 DIAS] {titulo_serie}")
+
+    prompt_serie = f"""Eres experto en contenido espiritual de YouTube.
+Este es el Dia {dia_serie} de una serie de 21 dias de manifestacion con Ganesha.
+El tema de hoy es: {tema_serie}
+Sin tildes ni caracteres especiales ni asteriscos.
+Genera una descripcion motivadora de 300 palabras sobre esta practica diaria, mencionando que es parte de la serie de 21 dias, invitando a suscribirse para no perderse los proximos dias.
+Responde EXACTAMENTE:
+DESCRIPCION: [descripcion de 300 palabras]
+TAGS: [20 hashtags separados por espacios]"""
+
+    r_serie = requests.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_serie}], 'max_tokens': 1200}
+    )
+    contenido_serie = r_serie.json()['choices'][0]['message']['content']
+    desc_serie = extraer_campo(contenido_serie, 'DESCRIPCION', 'TAGS') or tema_serie
+    desc_serie = limpiar_texto(desc_serie)
+    tags_serie = extraer_campo(contenido_serie, 'TAGS') or "#Ganesha #21Dias #Manifestacion #SpiritualWave"
+    tags_serie = limpiar_texto(tags_serie)
+
+    video_serie = montar_video(titulo_serie, duracion=1800)
+    if video_serie:
+        vid_id, url = subir_youtube(video_serie, titulo_serie, desc_serie, tags_serie, duracion_min=30, variante=4, playlist_nombre="21 Dias con Ganesha")
+        resultados.append({'tipo': 'SERIE 21D', 'titulo': titulo_serie, 'url': url})
+        telegram(f"✅ <b>Serie 21 Dias subido</b>\n🎬 {titulo_serie}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en serie 21 dias: {str(e)[:150]}")
+    print(f"Error serie: {e}")
 resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
 for r in resultados:
     resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"

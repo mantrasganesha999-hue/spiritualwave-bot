@@ -1,0 +1,31 @@
+name: SpiritualWave Dashboard Semanal
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'
+  workflow_dispatch:
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias
+      run: |
+        pip install requests google-api-python-client google-auth-oauthlib
+
+    - name: Generar dashboard
+      env:
+        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python scripts/dashboard_semanal.py
