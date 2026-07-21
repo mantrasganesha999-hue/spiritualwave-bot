@@ -639,6 +639,38 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         if playlist_nombre:
             agregar_a_playlist(youtube, video_id, playlist_nombre)
 
+        try:
+            comentarios_es = [
+                "Que manifestaste hoy? Cuentame en los comentarios 🙏",
+                "Cual fue tu experiencia con este mantra? Comparte abajo ✨",
+                "Etiqueta a alguien que necesita escuchar esto hoy 🔱",
+            ]
+            comentarios_en = [
+                "What did you manifest today? Tell me in the comments 🙏",
+                "What was your experience with this mantra? Share below ✨",
+                "Tag someone who needs to hear this today 🔱",
+            ]
+            comentario = random.choice(comentarios_en if not any(c in titulo for c in 'áéíóúñ') and 'Ganesha' in titulo and 'mantra' not in titulo.lower() else comentarios_es)
+            comment_response = youtube.commentThreads().insert(
+                part="snippet",
+                body={
+                    "snippet": {
+                        "videoId": video_id,
+                        "topLevelComment": {
+                            "snippet": {"textOriginal": comentario}
+                        }
+                    }
+                }
+            ).execute()
+            comment_id = comment_response['id']
+            youtube.comments().setModerationStatus(
+                id=comment_id,
+                moderationStatus="published"
+            ).execute()
+            print("  Comentario publicado")
+        except Exception as e:
+            print(f"  Comentario error: {e}")
+
     return video_id, url
 
 def montar_video_directo(titulo, duracion=6000):
