@@ -1,10 +1,12 @@
-import requests, base64, pickle, os
+import requests, base64, pickle, os, json
 from datetime import datetime, timedelta
 from googleapiclient.discovery import build
 
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HISTORIAL_PATH = os.path.join(BASE, 'historial_dashboard.json')
 
 def telegram(msg):
     try:
@@ -25,10 +27,7 @@ def get_youtube_service():
 
 def obtener_estadisticas_canal(youtube):
     try:
-        response = youtube.channels().list(
-            part='statistics,snippet',
-            mine=True
-        ).execute()
+        response = youtube.channels().list(part='statistics,snippet', mine=True).execute()
         canal = response['items'][0]
         stats = canal['statistics']
         return {
@@ -44,28 +43,18 @@ def obtener_analytics_semana(analytics):
     try:
         fin = datetime.now().strftime('%Y-%m-%d')
         inicio = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-
         response = analytics.reports().query(
-            ids='channel==MINE',
-            startDate=inicio,
-            endDate=fin,
+            ids='channel==MINE', startDate=inicio, endDate=fin,
             metrics='views,estimatedMinutesWatched,subscribersGained,likes,comments',
             dimensions='day'
         ).execute()
-
         rows = response.get('rows', [])
-        total_vistas = sum(row[1] for row in rows) if rows else 0
-        total_minutos = sum(row[2] for row in rows) if rows else 0
-        total_subs_ganados = sum(row[3] for row in rows) if rows else 0
-        total_likes = sum(row[4] for row in rows) if rows else 0
-        total_comentarios = sum(row[5] for row in rows) if rows else 0
-
         return {
-            'vistas_semana': total_vistas,
-            'horas_semana': round(total_minutos / 60, 1),
-            'subs_ganados': total_subs_ganados,
-            'likes': total_likes,
-            'comentarios': total_comentarios
+            'vistas_semana': sum(row[1] for row in rows) if rows else 0,
+            'horas_semana': round(sum(row[2] for row in rows) / 60, 1) if rows else 0,
+            'subs_ganados': sum(row[3] for row in rows) if rows else 0,
+            'likes': sum(row[4] for row in rows) if rows else 0,
+            'comentarios': sum(row[5] for row in rows) if rows else 0
         }
     except Exception as e:
         print(f"Error analytics: {e}")
@@ -75,17 +64,10 @@ def obtener_top_video(analytics):
     try:
         fin = datetime.now().strftime('%Y-%m-%d')
         inicio = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-
         response = analytics.reports().query(
-            ids='channel==MINE',
-            startDate=inicio,
-            endDate=fin,
-            metrics='views',
-            dimensions='video',
-            sort='-views',
-            maxResults=1
+            ids='channel==MINE', startDate=inicio, endDate=fin,
+            metrics='views', dimensions='video', sort='-views', maxResults=1
         ).execute()
-
         rows = response.get('rows', [])
         if rows:
             return rows[0][0], rows[0][1]
@@ -104,6 +86,37 @@ def obtener_titulo_video(youtube, video_id):
     except:
         return "Desconocido"
 
+def cargar_historial():
+    try:
+        with open(HISTORIAL_PATH, 'r') as f:
+            return json.load(f)
+    except:
+        return []
+
+def guardar_historial(historial):
+    try:
+        with open(HISTORIAL_PATH, 'w') as f:
+            json.dump(historial, f, indent=2)
+    except Exception as e:
+        print(f"Error guardando historial: {e}")
+
+def formatear_comparativa(actual, anterior, nombre, es_decimal=False):
+    if anterior is None:
+        return f"{actual}"
+    diff = actual - anterior
+    if diff > 0:
+        flecha = "📈"
+        signo = "+"
+    elif diff < 0:
+        flecha = "📉"
+        signo = ""
+    else:
+        flecha = "➡️"
+        signo = ""
+    if es_decimal:
+        return f"{actual} ({flecha} {signo}{diff:.1f})"
+    return f"{actual} ({flecha} {signo}{diff})"
+
 # MAIN
 print("=== DASHBOARD SEMANAL ===")
 
@@ -117,21 +130,33 @@ try:
 
     fecha = datetime.now().strftime("%Y-%m-%d")
 
+    historial = cargar_historial()
+    semana_anterior = historial[-1] if historial else None
+
     mensaje = f"📊 <b>DASHBOARD SEMANAL - SpiritualWave</b>\n📅 {fecha}\n\n"
 
     if stats_canal:
+        subs_ant = semana_anterior['subs_total'] if semana_anterior else None
+        vistas_ant = semana_anterior['vistas_totales'] if semana_anterior else None
+
         mensaje += f"🔱 <b>Canal Total</b>\n"
-        mensaje += f"👥 Suscriptores: {stats_canal['subs']}\n"
-        mensaje += f"👁 Vistas totales: {stats_canal['vistas_totales']}\n"
+        mensaje += f"👥 Suscriptores: {formatear_comparativa(stats_canal['subs'], subs_ant, 'subs')}\n"
+        mensaje += f"👁 Vistas totales: {formatear_comparativa(stats_canal['vistas_totales'], vistas_ant, 'vistas')}\n"
         mensaje += f"🎬 Videos totales: {stats_canal['videos_totales']}\n\n"
 
     if stats_semana:
-        mensaje += f"📈 <b>Esta Semana</b>\n"
-        mensaje += f"👁 Vistas: {stats_semana['vistas_semana']}\n"
-        mensaje += f"⏱ Horas vistas: {stats_semana['horas_semana']}\n"
-        mensaje += f"➕ Subs ganados: {stats_semana['subs_ganados']}\n"
-        mensaje += f"❤️ Likes: {stats_semana['likes']}\n"
-        mensaje += f"💬 Comentarios: {stats_semana['comentarios']}\n\n"
+        vistas_sem_ant = semana_anterior['vistas_semana'] if semana_anterior else None
+        horas_sem_ant = semana_anterior['horas_semana'] if semana_anterior else None
+        subs_gan_ant = semana_anterior['subs_ganados'] if semana_anterior else None
+        likes_ant = semana_anterior['likes'] if semana_anterior else None
+        comentarios_ant = semana_anterior['comentarios'] if semana_anterior else None
+
+        mensaje += f"📈 <b>Esta Semana vs Anterior</b>\n"
+        mensaje += f"👁 Vistas: {formatear_comparativa(stats_semana['vistas_semana'], vistas_sem_ant, 'vistas')}\n"
+        mensaje += f"⏱ Horas vistas: {formatear_comparativa(stats_semana['horas_semana'], horas_sem_ant, 'horas', es_decimal=True)}\n"
+        mensaje += f"➕ Subs ganados: {formatear_comparativa(stats_semana['subs_ganados'], subs_gan_ant, 'subs')}\n"
+        mensaje += f"❤️ Likes: {formatear_comparativa(stats_semana['likes'], likes_ant, 'likes')}\n"
+        mensaje += f"💬 Comentarios: {formatear_comparativa(stats_semana['comentarios'], comentarios_ant, 'comentarios')}\n\n"
 
     if top_video_id:
         mensaje += f"🏆 <b>Video mas visto esta semana</b>\n"
@@ -141,6 +166,21 @@ try:
 
     telegram(mensaje)
     print("Dashboard enviado OK")
+
+    nuevo_registro = {
+        'fecha': fecha,
+        'subs_total': stats_canal['subs'] if stats_canal else 0,
+        'vistas_totales': stats_canal['vistas_totales'] if stats_canal else 0,
+        'vistas_semana': stats_semana['vistas_semana'] if stats_semana else 0,
+        'horas_semana': stats_semana['horas_semana'] if stats_semana else 0,
+        'subs_ganados': stats_semana['subs_ganados'] if stats_semana else 0,
+        'likes': stats_semana['likes'] if stats_semana else 0,
+        'comentarios': stats_semana['comentarios'] if stats_semana else 0
+    }
+    historial.append(nuevo_registro)
+    historial = historial[-12:]
+    guardar_historial(historial)
+    print("Historial actualizado OK")
 
 except Exception as e:
     telegram(f"⚠️ Error generando dashboard semanal: {str(e)[:200]}")
