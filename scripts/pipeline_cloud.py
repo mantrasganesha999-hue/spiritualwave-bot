@@ -287,6 +287,27 @@ def obtener_dia_serie():
         f.write(str(dia_actual))
     return dia_actual
 
+def detectar_festival_hindu():
+    hoy = datetime.now()
+    mes = hoy.month
+    dia = hoy.day
+
+    festivales = {
+        (8, 15): "Ganesh Chaturthi", (8, 16): "Ganesh Chaturthi", (8, 17): "Ganesh Chaturthi",
+        (8, 18): "Ganesh Chaturthi", (8, 19): "Ganesh Chaturthi", (8, 20): "Ganesh Chaturthi",
+        (8, 21): "Ganesh Chaturthi", (8, 22): "Ganesh Chaturthi", (8, 23): "Ganesh Chaturthi",
+        (8, 24): "Ganesh Chaturthi", (8, 25): "Ganesh Chaturthi",
+        (10, 1): "Navratri", (10, 2): "Navratri", (10, 3): "Navratri", (10, 4): "Navratri",
+        (10, 5): "Navratri", (10, 6): "Navratri", (10, 7): "Navratri", (10, 8): "Navratri",
+        (10, 9): "Navratri", (10, 10): "Navratri",
+        (10, 20): "Diwali", (10, 21): "Diwali", (10, 22): "Diwali", (10, 23): "Diwali",
+        (10, 24): "Diwali", (10, 25): "Diwali", (10, 26): "Diwali", (10, 27): "Diwali",
+        (10, 28): "Diwali", (10, 29): "Diwali", (10, 30): "Diwali", (10, 31): "Diwali",
+        (11, 1): "Diwali", (11, 2): "Diwali",
+    }
+
+    return festivales.get((mes, dia), None)
+
 def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
     emoji = random.choice(EMOJIS_TITULO)
@@ -888,10 +909,18 @@ except Exception as e:
     print(f"Error PT: {e}")
 
 try:
-    tema_hi = random.choice(TEMAS_HI)
-    print(f"\n[VIDEO HI] {tema_hi}")
+    try:
+    festival = detectar_festival_hindu()
+    if festival:
+        tema_hi = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026"
+        print(f"\n[VIDEO HI - FESTIVAL: {festival}] {tema_hi}")
+    else:
+        tema_hi = random.choice(TEMAS_HI)
+        print(f"\n[VIDEO HI] {tema_hi}")
+    contexto_festival = f"IMPORTANT: Today is during {festival} celebration, make the title and description specifically celebrate this festival with festive greetings." if festival else ""
     prompt_hi = f"""You are an expert in Hindu spiritual YouTube content for Indian audience.
 Generate VIRAL content for a video about: {tema_hi}
+{contexto_festival}
 Use English but include devotional Hindi terms like Ganpati Bappa, Vighnaharta, Shubh, Mangal when natural.
 No asterisks, no markdown.
 Reply EXACTLY in this format:
