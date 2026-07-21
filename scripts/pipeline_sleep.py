@@ -20,7 +20,13 @@ TEMAS_SLEEP = [
     "8 Hours Om Mantra Ganesha Sleep Music Deep Relaxation",
     "8 Hours 528hz Miracle Tone Ganesha Sleep Music DNA Repair",
 ]
-
+TEMAS_SLEEP_INDIA = [
+    "8 Hours Ganpati Bappa Sleep Music Deep Devotional Meditation",
+    "8 Hours Vighnaharta Ganesha Chant Sleep Music Peaceful Night",
+    "8 Hours Om Gan Ganapataye Namaha Sleep Music Divine Blessing",
+    "8 Hours Ganpati Mantra Sleep Music Prosperity While You Sleep",
+    "8 Hours Shubh Ganesha Sleep Music Good Luck Devotional Chant",
+]
 def telegram(msg):
     try:
         requests.post(
@@ -245,7 +251,8 @@ fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 telegram(f"🌙 <b>Sleep Music Producer iniciado</b>\n📅 {fecha}")
 
 try:
-    titulo = random.choice(TEMAS_SLEEP)
+    todos_los_temas = TEMAS_SLEEP + TEMAS_SLEEP_INDIA
+    titulo = random.choice(todos_los_temas)
     descripcion, tags = generar_descripcion(titulo)
     video = montar_video_8h(titulo)
     if video:
@@ -254,5 +261,5 @@ try:
     else:
         telegram("❌ Error generando video de 8 horas")
 except Exception as e:
-    telegram(f"❌ <b>ERROR Sleep Music</b>\n⚠️ {str(e)[:200]}")
-    raise
+    telegram(f"⚠️ Error video sleep: {str(e)[:150]}")
+    print(f"Error sleep: {e}")
