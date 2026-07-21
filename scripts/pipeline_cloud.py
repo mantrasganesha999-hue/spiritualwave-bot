@@ -1,4 +1,4 @@
-import requests, subprocess, os, random, base64, pickle, io, json
+import requests, subprocess, os, random, base64, pickle, io, json, time
 from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -193,7 +193,7 @@ No asterisks, no markdown, no special symbols.
 Reply EXACTLY in this format:
 TITULO: {emoji} [title maximum 60 characters, with number or question]
 DESCRIPCION: [500 words with spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separated by spaces]"""
+TAGS: [30 relevant hashtags separated by spaces]"""
 
     r = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
@@ -394,23 +394,6 @@ def agregar_capitulos(descripcion, duracion_min):
     caps += f"Activa la campana para no perderte nada\n"
     return descripcion + caps
 
-def agregar_card(youtube, video_id, video_relacionado_id):
-    try:
-        if not video_relacionado_id:
-            return
-        youtube.videos().update(
-            part='snippet',
-            body={
-                'id': video_id,
-                'snippet': {
-                    'categoryId': '22',
-                }
-            }
-        ).execute()
-        print("  Card procesada")
-    except Exception as e:
-        print(f"  Card error: {e}")
-
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
@@ -459,20 +442,14 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                     "elements": [
                         {
                             "type": "VIDEO",
-                            "endgameElementStyle": {
-                                "image": {},
-                                "position": {"cornerPosition": "TOP_LEFT"}
-                            },
+                            "endgameElementStyle": {"image": {}, "position": {"cornerPosition": "TOP_LEFT"}},
                             "videoid": {"videoId": "recent"},
                             "startOffsetMs": start_ms,
                             "durationMs": "15000"
                         },
                         {
                             "type": "SUBSCRIBE",
-                            "endgameElementStyle": {
-                                "image": {},
-                                "position": {"cornerPosition": "BOTTOM_RIGHT"}
-                            },
+                            "endgameElementStyle": {"image": {}, "position": {"cornerPosition": "BOTTOM_RIGHT"}},
                             "startOffsetMs": start_ms,
                             "durationMs": "15000"
                         }
@@ -483,19 +460,12 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         except Exception as e:
             print(f"  End screen error: {e}")
 
-        # Agregar card apuntando a video anterior del dia
         if VIDEOS_SUBIDOS_HOY:
             try:
                 video_anterior = VIDEOS_SUBIDOS_HOY[-1]
                 youtube.cards().insert(
                     videoId=video_id,
-                    body={
-                        "card": {
-                            "videoIdCard": {
-                                "videoId": video_anterior
-                            }
-                        }
-                    }
+                    body={"card": {"videoIdCard": {"videoId": video_anterior}}}
                 ).execute()
                 print("  Card OK")
             except Exception as e:
@@ -505,12 +475,118 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 
     return video_id, url
 
+def montar_video_directo(titulo, duracion=6300):
+    print(f"Montando video para directo {duracion//60}min...")
+    imagenes = get_imagenes()
+    musicas = get_musicas()
+    if not imagenes or not musicas:
+        return None
+
+    musica = random.choice(musicas)
+    lista_path = '/tmp/lista_directo.txt'
+    salida = '/tmp/video_directo.mp4'
+    dur_img = 20
+    repeticiones = max(1, duracion // (len(imagenes) * dur_img) + 1)
+
+    with open(lista_path, 'w') as f:
+        for _ in range(repeticiones):
+            imgs = imagenes.copy()
+            random.shuffle(imgs)
+            for img in imgs:
+                f.write(f"file '{img}'\n")
+                f.write(f"duration {dur_img}\n")
+        f.write(f"file '{imagenes[0]}'\n")
+
+    filtro = (
+        "scale=1920:1080:force_original_aspect_ratio=decrease,"
+        "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
+        "format=yuv420p,"
+        f"drawtext=text='{titulo[:40]}':fontcolor=white:fontsize=44:"
+        "x=(w-text_w)/2:y=h-80:shadowcolor=black:shadowx=3:shadowy=3,"
+        "drawtext=text='SpiritualWave LIVE':fontcolor=0xFFD700:fontsize=32:"
+        "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2"
+    )
+
+    cmd = [
+        'ffmpeg', '-y',
+        '-f', 'concat', '-safe', '0', '-i', lista_path,
+        '-stream_loop', '-1', '-i', musica,
+        '-map', '0:v', '-map', '1:a',
+        '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
+        '-t', str(duracion), '-vf', filtro,
+        '-preset', 'fast', '-crf', '20', salida
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if os.path.exists(salida):
+        print(f"  OK: {os.path.getsize(salida)//1024//1024}MB")
+        return salida
+    print(f"  Error: {result.stderr[-300:]}")
+    return None
+
+def crear_directo_youtube(titulo, descripcion, video_path):
+    print("Creando transmision en vivo...")
+    try:
+        token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
+        creds = pickle.loads(token_data)
+        youtube = build('youtube', 'v3', credentials=creds)
+
+        broadcast = youtube.liveBroadcasts().insert(
+            part="snippet,status,contentDetails",
+            body={
+                "snippet": {
+                    "title": titulo[:100],
+                    "description": descripcion,
+                    "scheduledStartTime": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                },
+                "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+                "contentDetails": {
+                    "enableAutoStart": True,
+                    "enableAutoStop": True,
+                    "recordFromStart": True
+                }
+            }
+        ).execute()
+        broadcast_id = broadcast['id']
+        print(f"  Broadcast creado: {broadcast_id}")
+
+        stream = youtube.liveStreams().insert(
+            part="snippet,cdn",
+            body={
+                "snippet": {"title": f"Stream - {titulo[:80]}"},
+                "cdn": {"frameRate": "30fps", "ingestionType": "rtmp", "resolution": "1080p"}
+            }
+        ).execute()
+        stream_id = stream['id']
+        stream_key = stream['cdn']['ingestionInfo']['streamName']
+        rtmp_url = stream['cdn']['ingestionInfo']['ingestionAddress']
+
+        youtube.liveBroadcasts().bind(
+            part="id,contentDetails", id=broadcast_id, streamId=stream_id
+        ).execute()
+
+        print(f"  Transmitiendo hacia: {rtmp_url}/{stream_key}")
+
+        cmd = [
+            'ffmpeg', '-re', '-i', video_path,
+            '-c:v', 'libx264', '-preset', 'veryfast', '-maxrate', '3000k', '-bufsize', '6000k',
+            '-pix_fmt', 'yuv420p', '-g', '60', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100',
+            '-f', 'flv', f'{rtmp_url}/{stream_key}'
+        ]
+        print("  Iniciando stream RTMP (esto tomara el tiempo del video)...")
+        subprocess.run(cmd, timeout=6200)
+
+        print("  Stream finalizado")
+        return broadcast_id
+    except Exception as e:
+        print(f"  Error directo: {e}")
+        return None
+
 # MAIN
 print("\n=== SPIRITUALWAVE AUTO PRODUCER HD ===")
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 resultados = []
 
-telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando 5 videos HD...")
+telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido + directo...")
 
 try:
     tema_es = random.choice(TEMAS_ES)
@@ -521,25 +597,6 @@ try:
         vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1)
         resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
         telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
-
-    tema_en = random.choice(TEMAS_EN)
-    print(f"\n[VIDEO EN 1H] {tema_en}")
-    titulo_en, desc_en, tags_en = generar_guion(tema_en, 'en')
-    video_en = montar_video(titulo_en, duracion=3600)
-    if video_en:
-        vid_id, url = subir_youtube(video_en, titulo_en, desc_en, tags_en, duracion_min=60, variante=2)
-        resultados.append({'tipo': 'VIDEO EN 1H', 'titulo': titulo_en, 'url': url})
-        telegram(f"✅ <b>Video EN 1H subido</b>\n🎬 {titulo_en}\n🔗 {url}")
-
-    tema_3h = random.choice(TEMAS_EN)
-    titulo_3h, desc_3h, tags_3h = generar_guion(tema_3h, 'en')
-    titulo_3h = f"3 Hours {limpiar_texto(titulo_3h)}"[:65]
-    print(f"\n[VIDEO 3H] {titulo_3h}")
-    video_3h = montar_video(titulo_3h, duracion=10800)
-    if video_3h:
-        vid_id, url = subir_youtube(video_3h, titulo_3h, desc_3h, tags_3h, duracion_min=180, variante=3)
-        resultados.append({'tipo': 'VIDEO 3H', 'titulo': titulo_3h, 'url': url})
-        telegram(f"✅ <b>Video 3H subido</b>\n🎬 {titulo_3h}\n🔗 {url}")
 
     tema_short_es = random.choice(TEMAS_SHORTS_ES)
     print(f"\n[SHORT ES] {tema_short_es}")
@@ -557,11 +614,23 @@ try:
         resultados.append({'tipo': 'SHORT EN', 'titulo': tema_short_en, 'url': url})
         telegram(f"✅ <b>Short EN subido</b>\n🎬 {tema_short_en}\n🔗 {url}")
 
-    resumen = f"🔱 <b>Produccion HD completada</b>\n📅 {fecha}\n\n"
+    resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
     for r in resultados:
         resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
-    resumen += f"\n📊 Total: {len(resultados)} videos HD subidos"
     telegram(resumen)
+
+    # Transmision en vivo (usa el tiempo restante del job)
+    titulo_live = "🔱 Ganesha 528Hz Live - Musica Espiritual - SpiritualWave"
+    desc_live = "Transmision en vivo de musica espiritual con mantras de Ganesha y frecuencias 528hz.\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Ganesha #Live #528hz #Meditacion"
+
+    telegram(f"🔴 <b>Iniciando transmision en vivo</b>\n📅 {fecha}\n⏳ Duracion: ~1.5 horas")
+    video_live = montar_video_directo(titulo_live, duracion=6000)
+    if video_live:
+        broadcast_id = crear_directo_youtube(titulo_live, desc_live, video_live)
+        if broadcast_id:
+            telegram(f"🔴 <b>Directo finalizado</b>\n🔗 https://www.youtube.com/watch?v={broadcast_id}")
+        else:
+            telegram("⚠️ Error creando el directo")
 
 except Exception as e:
     telegram(f"❌ <b>ERROR</b>\n📅 {fecha}\n⚠️ {str(e)[:200]}")
