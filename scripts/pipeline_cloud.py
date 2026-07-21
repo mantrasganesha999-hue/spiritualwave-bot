@@ -159,6 +159,25 @@ TEMAS_SHORTS_PT = [
     "Ative sua abundancia com Ganesha agora",
 ]
 
+TEMAS_HI = [
+    "Ganesha mantra Om Gan Ganapataye Namaha for wealth and success",
+    "Ganpati Bappa mantra to remove all obstacles and bring luck",
+    "Powerful Ganesh mantra for money abundance and prosperity",
+    "Vighnaharta Ganesha mantra to destroy all problems in life",
+    "Ganpati mantra for business success and financial growth",
+    "Shubh Ganesha mantra for good luck and positive energy",
+    "Ganesh chaturthi special mantra for blessings and abundance",
+    "Ganpati Bappa Morya mantra for happiness and prosperity",
+]
+
+TEMAS_SHORTS_HI = [
+    "Why Ganpati Bappa removes all your problems instantly",
+    "This Ganesh mantra brings money in 21 days",
+    "Ganpati mantra for instant luck and success",
+    "The most powerful Ganesha mantra for wealth",
+    "Ganpati Bappa Morya mantra for happiness now",
+]
+
 DIAS_SERIE_21 = [
     "Dia 1: Reconoce que mereces la abundancia que pides",
     "Dia 2: Repite el mantra Om Gan Ganapataye con fe total",
@@ -985,6 +1004,40 @@ TAGS: [25 hashtags separadas por espacos]"""
 except Exception as e:
     telegram(f"⚠️ Error en video PT: {str(e)[:150]}")
     print(f"Error PT: {e}")
+
+try:
+    tema_hi = random.choice(TEMAS_HI)
+    print(f"\n[VIDEO HI] {tema_hi}")
+    prompt_hi = f"""You are an expert in Hindu spiritual YouTube content for Indian audience.
+Generate VIRAL content for a video about: {tema_hi}
+Use English but include devotional Hindi terms like Ganpati Bappa, Vighnaharta, Shubh, Mangal when natural.
+No asterisks, no markdown.
+Reply EXACTLY in this format:
+TITULO: [title maximum 60 characters, impactful, include Ganpati or Ganesha]
+DESCRIPCION: [400 words with devotional keywords, benefits, CTA to subscribe to youtube.com/@SpiritualWave888]
+TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi VighnahartaGanesh]"""
+
+    r_hi = requests.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500}
+    )
+    contenido_hi = r_hi.json()['choices'][0]['message']['content']
+    titulo_hi = extraer_campo(contenido_hi, 'TITULO', 'DESCRIPCION') or tema_hi[:60]
+    titulo_hi = limpiar_texto(titulo_hi)
+    desc_hi = extraer_campo(contenido_hi, 'DESCRIPCION', 'TAGS') or tema_hi
+    desc_hi = limpiar_texto(desc_hi)
+    tags_hi = extraer_campo(contenido_hi, 'TAGS') or "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
+    tags_hi = limpiar_texto(tags_hi)
+
+    video_hi = montar_video(titulo_hi, duracion=3600)
+    if video_hi:
+        vid_id, url = subir_youtube(video_hi, titulo_hi, desc_hi, tags_hi, duracion_min=60, variante=6, playlist_nombre="Ganpati Bappa Mantras")
+        resultados.append({'tipo': 'VIDEO HI', 'titulo': titulo_hi, 'url': url})
+        telegram(f"✅ <b>Video HI (India) subido</b>\n🎬 {titulo_hi}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en video HI: {str(e)[:150]}")
+    print(f"Error HI: {e}")
 
 resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
 for r in resultados:
