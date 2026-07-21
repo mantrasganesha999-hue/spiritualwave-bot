@@ -92,6 +92,19 @@ TEMAS_EN = [
     "Ganesha mantra for couples seeking reconciliation",
 ]
 
+TEMAS_PT = [
+    "mantra de Ganesha para atrair abundancia e eliminar dividas",
+    "frequencia 528hz para curar o corpo e atrair prosperidade",
+    "afirmacoes poderosas para manifestar dinheiro todas as manhas",
+    "meditacao guiada para eliminar energia negativa e atrair sucesso",
+    "lei da atracao para atrair dinheiro abundancia e saude",
+    "mantra poderoso de Ganesha para protecao e abundancia",
+    "musica de cura 432hz para dormir e restaurar a alma",
+    "mantra de Ganesha om gan ganapataye namaha poder e abundancia",
+    "528hz frequencia milagre para curar e atrair prosperidade",
+    "mantra de Ganesha para trabalho sucesso e prosperidade economica",
+]
+
 TEMAS_SHORTS_ES = [
     "Por que Ganesha elimina obstaculos al instante",
     "Que pasa si repites este mantra 21 veces",
@@ -137,6 +150,15 @@ TEMAS_SHORTS_EN = [
     "What happens if you listen to 528hz for 7 days",
     "How to clean your energy in one minute",
 ]
+
+TEMAS_SHORTS_PT = [
+    "Mantra de Ganesha para abundancia instantanea",
+    "528hz frequencia milagre ativa agora",
+    "Om Gan Ganapataye Namaha poder infinito",
+    "Mantra de Ganesha elimina obstaculos hoje",
+    "Ative sua abundancia com Ganesha agora",
+]
+
 DIAS_SERIE_21 = [
     "Dia 1: Reconoce que mereces la abundancia que pides",
     "Dia 2: Repite el mantra Om Gan Ganapataye con fe total",
@@ -256,6 +278,21 @@ def extraer_campo(contenido, campo, siguiente=None):
     except:
         return None
 
+def obtener_dia_serie():
+    archivo_estado = os.path.join(BASE, 'serie_dia.txt')
+    try:
+        with open(archivo_estado, 'r') as f:
+            dia_actual = int(f.read().strip())
+    except:
+        dia_actual = 0
+
+    dia_actual = (dia_actual % 21) + 1
+
+    with open(archivo_estado, 'w') as f:
+        f.write(str(dia_actual))
+
+    return dia_actual
+
 def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
     emoji = random.choice(EMOJIS_TITULO)
@@ -263,7 +300,7 @@ def generar_guion(tema, lang='es'):
         prompt = f"""Eres experto en contenido espiritual de YouTube en espanol latino, actualizado en tendencias 2026.
 Genera contenido VIRAL para un video sobre: {tema}
 Sin tildes ni caracteres especiales ni asteriscos ni markdown.
-Incluye en el titulo o descripcion terminos de tendencia actual como: manifestacion 2026, codigo 528, activacion cuantica, portal energetico, año de la abundancia, cuando sea relevante al tema.
+Incluye en el titulo o descripcion terminos de tendencia actual como: manifestacion 2026, codigo 528, activacion cuantica, portal energetico, ano de la abundancia, cuando sea relevante al tema.
 Responde EXACTAMENTE en este formato sin simbolos extra:
 TITULO: {emoji} [titulo maximo 60 caracteres, impactante con numero, pregunta o referencia a 2026]
 DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
@@ -567,6 +604,11 @@ def agregar_capitulos(descripcion, duracion_min):
     for i, tema_cap in enumerate(temas_caps):
         mins = (i+1) * paso
         caps += f"{mins:02d}:00 - {tema_cap}\n"
+
+    if VIDEOS_SUBIDOS_HOY:
+        caps += f"\nContinua tu practica espiritual con nuestro video anterior:\n"
+        caps += f"https://www.youtube.com/watch?v={VIDEOS_SUBIDOS_HOY[-1]}\n"
+
     caps += f"\nSuscribete: youtube.com/@SpiritualWave888\n"
     caps += f"Activa la campana para no perderte nada\n"
     return descripcion + caps
@@ -612,8 +654,13 @@ def agregar_a_playlist(youtube, video_id, playlist_nombre):
 
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1, playlist_nombre=None):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
+    from google.auth.transport.requests import Request
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
     creds = pickle.loads(token_data)
+    if creds.expired and creds.refresh_token:
+        print("  Token expirado, renovando automaticamente...")
+        creds.refresh(Request())
+        print("  Token renovado OK")
     youtube = build('youtube', 'v3', credentials=creds)
 
     titulo_final = f"{titulo} #Shorts" if es_short else titulo
@@ -660,8 +707,6 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
 
-       
-
         if VIDEOS_SUBIDOS_HOY:
             try:
                 video_anterior = VIDEOS_SUBIDOS_HOY[-1]
@@ -683,13 +728,22 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                 "Que manifestaste hoy? Cuentame en los comentarios 🙏",
                 "Cual fue tu experiencia con este mantra? Comparte abajo ✨",
                 "Etiqueta a alguien que necesita escuchar esto hoy 🔱",
+                "Deja tu Om en los comentarios si sentiste la energia 🕉",
+                "Cuantos dias llevas practicando este mantra? 🙏",
+                "Comparte este video con quien necesite abundancia hoy 💫",
+                "Que frecuencia te gustaria en el proximo video? 🎵",
             ]
             comentarios_en = [
                 "What did you manifest today? Tell me in the comments 🙏",
                 "What was your experience with this mantra? Share below ✨",
                 "Tag someone who needs to hear this today 🔱",
+                "Leave your Om below if you felt the energy 🕉",
+                "How many days have you been practicing this mantra? 🙏",
+                "Share this video with someone who needs abundance today 💫",
+                "What frequency would you like in the next video? 🎵",
             ]
-            comentario = random.choice(comentarios_en if not any(c in titulo for c in 'áéíóúñ') and 'Ganesha' in titulo and 'mantra' not in titulo.lower() else comentarios_es)
+            tiene_acentos = any(c in titulo for c in 'áéíóúñ')
+            comentario = random.choice(comentarios_es if tiene_acentos else comentarios_en)
             comment_response = youtube.commentThreads().insert(
                 part="snippet",
                 body={
@@ -826,20 +880,7 @@ resultados = []
 verificar_salud()
 
 telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido + directo...")
-def obtener_dia_serie():
-    archivo_estado = os.path.join(BASE, 'serie_dia.txt')
-    try:
-        with open(archivo_estado, 'r') as f:
-            dia_actual = int(f.read().strip())
-    except:
-        dia_actual = 0
 
-    dia_actual = (dia_actual % 21) + 1
-
-    with open(archivo_estado, 'w') as f:
-        f.write(str(dia_actual))
-
-    return dia_actual
 try:
     tema_es = random.choice(TEMAS_ES)
     print(f"\n[VIDEO ES 1H] {tema_es}")
@@ -911,6 +952,40 @@ TAGS: [20 hashtags separados por espacios]"""
 except Exception as e:
     telegram(f"⚠️ Error en serie 21 dias: {str(e)[:150]}")
     print(f"Error serie: {e}")
+
+try:
+    tema_pt = random.choice(TEMAS_PT)
+    print(f"\n[VIDEO PT] {tema_pt}")
+    prompt_pt = f"""Voce e um especialista em conteudo espiritual do YouTube em portugues do Brasil.
+Gere conteudo VIRAL para um video sobre: {tema_pt}
+Sem acentos ou caracteres especiais nem asteriscos.
+Responda EXATAMENTE neste formato:
+TITULO: [titulo maximo 60 caracteres impactante]
+DESCRICAO: [400 palavras com palavras chave espirituais, beneficios, CTA para se inscrever em youtube.com/@SpiritualWave888]
+TAGS: [25 hashtags separadas por espacos]"""
+
+    r_pt = requests.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_pt}], 'max_tokens': 1500}
+    )
+    contenido_pt = r_pt.json()['choices'][0]['message']['content']
+    titulo_pt = extraer_campo(contenido_pt, 'TITULO', 'DESCRICAO') or tema_pt[:60]
+    titulo_pt = limpiar_texto(titulo_pt)
+    desc_pt = extraer_campo(contenido_pt, 'DESCRICAO', 'TAGS') or tema_pt
+    desc_pt = limpiar_texto(desc_pt)
+    tags_pt = extraer_campo(contenido_pt, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz"
+    tags_pt = limpiar_texto(tags_pt)
+
+    video_pt = montar_video(titulo_pt, duracion=3600)
+    if video_pt:
+        vid_id, url = subir_youtube(video_pt, titulo_pt, desc_pt, tags_pt, duracion_min=60, variante=5, playlist_nombre="Mantras em Portugues")
+        resultados.append({'tipo': 'VIDEO PT', 'titulo': titulo_pt, 'url': url})
+        telegram(f"✅ <b>Video PT subido</b>\n🎬 {titulo_pt}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en video PT: {str(e)[:150]}")
+    print(f"Error PT: {e}")
+
 resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
 for r in resultados:
     resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
