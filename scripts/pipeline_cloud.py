@@ -554,7 +554,10 @@ def montar_video(titulo, duracion=3600, es_short=False):
             "x=(w-text_w)/2:y=h-90:"
             "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
             "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=28:"
-            "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2"
+            "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2,"
+            "drawtext=text='SUSCRIBETE 🔔':fontcolor=0xFFD700:fontsize=42:"
+            "x=(w-text_w)/2:y=h-160:shadowcolor=black:shadowx=3:shadowy=3:"
+            "enable='between(t\\,90\\,100)'"
         )
         t = str(duracion)
     cmd = [
