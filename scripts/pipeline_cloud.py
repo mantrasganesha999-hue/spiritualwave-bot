@@ -179,21 +179,23 @@ def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
     emoji = random.choice(EMOJIS_TITULO)
     if lang == 'es':
-        prompt = f"""Eres experto en contenido espiritual de YouTube en espanol latino.
+        prompt = f"""Eres experto en contenido espiritual de YouTube en espanol latino, actualizado en tendencias 2026.
 Genera contenido VIRAL para un video sobre: {tema}
 Sin tildes ni caracteres especiales ni asteriscos ni markdown.
+Incluye en el titulo o descripcion terminos de tendencia actual como: manifestacion 2026, codigo 528, activacion cuantica, portal energetico, año de la abundancia, cuando sea relevante al tema.
 Responde EXACTAMENTE en este formato sin simbolos extra:
-TITULO: {emoji} [titulo maximo 60 caracteres, impactante con numero o pregunta]
-DESCRIPCION: [500 palabras con keywords espirituales, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separados por espacios]"""
+TITULO: {emoji} [titulo maximo 60 caracteres, impactante con numero, pregunta o referencia a 2026]
+DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
+TAGS: [30 hashtags separados por espacios incluyendo terminos de tendencia 2026]"""
     else:
-        prompt = f"""You are a viral spiritual YouTube expert.
+        prompt = f"""You are a viral spiritual YouTube expert, updated on 2026 trends.
 Generate content for: {tema}
 No asterisks, no markdown, no special symbols.
+Include trending 2026 terms when relevant like: manifestation 2026, quantum activation, 528 code, energy portal, year of abundance.
 Reply EXACTLY in this format:
-TITULO: {emoji} [title maximum 60 characters, with number or question]
-DESCRIPCION: [500 words with spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 relevant hashtags separated by spaces]"""
+TITULO: {emoji} [title maximum 60 characters, with number, question or 2026 reference]
+DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
+TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms]"""
 
     r = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
@@ -394,7 +396,7 @@ def agregar_capitulos(descripcion, duracion_min):
     caps += f"Activa la campana para no perderte nada\n"
     return descripcion + caps
 
-def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1):
+def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1, playlist_nombre=None):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
     creds = pickle.loads(token_data)
@@ -473,6 +475,9 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 
         VIDEOS_SUBIDOS_HOY.append(video_id)
 
+        if playlist_nombre:
+            agregar_a_playlist(youtube, video_id, playlist_nombre)
+
     return video_id, url
 
 def montar_video_directo(titulo, duracion=6300):
@@ -522,6 +527,44 @@ def montar_video_directo(titulo, duracion=6300):
         return salida
     print(f"  Error: {result.stderr[-300:]}")
     return None
+def agregar_a_playlist(youtube, video_id, playlist_nombre):
+    try:
+        playlists = youtube.playlists().list(
+            part='snippet', mine=True, maxResults=50
+        ).execute()
+
+        playlist_id = None
+        for pl in playlists.get('items', []):
+            if pl['snippet']['title'] == playlist_nombre:
+                playlist_id = pl['id']
+                break
+
+        if not playlist_id:
+            resp = youtube.playlists().insert(
+                part='snippet,status',
+                body={
+                    'snippet': {
+                        'title': playlist_nombre,
+                        'description': f'Videos de {playlist_nombre} - SpiritualWave'
+                    },
+                    'status': {'privacyStatus': 'public'}
+                }
+            ).execute()
+            playlist_id = resp['id']
+            print(f"  Playlist creada: {playlist_nombre}")
+
+        youtube.playlistItems().insert(
+            part='snippet',
+            body={
+                'snippet': {
+                    'playlistId': playlist_id,
+                    'resourceId': {'kind': 'youtube#video', 'videoId': video_id}
+                }
+            }
+        ).execute()
+        print(f"  Agregado a playlist: {playlist_nombre}")
+    except Exception as e:
+        print(f"  Playlist error: {e}")
 
 def crear_directo_youtube(titulo, descripcion, video_path):
     print("Creando transmision en vivo...")
@@ -594,7 +637,7 @@ try:
     titulo_es, desc_es, tags_es = generar_guion(tema_es, 'es')
     video_es = montar_video(titulo_es, duracion=3600)
     if video_es:
-        vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1)
+        vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1, playlist_nombre="Mantras de Ganesha")
         resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
         telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
 
