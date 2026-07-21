@@ -621,32 +621,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
 
-        try:
-            duracion_seg = duracion_min * 60
-            start_ms = str((duracion_seg - 20) * 1000)
-            youtube.videoEndscreens().insert(
-                videoId=video_id,
-                body={
-                    "elements": [
-                        {
-                            "type": "VIDEO",
-                            "endgameElementStyle": {"image": {}, "position": {"cornerPosition": "TOP_LEFT"}},
-                            "videoid": {"videoId": "recent"},
-                            "startOffsetMs": start_ms,
-                            "durationMs": "15000"
-                        },
-                        {
-                            "type": "SUBSCRIBE",
-                            "endgameElementStyle": {"image": {}, "position": {"cornerPosition": "BOTTOM_RIGHT"}},
-                            "startOffsetMs": start_ms,
-                            "durationMs": "15000"
-                        }
-                    ]
-                }
-            ).execute()
-            print("  End screen OK")
-        except Exception as e:
-            print(f"  End screen error: {e}")
+       
 
         if VIDEOS_SUBIDOS_HOY:
             try:

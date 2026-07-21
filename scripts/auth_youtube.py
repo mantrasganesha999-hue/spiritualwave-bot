@@ -3,7 +3,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
 
-SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+SCOPES = ['https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.force-ssl']
 SECRETS = 'C:/SpiritualWave/client_secrets.json'
 TOKEN = 'C:/SpiritualWave/token.pickle'
 
