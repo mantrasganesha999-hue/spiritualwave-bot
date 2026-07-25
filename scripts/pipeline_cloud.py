@@ -240,6 +240,20 @@ def get_imagenes():
     random.shuffle(imgs)
     return imgs
 
+def get_imagenes_shorts():
+    folder = os.path.join(BASE, 'assets/backgrounds_shorts')
+    if not os.path.exists(folder):
+        return get_imagenes()
+    imgs = [
+        os.path.join(folder, f)
+        for f in os.listdir(folder)
+        if f.startswith('ganesha_short') and f.endswith('.jpg')
+    ]
+    if not imgs:
+        return get_imagenes()
+    random.shuffle(imgs)
+    return imgs
+
 def get_musicas():
     todas = []
     for i in range(1, 22):
@@ -598,7 +612,7 @@ def generar_thumbnail_short(titulo, variante=1):
 
 def montar_video(titulo, duracion=3600, es_short=False):
     print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
-    imagenes = get_imagenes()
+    imagenes = get_imagenes_shorts() if es_short else get_imagenes()
     musicas = get_musicas()
 
     if not imagenes or not musicas:
