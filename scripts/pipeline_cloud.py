@@ -188,6 +188,36 @@ DIAS_SERIE_21 = [
 
 EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
 
+FRASES_ES = [
+    "Abro mi mente a la abundancia infinita",
+    "Ganesha elimina todos mis obstaculos",
+    "Merezco la prosperidad que estoy manifestando",
+    "Mi energia atrae dinero y bendiciones",
+    "Confio en el proceso divino de mi vida",
+    "Cada dia atraigo mas abundancia y paz",
+    "Soy un iman para el exito y la riqueza",
+    "Libero el miedo y abrazo la prosperidad",
+    "El universo conspira a mi favor siempre",
+    "Mi mente esta alineada con la abundancia",
+    "Agradezco todo lo que ya tengo en mi vida",
+    "Estoy listo para recibir milagros hoy",
+]
+
+FRASES_EN = [
+    "I open my mind to infinite abundance",
+    "Ganesha removes all my obstacles now",
+    "I deserve the prosperity I am manifesting",
+    "My energy attracts money and blessings",
+    "I trust the divine process of my life",
+    "Every day I attract more abundance and peace",
+    "I am a magnet for success and wealth",
+    "I release fear and embrace prosperity",
+    "The universe always conspires in my favor",
+    "My mind is aligned with abundance",
+    "I am grateful for everything I already have",
+    "I am ready to receive miracles today",
+]
+
 VIDEOS_SUBIDOS_HOY = []
 
 def telegram(mensaje):
@@ -291,7 +321,6 @@ def detectar_festival_hindu():
     hoy = datetime.now()
     mes = hoy.month
     dia = hoy.day
-
     festivales = {
         (8, 15): "Ganesh Chaturthi", (8, 16): "Ganesh Chaturthi", (8, 17): "Ganesh Chaturthi",
         (8, 18): "Ganesh Chaturthi", (8, 19): "Ganesh Chaturthi", (8, 20): "Ganesh Chaturthi",
@@ -305,28 +334,41 @@ def detectar_festival_hindu():
         (10, 28): "Diwali", (10, 29): "Diwali", (10, 30): "Diwali", (10, 31): "Diwali",
         (11, 1): "Diwali", (11, 2): "Diwali",
     }
-
     return festivales.get((mes, dia), None)
 
 def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
     emoji = random.choice(EMOJIS_TITULO)
     if lang == 'es':
-        prompt = f"""Eres experto en contenido espiritual de YouTube en espanol latino, actualizado en tendencias 2026.
+        prompt = f"""Eres el mejor copywriter viral de YouTube en nicho espiritual, experto en titulos que generan clicks masivos.
 Genera contenido VIRAL para un video sobre: {tema}
 Sin tildes ni caracteres especiales ni asteriscos ni markdown.
-Incluye en el titulo o descripcion terminos de tendencia actual como: manifestacion 2026, codigo 528, activacion cuantica, portal energetico, ano de la abundancia, cuando sea relevante al tema.
+
+El TITULO debe usar una de estas formulas probadas (elige la mejor para el tema):
+- Pregunta directa que genera curiosidad: "Por que Ganesha no te ha respondido aun?"
+- Numero + promesa especifica: "3 Minutos Que Cambiaran Tu Suerte Hoy"
+- Urgencia + accion: "Escucha ESTO Antes De Dormir Esta Noche"
+- Secreto revelado: "Lo Que Nadie Te Conto Sobre El Dinero y Ganesha"
+- Contraste inesperado: "Deje de Pedir Dinero y Empece a Recibirlo Asi"
+
 Responde EXACTAMENTE en este formato sin simbolos extra:
-TITULO: {emoji} [titulo maximo 60 caracteres, impactante con numero, pregunta o referencia a 2026]
+TITULO: {emoji} [titulo viral usando una formula de arriba, maximo 60 caracteres, con mayusculas en palabras clave]
 DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
 TAGS: [30 hashtags separados por espacios incluyendo terminos de tendencia 2026]"""
     else:
-        prompt = f"""You are a viral spiritual YouTube expert, updated on 2026 trends.
-Generate content for: {tema}
+        prompt = f"""You are the best viral YouTube copywriter in the spiritual niche, expert in titles that generate massive clicks.
+Generate VIRAL content for: {tema}
 No asterisks, no markdown, no special symbols.
-Include trending 2026 terms when relevant like: manifestation 2026, quantum activation, 528 code, energy portal, year of abundance.
+
+The TITULO must use one of these proven formulas (choose the best for the topic):
+- Direct question that creates curiosity: "Why Hasn't Ganesha Answered You Yet?"
+- Number + specific promise: "3 Minutes That Will Change Your Luck Today"
+- Urgency + action: "Listen To THIS Before You Sleep Tonight"
+- Secret revealed: "What Nobody Told You About Money and Ganesha"
+- Unexpected contrast: "I Stopped Asking For Money And Started Receiving It Like This"
+
 Reply EXACTLY in this format:
-TITULO: {emoji} [title maximum 60 characters, with number, question or 2026 reference]
+TITULO: {emoji} [viral title using a formula above, maximum 60 characters, capitalize key words]
 DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
 TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms]"""
 
@@ -336,14 +378,18 @@ TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms]""
         json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000}
     )
     contenido = r.json()['choices'][0]['message']['content']
+
     titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
     titulo = limpiar_texto(titulo)
     if len(titulo) > 65:
         titulo = titulo[:65].strip()
+
     descripcion = extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or f"Video sobre {tema}"
     descripcion = limpiar_texto(descripcion)
+
     tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz #Abundancia"
     tags = limpiar_texto(tags)
+
     return titulo, descripcion, tags
 
 def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto='Mantras & Frecuencias Divinas'):
@@ -352,27 +398,48 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
         imagenes = get_imagenes()
         if not imagenes:
             return None
+
         img_path = imagenes[variante % len(imagenes)]
         img = Image.open(img_path).resize((1920, 1080)).convert('RGB')
+
         enhancer = ImageEnhance.Color(img)
         img = enhancer.enhance(1.3)
         enhancer = ImageEnhance.Contrast(img)
         img = enhancer.enhance(1.1)
+
+        paletas_borde = [
+            (201, 168, 76),
+            (180, 50, 50),
+            (60, 90, 180),
+            (150, 60, 180),
+            (30, 150, 100),
+        ]
+        color_base = paletas_borde[variante % len(paletas_borde)]
+
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
+
         for i in range(350):
             alpha = int(220 * (i / 350))
-            d.rectangle([(0, img.height - 350 + i), (img.width, img.height - 349 + i)], fill=(0, 0, 0, alpha))
+            d.rectangle(
+                [(0, img.height - 350 + i), (img.width, img.height - 349 + i)],
+                fill=(0, 0, 0, alpha)
+            )
+
         d.rectangle([(0, 0), (img.width, 120)], fill=(0, 0, 0, 185))
-        for thickness in range(8):
-            color_val = max(150, 201 - thickness * 10)
+
+        for thickness in range(10):
+            factor = max(0.5, 1 - thickness * 0.05)
+            color_borde = (int(color_base[0]*factor), int(color_base[1]*factor), int(color_base[2]*factor))
             d.rectangle(
                 [(thickness, thickness), (img.width-1-thickness, img.height-1-thickness)],
-                outline=(color_val, int(color_val * 0.83), int(color_val * 0.37)),
+                outline=color_borde,
                 width=1
             )
+
         img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(img)
+
         try:
             font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 88)
             font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 44)
@@ -381,17 +448,21 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
             font_titulo = ImageFont.load_default()
             font_canal = ImageFont.load_default()
             font_sub = ImageFont.load_default()
+
         canal = texto_marca
         bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
         cx = (img.width - w) // 2
-        draw.text((cx+5, 35), canal, fill=(80, 60, 0), font=font_canal)
-        draw.text((cx+3, 33), canal, fill=(120, 90, 0), font=font_canal)
+        sombra_color = tuple(int(c*0.4) for c in color_base)
+        draw.text((cx+5, 35), canal, fill=sombra_color, font=font_canal)
+        draw.text((cx+3, 33), canal, fill=tuple(int(c*0.7) for c in color_base), font=font_canal)
         draw.text((cx, 30), canal, fill=(255, 220, 50), font=font_canal)
+
         sub = subtexto
         bbox = draw.textbbox((0, 0), sub, font=font_sub)
         w = bbox[2] - bbox[0]
         draw.text(((img.width-w)//2, 85), sub, fill=(230, 200, 130), font=font_sub)
+
         titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:55]
         palabras = titulo_clean.split()
         lineas = []
@@ -407,18 +478,23 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
                 linea = p
         if linea:
             lineas.append(linea)
+
         total_lines = min(len(lineas), 3)
         line_height = 100
         total_height = total_lines * line_height
         y_start = img.height - 330 + (330 - total_height) // 2
+
         for linea in lineas[:3]:
             bbox = draw.textbbox((0, 0), linea, font=font_titulo)
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
+
             for dx, dy in [(-4,4),(4,4),(4,-4),(-4,-4),(0,5),(5,0),(0,-5),(-5,0),(-3,3),(3,3),(3,-3),(-3,-3)]:
                 draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
+
             draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
             y_start += line_height
+
         path = f'/tmp/thumbnail_{variante}.jpg'
         img.save(path, 'JPEG', quality=98)
         print(f"  Thumbnail profesional OK")
@@ -446,10 +522,12 @@ def generar_thumbnail_short(titulo, variante=1):
             top = (h - new_h) // 2
             img = img.crop((0, top, w, top + new_h))
         img = img.resize((1080, 1920)).convert('RGB')
+
         enhancer = ImageEnhance.Color(img)
         img = enhancer.enhance(1.35)
         enhancer = ImageEnhance.Contrast(img)
         img = enhancer.enhance(1.15)
+
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
         for i in range(500):
@@ -465,18 +543,21 @@ def generar_thumbnail_short(titulo, variante=1):
             )
         img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(img)
+
         try:
             font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 68)
             font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 46)
         except:
             font_titulo = ImageFont.load_default()
             font_canal = ImageFont.load_default()
+
         canal = 'SpiritualWave'
         bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
         cx = (img.width - w) // 2
         draw.text((cx+4, 44), canal, fill=(100, 75, 0), font=font_canal)
         draw.text((cx, 40), canal, fill=(255, 220, 50), font=font_canal)
+
         titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:60]
         palabras = titulo_clean.split()
         lineas = []
@@ -492,10 +573,12 @@ def generar_thumbnail_short(titulo, variante=1):
                 linea = p
         if linea:
             lineas.append(linea)
+
         total_lines = min(len(lineas), 4)
         line_height = 80
         total_height = total_lines * line_height
         y_start = img.height - 470 + (470 - total_height) // 2
+
         for linea in lineas[:4]:
             bbox = draw.textbbox((0, 0), linea, font=font_titulo)
             w = bbox[2] - bbox[0]
@@ -504,6 +587,7 @@ def generar_thumbnail_short(titulo, variante=1):
                 draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
             draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
             y_start += line_height
+
         path = f'/tmp/thumbnail_short_{variante}.jpg'
         img.save(path, 'JPEG', quality=98)
         print(f"  Thumbnail Short OK")
@@ -513,68 +597,85 @@ def generar_thumbnail_short(titulo, variante=1):
         return None
 
 def montar_video(titulo, duracion=3600, es_short=False):
-    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
+    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD con efectos...")
     imagenes = get_imagenes()
     musicas = get_musicas()
+
     if not imagenes or not musicas:
         print("ERROR: Faltan imagenes o musica")
         return None
+
     musica = random.choice(musicas)
     titulo_clean = limpiar_texto(titulo)[:45].replace("'","").replace('"','').replace(':','-').replace('#','')
-    lista_path = '/tmp/lista_short.txt' if es_short else '/tmp/lista.txt'
+
+    w, h = (1080, 1920) if es_short else (1920, 1080)
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
-    dur_img = 10 if es_short else 15
-    repeticiones = 2 if es_short else max(1, duracion // (len(imagenes) * dur_img) + 1)
-    with open(lista_path, 'w') as f:
-        for _ in range(repeticiones):
-            imgs = imagenes.copy()
-            random.shuffle(imgs)
-            for img in imgs:
-                f.write(f"file '{img}'\n")
-                f.write(f"duration {dur_img}\n")
-        f.write(f"file '{imagenes[0]}'\n")
-    if es_short:
-        filtro = (
-            "scale=1080:1920:force_original_aspect_ratio=increase,"
-            "crop=1080:1920,"
-            "format=yuv420p,"
-            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=44:"
-            "x=(w-text_w)/2:y=h-150:"
-            "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
-            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=32:"
-            "x=(w-text_w)/2:y=70:shadowcolor=black:shadowx=3:shadowy=3"
+
+    dur_img = 12 if es_short else 18
+    num_imagenes = min(20, len(imagenes)) if not es_short else min(10, len(imagenes))
+    imagenes_uso = random.sample(imagenes, num_imagenes)
+
+    es_ingles = any(w in titulo.lower() for w in ['the ', 'you ', 'why ', 'what ', 'how '])
+    frases = FRASES_EN if es_ingles else FRASES_ES
+    frases_uso = [random.choice(frases) for _ in range(num_imagenes)]
+
+    inputs = []
+    for img in imagenes_uso:
+        inputs.extend(['-loop', '1', '-t', str(dur_img + 2), '-i', img])
+
+    escalas = []
+    for i in range(len(imagenes_uso)):
+        frase_escapada = frases_uso[i].replace("'", "").replace(':', '')
+        escalas.append(
+            f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h},setsar=1,fps=25,"
+            f"drawtext=text='{frase_escapada}':fontcolor=0xFFD700:fontsize={38 if es_short else 46}:"
+            f"x=(w-text_w)/2:y=(h/2)+{100 if es_short else 60}:"
+            "shadowcolor=0x000000CC:shadowx=3:shadowy=3:borderw=1:bordercolor=0x8B6914,"
+            f"alpha='if(lt(t,1),t,if(gt(t,{dur_img-1}),{dur_img+2}-t,1))'"
+            f"[v{i}]"
         )
-        t = '58'
-    else:
-        filtro = (
-            "scale=1920:1080:force_original_aspect_ratio=decrease,"
-            "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
-            "format=yuv420p,"
-            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=52:"
-            "x=(w-text_w)/2:y=h-90:"
-            "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
-            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=28:"
-            "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2,"
-            "drawtext=text='SUSCRIBETE 🔔':fontcolor=0xFFD700:fontsize=42:"
-            "x=(w-text_w)/2:y=h-160:shadowcolor=black:shadowx=3:shadowy=3:"
-            "enable='between(t\\,90\\,100)'"
-        )
-        t = str(duracion)
+    filtro_escalas = ";".join(escalas)
+
+    xfade_parts = []
+    prev = "v0"
+    tiempo_acumulado = dur_img
+    for i in range(1, len(imagenes_uso)):
+        offset = tiempo_acumulado - 1
+        out_label = "vout" if i == len(imagenes_uso) - 1 else f"vx{i}"
+        xfade_parts.append(f"[{prev}][v{i}]xfade=transition=fade:duration=1:offset={offset}[{out_label}]")
+        prev = out_label
+        tiempo_acumulado += dur_img - 1
+
+    filtro_xfade = ";".join(xfade_parts)
+
+    filtro_final = (
+        f"{filtro_escalas};{filtro_xfade};"
+        f"[vout]vignette=PI/6,"
+        f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize={44 if es_short else 52}:"
+        f"x=(w-text_w)/2:y=h-{150 if es_short else 90}:"
+        "shadowcolor=0x000000EE:shadowx=3:shadowy=3:borderw=2:bordercolor=black,"
+        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={32 if es_short else 28}:"
+        f"x=(w-text_w)/2:y={70 if es_short else 25}:shadowcolor=black:shadowx=2:shadowy=2[vfinal]"
+    )
+
     cmd = [
         'ffmpeg', '-y',
-        '-f', 'concat', '-safe', '0', '-i', lista_path,
+        *inputs,
         '-stream_loop', '-1', '-i', musica,
-        '-map', '0:v', '-map', '1:a',
+        '-filter_complex', filtro_final,
+        '-map', '[vfinal]', '-map', f'{len(imagenes_uso)}:a',
         '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
-        '-t', t, '-vf', filtro,
-        '-preset', 'fast', '-crf', '18',
+        '-t', str(duracion),
+        '-preset', 'fast', '-crf', '20',
         salida
     ]
+
     result = subprocess.run(cmd, capture_output=True, text=True)
     if os.path.exists(salida):
-        print(f"  OK HD: {os.path.getsize(salida)//1024//1024}MB")
+        print(f"  OK HD con efectos: {os.path.getsize(salida)//1024//1024}MB")
         return salida
-    print(f"  Error: {result.stderr[-300:]}")
+    print(f"  Error: {result.stderr[-500:]}")
     return None
 
 def agregar_capitulos(descripcion, duracion_min):

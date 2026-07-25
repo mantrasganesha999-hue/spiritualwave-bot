@@ -34,3 +34,12 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: |
         python scripts/pipeline_cloud.py
+
+    - name: Guardar progreso de la serie
+      if: always()
+      run: |
+        git config user.name "SpiritualWave Bot"
+        git config user.email "bot@spiritualwave.com"
+        git add serie_dia.txt || true
+        git diff --staged --quiet || git commit -m "Actualizar dia de la serie [skip ci]"
+        git push || true
