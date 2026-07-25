@@ -597,7 +597,7 @@ def generar_thumbnail_short(titulo, variante=1):
         return None
 
 def montar_video(titulo, duracion=3600, es_short=False):
-    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD con efectos...")
+    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
     imagenes = get_imagenes()
     musicas = get_musicas()
 
@@ -608,72 +608,68 @@ def montar_video(titulo, duracion=3600, es_short=False):
     musica = random.choice(musicas)
     titulo_clean = limpiar_texto(titulo)[:45].replace("'","").replace('"','').replace(':','-').replace('#','')
 
-    w, h = (1080, 1920) if es_short else (1920, 1080)
+    lista_path = '/tmp/lista_short.txt' if es_short else '/tmp/lista.txt'
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
 
-    dur_img = 12 if es_short else 18
-    num_imagenes = min(20, len(imagenes)) if not es_short else min(10, len(imagenes))
-    imagenes_uso = random.sample(imagenes, num_imagenes)
+    dur_img = 10 if es_short else 15
+    repeticiones = 2 if es_short else max(1, duracion // (len(imagenes) * dur_img) + 1)
+
+    with open(lista_path, 'w') as f:
+        for _ in range(repeticiones):
+            imgs = imagenes.copy()
+            random.shuffle(imgs)
+            for img in imgs:
+                f.write(f"file '{img}'\n")
+                f.write(f"duration {dur_img}\n")
+        f.write(f"file '{imagenes[0]}'\n")
 
     es_ingles = any(w in titulo.lower() for w in ['the ', 'you ', 'why ', 'what ', 'how '])
-    frases = FRASES_EN if es_ingles else FRASES_ES
-    frases_uso = [random.choice(frases) for _ in range(num_imagenes)]
+    frase = random.choice(FRASES_EN if es_ingles else FRASES_ES).replace("'", "").replace(':', '')
 
-    inputs = []
-    for img in imagenes_uso:
-        inputs.extend(['-loop', '1', '-t', str(dur_img + 2), '-i', img])
-
-    escalas = []
-    for i in range(len(imagenes_uso)):
-        frase_escapada = frases_uso[i].replace("'", "").replace(':', '')
-        escalas.append(
-            f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase,"
-            f"crop={w}:{h},setsar=1,fps=25,"
-            f"drawtext=text='{frase_escapada}':fontcolor=0xFFD700:fontsize={38 if es_short else 46}:"
-            f"x=(w-text_w)/2:y=(h/2)+{100 if es_short else 60}:"
-            "shadowcolor=0x000000CC:shadowx=3:shadowy=3:borderw=1:bordercolor=0x8B6914,"
-            f"alpha='if(lt(t,1),t,if(gt(t,{dur_img-1}),{dur_img+2}-t,1))'"
-            f"[v{i}]"
+    if es_short:
+        filtro = (
+            "scale=1080:1920:force_original_aspect_ratio=increase,"
+            "crop=1080:1920,"
+            "format=yuv420p,"
+            f"drawtext=text='{frase}':fontcolor=0xFFD700:fontsize=36:"
+            "x=(w-text_w)/2:y=(h/2):"
+            "shadowcolor=0x000000CC:shadowx=2:shadowy=2:borderw=1:bordercolor=0x8B6914,"
+            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=44:"
+            "x=(w-text_w)/2:y=h-150:"
+            "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
+            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=32:"
+            "x=(w-text_w)/2:y=70:shadowcolor=black:shadowx=3:shadowy=3"
         )
-    filtro_escalas = ";".join(escalas)
-
-    xfade_parts = []
-    prev = "v0"
-    tiempo_acumulado = dur_img
-    for i in range(1, len(imagenes_uso)):
-        offset = tiempo_acumulado - 1
-        out_label = "vout" if i == len(imagenes_uso) - 1 else f"vx{i}"
-        xfade_parts.append(f"[{prev}][v{i}]xfade=transition=fade:duration=1:offset={offset}[{out_label}]")
-        prev = out_label
-        tiempo_acumulado += dur_img - 1
-
-    filtro_xfade = ";".join(xfade_parts)
-
-    filtro_final = (
-        f"{filtro_escalas};{filtro_xfade};"
-        f"[vout]vignette=PI/6,"
-        f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize={44 if es_short else 52}:"
-        f"x=(w-text_w)/2:y=h-{150 if es_short else 90}:"
-        "shadowcolor=0x000000EE:shadowx=3:shadowy=3:borderw=2:bordercolor=black,"
-        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={32 if es_short else 28}:"
-        f"x=(w-text_w)/2:y={70 if es_short else 25}:shadowcolor=black:shadowx=2:shadowy=2[vfinal]"
-    )
+        t = '58'
+    else:
+        filtro = (
+            "scale=1920:1080:force_original_aspect_ratio=decrease,"
+            "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
+            "format=yuv420p,"
+            f"drawtext=text='{frase}':fontcolor=0xFFD700:fontsize=42:"
+            "x=(w-text_w)/2:y=(h/2)+80:"
+            "shadowcolor=0x000000CC:shadowx=3:shadowy=3:borderw=1:bordercolor=0x8B6914,"
+            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=52:"
+            "x=(w-text_w)/2:y=h-90:"
+            "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
+            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=28:"
+            "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2"
+        )
+        t = str(duracion)
 
     cmd = [
         'ffmpeg', '-y',
-        *inputs,
+        '-f', 'concat', '-safe', '0', '-i', lista_path,
         '-stream_loop', '-1', '-i', musica,
-        '-filter_complex', filtro_final,
-        '-map', '[vfinal]', '-map', f'{len(imagenes_uso)}:a',
+        '-map', '0:v', '-map', '1:a',
         '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
-        '-t', str(duracion),
+        '-t', t, '-vf', filtro,
         '-preset', 'fast', '-crf', '20',
         salida
     ]
-
     result = subprocess.run(cmd, capture_output=True, text=True)
     if os.path.exists(salida):
-        print(f"  OK HD con efectos: {os.path.getsize(salida)//1024//1024}MB")
+        print(f"  OK HD: {os.path.getsize(salida)//1024//1024}MB")
         return salida
     print(f"  Error: {result.stderr[-500:]}")
     return None
@@ -1025,9 +1021,9 @@ try:
 Generate VIRAL content for a video about: {tema_hi}
 {contexto_festival}
 Use English but include devotional Hindi terms like Ganpati Bappa, Vighnaharta, Shubh, Mangal when natural.
-No asterisks, no markdown.
+No asterisks, no markdown, no emojis in the title.
 Reply EXACTLY in this format:
-TITULO: 🇮🇳 [title maximum 60 characters, impactful, include Ganpati or Ganesha]
+TITULO: [title maximum 60 characters, impactful, include Ganpati or Ganesha]
 DESCRIPCION: [400 words with devotional keywords, benefits, CTA to subscribe to youtube.com/@SpiritualWave888]
 TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi VighnahartaGanesh]"""
     r_hi = requests.post(
