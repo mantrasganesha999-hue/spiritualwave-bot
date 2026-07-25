@@ -637,17 +637,11 @@ def montar_video(titulo, duracion=3600, es_short=False):
                 f.write(f"duration {dur_img}\n")
         f.write(f"file '{imagenes[0]}'\n")
 
-    es_ingles = any(w in titulo.lower() for w in ['the ', 'you ', 'why ', 'what ', 'how '])
-    frase = random.choice(FRASES_EN if es_ingles else FRASES_ES).replace("'", "").replace(':', '')
-
     if es_short:
         filtro = (
             "scale=1080:1920:force_original_aspect_ratio=increase,"
             "crop=1080:1920,"
             "format=yuv420p,"
-            f"drawtext=text='{frase}':fontcolor=0xFFD700:fontsize=36:"
-            "x=(w-text_w)/2:y=(h/2):"
-            "shadowcolor=0x000000CC:shadowx=2:shadowy=2:borderw=1:bordercolor=0x8B6914,"
             f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=44:"
             "x=(w-text_w)/2:y=h-150:"
             "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
@@ -660,9 +654,6 @@ def montar_video(titulo, duracion=3600, es_short=False):
             "scale=1920:1080:force_original_aspect_ratio=decrease,"
             "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
             "format=yuv420p,"
-            f"drawtext=text='{frase}':fontcolor=0xFFD700:fontsize=42:"
-            "x=(w-text_w)/2:y=(h/2)+80:"
-            "shadowcolor=0x000000CC:shadowx=3:shadowy=3:borderw=1:bordercolor=0x8B6914,"
             f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=52:"
             "x=(w-text_w)/2:y=h-90:"
             "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
