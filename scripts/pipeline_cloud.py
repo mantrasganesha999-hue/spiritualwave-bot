@@ -639,11 +639,11 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
     if es_short:
         filtro = (
-            "scale=1080:1920:force_original_aspect_ratio=increase,"
-            "crop=1080:1920,"
+            "scale=1080:1920:force_original_aspect_ratio=decrease,"
+            "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,"
             "format=yuv420p,"
-            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=44:"
-            "x=(w-text_w)/2:y=h-150:"
+            f"drawtext=text='{titulo_clean[:35]}':fontcolor=white:fontsize=38:"
+            "x=(w-text_w)/2:y=h-180:"
             "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
             "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=32:"
             "x=(w-text_w)/2:y=70:shadowcolor=black:shadowx=3:shadowy=3"
