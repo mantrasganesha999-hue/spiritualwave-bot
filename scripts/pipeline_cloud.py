@@ -264,6 +264,18 @@ def get_imagenes_shorts():
     random.shuffle(imgs)
     return imgs
 
+def get_clips_ganesha():
+    folder = os.path.join(BASE, 'assets/videos_ganesha')
+    if not os.path.exists(folder):
+        return []
+    clips = [
+        os.path.join(folder, f)
+        for f in os.listdir(folder)
+        if f.startswith('ganesha_clip') and f.endswith('.mp4')
+    ]
+    random.shuffle(clips)
+    return clips
+
 def get_musicas():
     todas = []
     for i in range(1, 22):
@@ -621,12 +633,13 @@ def generar_thumbnail_short(titulo, variante=1):
         return None
 
 def montar_video(titulo, duracion=3600, es_short=False):
-    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD con zoom...")
+    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
+    clips_reales = get_clips_ganesha()
     imagenes = get_imagenes_shorts() if es_short else get_imagenes()
     musicas = get_musicas()
 
-    if not imagenes or not musicas:
-        print("ERROR: Faltan imagenes o musica")
+    if not musicas:
+        print("ERROR: Falta musica")
         return None
 
     musica = random.choice(musicas)
@@ -634,47 +647,79 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
     w, h = (1080, 1920) if es_short else (1920, 1080)
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
-    dur_img = 8 if es_short else 12
-    num_imagenes = min(8, len(imagenes)) if not es_short else min(6, len(imagenes))
-    imagenes_uso = random.sample(imagenes, num_imagenes)
+    lista_path = '/tmp/lista.txt'
 
-    clips_temp = []
-    for idx, img in enumerate(imagenes_uso):
-        clip_path = f'/tmp/clip_{idx}.mp4'
-        zoom_in = idx % 2 == 0
-        if zoom_in:
-            zoom_expr = f"min(zoom+0.0012,1.25)"
+    usar_clips = len(clips_reales) >= 3
+
+    if usar_clips:
+        print(f"  Usando {len(clips_reales)} clips de video reales")
+        clips_normalizados = []
+        num_clips = min(10, len(clips_reales))
+        clips_uso = random.sample(clips_reales, num_clips)
+
+        for idx, clip in enumerate(clips_uso):
+            norm_path = f'/tmp/norm_{idx}.mp4'
+            filtro_norm = f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,fps=25"
+            cmd_norm = [
+                'ffmpeg', '-y', '-i', clip,
+                '-vf', filtro_norm, '-an', '-t', '8',
+                '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
+                norm_path
+            ]
+            result = subprocess.run(cmd_norm, capture_output=True, text=True)
+            if os.path.exists(norm_path):
+                clips_normalizados.append(norm_path)
+
+        if not clips_normalizados:
+            usar_clips = False
         else:
-            zoom_expr = f"if(eq(on,1),1.25,max(1.0,zoom-0.0012))"
+            with open(lista_path, 'w') as f:
+                repeticiones = max(1, duracion // (8 * len(clips_normalizados)) + 1)
+                for _ in range(repeticiones):
+                    clips_shuffled = clips_normalizados.copy()
+                    random.shuffle(clips_shuffled)
+                    for clip in clips_shuffled:
+                        f.write(f"file '{clip}'\n")
 
-        filtro_clip = (
-            f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
-            f"crop={w*2}:{h*2},"
-            f"zoompan=z='{zoom_expr}':d={dur_img*25}:s={w}x{h}:fps=25,"
-            "format=yuv420p"
-        )
-        cmd_clip = [
-            'ffmpeg', '-y', '-loop', '1', '-i', img,
-            '-vf', filtro_clip, '-t', str(dur_img),
-            '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
-            clip_path
-        ]
-        result = subprocess.run(cmd_clip, capture_output=True, text=True)
-        if os.path.exists(clip_path):
-            clips_temp.append(clip_path)
-        else:
-            print(f"  Error generando clip {idx}: {result.stderr[-200:]}")
+    if not usar_clips:
+        print("  Usando imagenes con zoom (respaldo)")
+        if not imagenes:
+            print("ERROR: Faltan imagenes o clips")
+            return None
+        dur_img = 8 if es_short else 12
+        num_imagenes = min(8, len(imagenes)) if not es_short else min(6, len(imagenes))
+        imagenes_uso = random.sample(imagenes, num_imagenes)
+        clips_normalizados = []
 
-    if not clips_temp:
-        print("ERROR: No se genero ningun clip con zoom")
-        return None
+        for idx, img in enumerate(imagenes_uso):
+            clip_path = f'/tmp/clip_{idx}.mp4'
+            zoom_in = idx % 2 == 0
+            zoom_expr = f"min(zoom+0.0012,1.25)" if zoom_in else f"if(eq(on,1),1.25,max(1.0,zoom-0.0012))"
+            filtro_clip = (
+                f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
+                f"crop={w*2}:{h*2},"
+                f"zoompan=z='{zoom_expr}':d={dur_img*25}:s={w}x{h}:fps=25,"
+                "format=yuv420p"
+            )
+            cmd_clip = [
+                'ffmpeg', '-y', '-loop', '1', '-i', img,
+                '-vf', filtro_clip, '-t', str(dur_img),
+                '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
+                clip_path
+            ]
+            result = subprocess.run(cmd_clip, capture_output=True, text=True)
+            if os.path.exists(clip_path):
+                clips_normalizados.append(clip_path)
 
-    lista_path = '/tmp/lista_clips.txt'
-    with open(lista_path, 'w') as f:
-        repeticiones = max(1, duracion // (dur_img * len(clips_temp)) + 1)
-        for _ in range(repeticiones):
-            for clip in clips_temp:
-                f.write(f"file '{clip}'\n")
+        if not clips_normalizados:
+            print("ERROR: No se genero ningun clip")
+            return None
+
+        with open(lista_path, 'w') as f:
+            repeticiones = max(1, duracion // (dur_img * len(clips_normalizados)) + 1)
+            for _ in range(repeticiones):
+                for clip in clips_normalizados:
+                    f.write(f"file '{clip}'\n")
 
     filtro_texto = (
         f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize={38 if es_short else 52}:"
@@ -698,14 +743,14 @@ def montar_video(titulo, duracion=3600, es_short=False):
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
 
-    for clip in clips_temp:
+    for clip in clips_normalizados:
         try:
             os.remove(clip)
         except:
             pass
 
     if os.path.exists(salida):
-        print(f"  OK HD con zoom: {os.path.getsize(salida)//1024//1024}MB")
+        print(f"  OK HD: {os.path.getsize(salida)//1024//1024}MB")
         return salida
     print(f"  Error: {result.stderr[-500:]}")
     return None
