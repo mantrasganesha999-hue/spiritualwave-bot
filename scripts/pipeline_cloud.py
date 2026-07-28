@@ -611,7 +611,7 @@ def generar_thumbnail_short(titulo, variante=1):
         return None
 
 def montar_video(titulo, duracion=3600, es_short=False):
-    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
+    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD con zoom...")
     imagenes = get_imagenes_shorts() if es_short else get_imagenes()
     musicas = get_musicas()
 
@@ -620,47 +620,61 @@ def montar_video(titulo, duracion=3600, es_short=False):
         return None
 
     musica = random.choice(musicas)
-    titulo_clean = limpiar_texto(titulo)[:45].replace("'","").replace('"','').replace(':','-').replace('#','')
+    titulo_clean = limpiar_texto(titulo)[:35 if es_short else 45].replace("'","").replace('"','').replace(':','-').replace('#','')
 
-    lista_path = '/tmp/lista_short.txt' if es_short else '/tmp/lista.txt'
+    w, h = (1080, 1920) if es_short else (1920, 1080)
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
+    dur_img = 8 if es_short else 12
+    num_imagenes = min(8, len(imagenes)) if not es_short else min(6, len(imagenes))
+    imagenes_uso = random.sample(imagenes, num_imagenes)
 
-    dur_img = 10 if es_short else 15
-    repeticiones = 2 if es_short else max(1, duracion // (len(imagenes) * dur_img) + 1)
+    clips_temp = []
+    for idx, img in enumerate(imagenes_uso):
+        clip_path = f'/tmp/clip_{idx}.mp4'
+        zoom_in = idx % 2 == 0
+        if zoom_in:
+            zoom_expr = f"min(zoom+0.0012,1.25)"
+        else:
+            zoom_expr = f"if(eq(on,1),1.25,max(1.0,zoom-0.0012))"
 
+        filtro_clip = (
+            f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
+            f"crop={w*2}:{h*2},"
+            f"zoompan=z='{zoom_expr}':d={dur_img*25}:s={w}x{h}:fps=25,"
+            "format=yuv420p"
+        )
+        cmd_clip = [
+            'ffmpeg', '-y', '-loop', '1', '-i', img,
+            '-vf', filtro_clip, '-t', str(dur_img),
+            '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
+            clip_path
+        ]
+        result = subprocess.run(cmd_clip, capture_output=True, text=True)
+        if os.path.exists(clip_path):
+            clips_temp.append(clip_path)
+        else:
+            print(f"  Error generando clip {idx}: {result.stderr[-200:]}")
+
+    if not clips_temp:
+        print("ERROR: No se genero ningun clip con zoom")
+        return None
+
+    lista_path = '/tmp/lista_clips.txt'
     with open(lista_path, 'w') as f:
+        repeticiones = max(1, duracion // (dur_img * len(clips_temp)) + 1)
         for _ in range(repeticiones):
-            imgs = imagenes.copy()
-            random.shuffle(imgs)
-            for img in imgs:
-                f.write(f"file '{img}'\n")
-                f.write(f"duration {dur_img}\n")
-        f.write(f"file '{imagenes[0]}'\n")
+            for clip in clips_temp:
+                f.write(f"file '{clip}'\n")
 
-    if es_short:
-        filtro = (
-            "scale=1080:1920:force_original_aspect_ratio=decrease,"
-            "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,"
-            "format=yuv420p,"
-            f"drawtext=text='{titulo_clean[:35]}':fontcolor=white:fontsize=38:"
-            "x=(w-text_w)/2:y=h-180:"
-            "shadowcolor=0x000000EE:shadowx=4:shadowy=4:borderw=2:bordercolor=black,"
-            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=32:"
-            "x=(w-text_w)/2:y=70:shadowcolor=black:shadowx=3:shadowy=3"
-        )
-        t = '58'
-    else:
-        filtro = (
-            "scale=1920:1080:force_original_aspect_ratio=decrease,"
-            "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
-            "format=yuv420p,"
-            f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize=52:"
-            "x=(w-text_w)/2:y=h-90:"
-            "shadowcolor=0x000000CC:shadowx=3:shadowy=3,"
-            "drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize=28:"
-            "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2"
-        )
-        t = str(duracion)
+    filtro_texto = (
+        f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize={38 if es_short else 52}:"
+        f"x=(w-text_w)/2:y=h-{180 if es_short else 90}:"
+        "shadowcolor=0x000000EE:shadowx=3:shadowy=3:borderw=2:bordercolor=black,"
+        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={32 if es_short else 28}:"
+        f"x=(w-text_w)/2:y={70 if es_short else 25}:shadowcolor=black:shadowx=2:shadowy=2"
+    )
+
+    t = '58' if es_short else str(duracion)
 
     cmd = [
         'ffmpeg', '-y',
@@ -668,13 +682,20 @@ def montar_video(titulo, duracion=3600, es_short=False):
         '-stream_loop', '-1', '-i', musica,
         '-map', '0:v', '-map', '1:a',
         '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
-        '-t', t, '-vf', filtro,
+        '-t', t, '-vf', filtro_texto,
         '-preset', 'fast', '-crf', '20',
         salida
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
+
+    for clip in clips_temp:
+        try:
+            os.remove(clip)
+        except:
+            pass
+
     if os.path.exists(salida):
-        print(f"  OK HD: {os.path.getsize(salida)//1024//1024}MB")
+        print(f"  OK HD con zoom: {os.path.getsize(salida)//1024//1024}MB")
         return salida
     print(f"  Error: {result.stderr[-500:]}")
     return None
