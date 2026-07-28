@@ -196,7 +196,7 @@ DIAS_SERIE_21 = [
     "Dia 21: Celebra tu transformacion y nueva abundancia",
 ]
 
-EMOJIS_TITULO = ["🔱", "✨", "🙏", "⚡", "🌟", "💫", "🎯", "🔥", "💎", "🌙"]
+EMOJIS_COMBOS = ["✨🔱🌸", "🔥✨🕉", "🙏💫🔱", "⚡🌟🕉", "🔥🙏✨", "💫🕉🌸"]
 
 FRASES_ES = [
     "Abro mi mente a la abundancia infinita",
@@ -374,7 +374,7 @@ def detectar_festival_hindu():
 
 def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
-    emoji = random.choice(EMOJIS_TITULO)
+    emoji = random.choice(EMOJIS_COMBOS)
     if lang == 'es':
         prompt = f"""Eres el mejor copywriter viral de YouTube en nicho espiritual, experto en titulos que generan clicks masivos.
 Genera contenido VIRAL para un video sobre: {tema}
