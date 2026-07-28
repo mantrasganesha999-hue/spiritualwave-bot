@@ -654,7 +654,7 @@ def montar_video(titulo, duracion=3600, es_short=False):
     if usar_clips:
         print(f"  Usando {len(clips_reales)} clips de video reales")
         clips_normalizados = []
-        num_clips = min(10, len(clips_reales))
+        num_clips = min(15, len(clips_reales))
         clips_uso = random.sample(clips_reales, num_clips)
 
         for idx, clip in enumerate(clips_uso):
