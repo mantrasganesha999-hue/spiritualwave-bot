@@ -264,14 +264,19 @@ def get_imagenes_shorts():
     random.shuffle(imgs)
     return imgs
 
-def get_clips_ganesha():
-    folder = os.path.join(BASE, 'assets/videos_ganesha')
+def get_clips_ganesha(es_short=False):
+    if es_short:
+        folder = os.path.join(BASE, 'assets/videos_ganesha')
+        prefijo = 'ganesha_clip'
+    else:
+        folder = os.path.join(BASE, 'assets/videos_ganesha_horizontal')
+        prefijo = 'ganesha_h'
     if not os.path.exists(folder):
         return []
     clips = [
         os.path.join(folder, f)
         for f in os.listdir(folder)
-        if f.startswith('ganesha_clip') and f.endswith('.mp4')
+        if f.startswith(prefijo) and f.endswith('.mp4')
     ]
     random.shuffle(clips)
     return clips
@@ -634,7 +639,7 @@ def generar_thumbnail_short(titulo, variante=1):
 
 def montar_video(titulo, duracion=3600, es_short=False):
     print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
-    clips_reales = get_clips_ganesha()
+    clips_reales = get_clips_ganesha(es_short=es_short)
     imagenes = get_imagenes_shorts() if es_short else get_imagenes()
     musicas = get_musicas()
 
