@@ -161,6 +161,16 @@ TEMAS_SHORTS_EN = [
     "What happens if you listen to 528hz for 7 days",
     "How to clean your energy in one minute",
 ]
+TEMAS_SHORTS_DEVOCIONAL = [
+    "Jai Maa Kali mantra para proteccion y poder divino",
+    "Mantra de Durga para eliminar todo mal",
+    "Om Namah Shivaya para paz y transformacion interior",
+    "Mantra de Lakshmi para riqueza instantanea",
+    "Aarti poderosa para bendiciones diarias",
+    "Stotram sagrado para eliminar obstaculos",
+    "Bhajan devocional para sanar el alma",
+    "Mantra de Hanuman para valor y proteccion",
+]
 
 DIAS_SERIE_21 = [
     "Dia 1: Reconoce que mereces la abundancia que pides",
@@ -368,7 +378,7 @@ El TITULO debe usar una de estas formulas probadas (elige la mejor para el tema)
 Responde EXACTAMENTE en este formato sin simbolos extra:
 TITULO: {emoji} [titulo viral usando una formula de arriba, maximo 60 caracteres, con mayusculas en palabras clave]
 DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separados por espacios incluyendo terminos de tendencia 2026]"""
+TAGS: [30 hashtags separados por espacios incluyendo terminos de tendencia 2026, Bhakti, Devocional, JaiGanesh, SanatanDharma cuando sea relevante]"""
     else:
         prompt = f"""You are the best viral YouTube copywriter in the spiritual niche, expert in titles that generate massive clicks.
 Generate VIRAL content for: {tema}
@@ -384,7 +394,7 @@ The TITULO must use one of these proven formulas (choose the best for the topic)
 Reply EXACTLY in this format:
 TITULO: {emoji} [viral title using a formula above, maximum 60 characters, capitalize key words]
 DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms]"""
+TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms, Bhakti, Devotional, JaiGanesh, SanatanDharma when relevant]"""
 
     r = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
@@ -401,7 +411,7 @@ TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms]""
     descripcion = extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or f"Video sobre {tema}"
     descripcion = limpiar_texto(descripcion)
 
-    tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz #Abundancia"
+    tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz #Abundancia #Bhakti #Devocional #JaiGanesh #Mantra2026 #SanatanDharma #MusicaEspiritual #Meditacion"
     tags = limpiar_texto(tags)
 
     return titulo, descripcion, tags
@@ -712,6 +722,9 @@ def agregar_capitulos(descripcion, duracion_min):
         caps += f"https://www.youtube.com/watch?v={VIDEOS_SUBIDOS_HOY[-1]}\n"
     caps += f"\nSuscribete: youtube.com/@SpiritualWave888\n"
     caps += f"Activa la campana para no perderte nada\n"
+    caps += "\n\nNota de Copyright:\nSi algun clip o contenido usado aqui te pertenece y fue incluido sin intencion, contactanos antes de reclamar. Respetamos a los creadores y actuaremos de inmediato si es necesario.\n"
+    caps += "\nAviso:\nAlgunas imagenes de este canal son generadas o mejoradas con IA. Estos videos son creados con fines devocionales, artisticos y de entretenimiento.\n"
+    caps += "\nUso Justo:\nBajo la Seccion 107 de la Ley de Derechos de Autor de 1976, se permite el uso justo para fines de critica, comentario, ensenanza y estudio.\n"
     return descripcion + caps
 
 def agregar_a_playlist(youtube, video_id, playlist_nombre):
@@ -970,6 +983,17 @@ try:
 except Exception as e:
     telegram(f"⚠️ Error en Short EN: {str(e)[:150]}")
     print(f"Error Short EN: {e}")
+try:
+    tema_short_dev = random.choice(TEMAS_SHORTS_DEVOCIONAL)
+    print(f"\n[SHORT DEVOCIONAL] {tema_short_dev}")
+    short_dev = montar_video(tema_short_dev, es_short=True)
+    if short_dev:
+        vid_id, url = subir_youtube(short_dev, tema_short_dev, f"🙏 {tema_short_dev}\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Bhakti #Devocional #Mantra #JaiGanesh #SanatanDharma #Shorts", "#Bhakti #Devocional #Mantra #JaiGanesh #SanatanDharma #Shorts #SpiritualWave", es_short=True, variante=7, idioma='es')
+        resultados.append({'tipo': 'SHORT DEVOCIONAL', 'titulo': tema_short_dev, 'url': url})
+        telegram(f"✅ <b>Short Devocional subido</b>\n🎬 {tema_short_dev}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en Short Devocional: {str(e)[:150]}")
+    print(f"Error Short Devocional: {e}")
 
 try:
     dia_serie = obtener_dia_serie()
