@@ -413,12 +413,21 @@ TITULO: {emoji} [viral title using a formula above, maximum 60 characters, capit
 DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
 TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms, Bhakti, Devotional, JaiGanesh, SanatanDharma when relevant]"""
 
-    r = requests.post(
-        'https://api.groq.com/openai/v1/chat/completions',
-        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000}
-    )
-    contenido = r.json()['choices'][0]['message']['content']
+    try:
+        r = requests.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
+            json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000},
+            timeout=30
+        )
+        data = r.json()
+        if 'choices' not in data:
+            print(f'  Groq error: {data}')
+            return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #528hz'
+        contenido = data['choices'][0]['message']['content']
+    except Exception as e:
+        print(f'  Groq exception: {e}')
+        return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #528hz' 
 
     titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
     titulo = limpiar_texto(titulo)
