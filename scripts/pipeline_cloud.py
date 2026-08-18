@@ -1070,9 +1070,11 @@ TAGS: [20 hashtags separados por espacios]"""
     r_serie = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
         headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_serie}], 'max_tokens': 1200}
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_serie}], 'max_tokens': 1200},
+        timeout=30
     )
-    contenido_serie = r_serie.json()['choices'][0]['message']['content']
+    data_serie = r_serie.json()
+    contenido_serie = data_serie['choices'][0]['message']['content'] if 'choices' in data_serie else ''  
     desc_serie = extraer_campo(contenido_serie, 'DESCRIPCION', 'TAGS') or tema_serie
     desc_serie = limpiar_texto(desc_serie)
     tags_serie = extraer_campo(contenido_serie, 'TAGS') or "#Ganesha #21Dias #Manifestacion #SpiritualWave"
@@ -1099,9 +1101,11 @@ TAGS: [25 hashtags separadas por espacos]"""
     r_pt = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
         headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_pt}], 'max_tokens': 1500}
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_pt}], 'max_tokens': 1500},
+        timeout=30
     )
-    contenido_pt = r_pt.json()['choices'][0]['message']['content']
+    data_pt = r_pt.json()
+    contenido_pt = data_pt['choices'][0]['message']['content'] if 'choices' in data_pt else ''  
     titulo_pt = extraer_campo(contenido_pt, 'TITULO', 'DESCRICAO') or tema_pt[:60]
     titulo_pt = limpiar_texto(titulo_pt)
     desc_pt = extraer_campo(contenido_pt, 'DESCRICAO', 'TAGS') or tema_pt
@@ -1138,9 +1142,11 @@ TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi Vighnah
     r_hi = requests.post(
         'https://api.groq.com/openai/v1/chat/completions',
         headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500}
+        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
+        timeout=30
     )
-    contenido_hi = r_hi.json()['choices'][0]['message']['content']
+    data_hi = r_hi.json()
+    contenido_hi = data_hi['choices'][0]['message']['content'] if 'choices' in data_hi else ''  
     titulo_hi = extraer_campo(contenido_hi, 'TITULO', 'DESCRIPCION') or tema_hi[:60]
     titulo_hi = limpiar_texto(titulo_hi)
     desc_hi = extraer_campo(contenido_hi, 'DESCRIPCION', 'TAGS') or tema_hi
