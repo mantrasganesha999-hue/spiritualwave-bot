@@ -770,20 +770,29 @@ def montar_video(titulo, duracion=3600, es_short=False):
     return None
 
 def agregar_capitulos(descripcion, duracion_min):
-    caps = "\n\nCAPITULOS:\n00:00 - Introduccion y bienvenida\n"
+    caps = "\n\nCAPITULOS:\n"
+    caps += "00:00 - Introduccion y bienvenida\n"
+    caps += "00:30 - Mantra principal Om Gan Ganapataye Namaha\n"
     paso = duracion_min // 5
-    temas_caps = ["Mantra principal", "Meditacion profunda", "Afirmaciones de abundancia", "Cierre y bendicion"]
-    for i, tema_cap in enumerate(temas_caps):
-        mins = (i+1) * paso
-        caps += f"{mins:02d}:00 - {tema_cap}\n"
+    temas = [
+        "Meditacion profunda con frecuencias sagradas",
+        "Afirmaciones de abundancia y prosperidad",
+        "Sanacion energetica y limpieza del aura",
+        "Cierre y bendicion de Ganesha"
+    ]
+    tiempos = [paso, paso*2, paso*3, paso*4]
+    for tiempo, tema in zip(tiempos, temas):
+        h = tiempo // 60
+        m = tiempo % 60
+        if h > 0:
+            caps += f"{h:01d}:{m:02d}:00 - {tema}\n"
+        else:
+            caps += f"{m:02d}:00 - {tema}\n"
     if VIDEOS_SUBIDOS_HOY:
         caps += f"\nContinua tu practica espiritual con nuestro video anterior:\n"
         caps += f"https://www.youtube.com/watch?v={VIDEOS_SUBIDOS_HOY[-1]}\n"
-    caps += f"\nSuscribete: youtube.com/@SpiritualWave888\n"
-    caps += f"Activa la campana para no perderte nada\n"
-    caps += "\n\nNota de Copyright:\nSi algun clip o contenido usado aqui te pertenece y fue incluido sin intencion, contactanos antes de reclamar. Respetamos a los creadores y actuaremos de inmediato si es necesario.\n"
-    caps += "\nAviso:\nAlgunas imagenes de este canal son generadas o mejoradas con IA. Estos videos son creados con fines devocionales, artisticos y de entretenimiento.\n"
-    caps += "\nUso Justo:\nBajo la Seccion 107 de la Ley de Derechos de Autor de 1976, se permite el uso justo para fines de critica, comentario, ensenanza y estudio.\n"
+    caps += "\nSuscribete: youtube.com/@SpiritualWave888\n"
+    caps += "Activa la campana para no perderte nada\n"
     return descripcion + caps
 
 def agregar_a_playlist(youtube, video_id, playlist_nombre):
@@ -811,6 +820,48 @@ def agregar_a_playlist(youtube, video_id, playlist_nombre):
         print(f"  Agregado a playlist: {playlist_nombre}")
     except Exception as e:
         print(f"  Playlist error: {e}")
+
+
+def generar_srt(titulo, duracion_min, idioma='es'):
+    frases_es = [
+        "Bienvenido a SpiritualWave. Activa las notificaciones para no perderte nada.",
+        "Relaja tu mente y abre tu corazon a las frecuencias sagradas de Ganesha.",
+        "Om Gan Ganapataye Namaha. El mantra mas poderoso para eliminar obstaculos.",
+        "Respira profundo. Deja que la energia de Ganesha fluya a traves de ti.",
+        "Suscribete al canal para recibir mantras poderosos cada dia.",
+        "Que Ganesha elimine todos los obstaculos de tu camino hacia la abundancia.",
+        "Gracias por acompanarnos en esta practica espiritual. Namaste.",
+    ]
+    frases_en = [
+        "Welcome to SpiritualWave. Turn on notifications so you never miss anything.",
+        "Relax your mind and open your heart to Ganesha's sacred frequencies.",
+        "Om Gan Ganapataye Namaha. The most powerful mantra to remove obstacles.",
+        "Breathe deeply. Let Ganesha's energy flow through you.",
+        "Subscribe to the channel to receive powerful mantras every day.",
+        "May Ganesha remove all obstacles on your path to abundance.",
+        "Thank you for joining us in this spiritual practice. Namaste.",
+    ]
+    
+    frases = frases_en if idioma == 'en' else frases_es
+    duracion_seg = duracion_min * 60
+    intervalo = duracion_seg // len(frases)
+    
+    srt = ""
+    for i, frase in enumerate(frases):
+        inicio = i * intervalo
+        fin = inicio + min(intervalo - 2, 30)
+        
+        h_i, m_i, s_i = inicio//3600, (inicio%3600)//60, inicio%60
+        h_f, m_f, s_f = fin//3600, (fin%3600)//60, fin%60
+        
+        srt += f"{i+1}\n"
+        srt += f"{h_i:02d}:{m_i:02d}:{s_i:02d},000 --> {h_f:02d}:{m_f:02d}:{s_f:02d},000\n"
+        srt += f"{frase}\n\n"
+    
+    path = f'/tmp/subtitulos_{idioma}.srt'
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(srt)
+    return path
 
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1, playlist_nombre=None, idioma='es'):
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
@@ -878,6 +929,26 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 
         if playlist_nombre:
             agregar_a_playlist(youtube, video_id, playlist_nombre)
+
+        try:
+            srt_path = generar_srt(titulo, duracion_min, idioma)
+            youtube.captions().insert(
+                part='snippet',
+                body={
+                    'snippet': {
+                        'videoId': video_id,
+                        'language': idioma,
+                        'name': 'SpiritualWave',
+                        'isDraft': False
+                    }
+                },
+                media_body=__import__('googleapiclient.http', fromlist=['MediaFileUpload']).MediaFileUpload(
+                    srt_path, mimetype='application/octet-stream'
+                )
+            ).execute()
+            print(f"  Subtitulos {idioma} OK")
+        except Exception as e:
+            print(f"  Subtitulos error: {e}")
 
         try:
             comentarios_es = [
