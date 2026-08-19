@@ -1,0 +1,35 @@
+name: SpiritualWave Directo
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+    - cron: '30 8 * * *'
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+
+jobs:
+  transmitir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
+        pip install requests google-api-python-client google-auth-oauthlib Pillow
+
+    - name: Transmitir en vivo
+      env:
+        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python scripts/pipeline_directo.py
