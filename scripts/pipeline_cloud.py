@@ -914,41 +914,14 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
 
-        if VIDEOS_SUBIDOS_HOY:
-            try:
-                video_anterior = VIDEOS_SUBIDOS_HOY[-1]
-                youtube.cards().insert(
-                    videoId=video_id,
-                    body={"card": {"videoIdCard": {"videoId": video_anterior}}}
-                ).execute()
-                print("  Card OK")
-            except Exception as e:
-                print(f"  Card error: {e}")
+        # Cards desactivadas - API no soportada en version actual
 
         VIDEOS_SUBIDOS_HOY.append(video_id)
 
         if playlist_nombre:
             agregar_a_playlist(youtube, video_id, playlist_nombre)
 
-        try:
-            srt_path = generar_srt(titulo, duracion_min, idioma)
-            youtube.captions().insert(
-                part='snippet',
-                body={
-                    'snippet': {
-                        'videoId': video_id,
-                        'language': idioma,
-                        'name': 'SpiritualWave',
-                        'isDraft': False
-                    }
-                },
-                media_body=__import__('googleapiclient.http', fromlist=['MediaFileUpload']).MediaFileUpload(
-                    srt_path, mimetype='application/octet-stream'
-                )
-            ).execute()
-            print(f"  Subtitulos {idioma} OK")
-        except Exception as e:
-            print(f"  Subtitulos error: {e}")
+        # Subtitulos desactivados para conservar quota de API
 
         try:
             comentarios_es = [
