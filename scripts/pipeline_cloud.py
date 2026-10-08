@@ -1044,122 +1044,7 @@ fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 resultados = []
 
 verificar_salud()
-telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido + directo...")
-
-try:
-    tema_es = random.choice(TEMAS_ES)
-    print(f"\n[VIDEO ES 1H] {tema_es}")
-    titulo_es, desc_es, tags_es = generar_guion(tema_es, 'es')
-    video_es = montar_video(titulo_es, duracion=3600)
-    if video_es:
-        vid_id, url = subir_youtube(video_es, titulo_es, desc_es, tags_es, duracion_min=60, variante=1, playlist_nombre="Mantras de Ganesha", idioma='es')
-        resultados.append({'tipo': 'VIDEO ES 1H', 'titulo': titulo_es, 'url': url})
-        telegram(f"✅ <b>Video ES 1H subido</b>\n🎬 {titulo_es}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en video ES: {str(e)[:150]}")
-    print(f"Error video ES: {e}")
-
-try:
-    tema_short_es = random.choice(TEMAS_SHORTS_ES)
-    print(f"\n[SHORT ES] {tema_short_es}")
-    short_es = montar_video(tema_short_es, es_short=True)
-    if short_es:
-        vid_id, url = subir_youtube(short_es, tema_short_es, f"🙏 {tema_short_es}\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz", "#Ganesha #Shorts #Mantra #Espiritual #Abundancia #528hz #SpiritualWave", es_short=True, variante=2, idioma='es')
-        resultados.append({'tipo': 'SHORT ES', 'titulo': tema_short_es, 'url': url})
-        telegram(f"✅ <b>Short ES subido</b>\n🎬 {tema_short_es}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en Short ES: {str(e)[:150]}")
-    print(f"Error Short ES: {e}")
-
-try:
-    tema_short_en = random.choice(TEMAS_SHORTS_EN)
-    print(f"\n[SHORT EN] {tema_short_en}")
-    short_en = montar_video(tema_short_en, es_short=True)
-    if short_en:
-        vid_id, url = subir_youtube(short_en, tema_short_en, f"🙏 {tema_short_en}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz", "#Ganesha #Shorts #Mantra #Spiritual #Abundance #528hz #SpiritualWave", es_short=True, variante=3, idioma='en')
-        resultados.append({'tipo': 'SHORT EN', 'titulo': tema_short_en, 'url': url})
-        telegram(f"✅ <b>Short EN subido</b>\n🎬 {tema_short_en}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en Short EN: {str(e)[:150]}")
-    print(f"Error Short EN: {e}")
-try:
-    tema_short_dev = random.choice(TEMAS_SHORTS_DEVOCIONAL)
-    print(f"\n[SHORT DEVOCIONAL] {tema_short_dev}")
-    short_dev = montar_video(tema_short_dev, es_short=True)
-    if short_dev:
-        vid_id, url = subir_youtube(short_dev, tema_short_dev, f"🙏 {tema_short_dev}\n\nSuscribete: youtube.com/@SpiritualWave888\n\n#Bhakti #Devocional #Mantra #JaiGanesh #SanatanDharma #Shorts", "#Bhakti #Devocional #Mantra #JaiGanesh #SanatanDharma #Shorts #SpiritualWave", es_short=True, variante=7, idioma='es')
-        resultados.append({'tipo': 'SHORT DEVOCIONAL', 'titulo': tema_short_dev, 'url': url})
-        telegram(f"✅ <b>Short Devocional subido</b>\n🎬 {tema_short_dev}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en Short Devocional: {str(e)[:150]}")
-    print(f"Error Short Devocional: {e}")
-
-try:
-    dia_serie = obtener_dia_serie()
-    tema_serie = DIAS_SERIE_21[dia_serie - 1]
-    titulo_serie = f"21 Dias con Ganesha - Dia {dia_serie}/21"
-    print(f"\n[SERIE 21 DIAS] {titulo_serie}")
-    prompt_serie = f"""Eres experto en contenido espiritual de YouTube.
-Este es el Dia {dia_serie} de una serie de 21 dias de manifestacion con Ganesha.
-El tema de hoy es: {tema_serie}
-Sin tildes ni caracteres especiales ni asteriscos.
-Genera una descripcion motivadora de 300 palabras sobre esta practica diaria, mencionando que es parte de la serie de 21 dias, invitando a suscribirse para no perderse los proximos dias.
-Responde EXACTAMENTE:
-DESCRIPCION: [descripcion de 300 palabras]
-TAGS: [20 hashtags separados por espacios]"""
-    r_serie = requests.post(
-        'https://api.groq.com/openai/v1/chat/completions',
-        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_serie}], 'max_tokens': 1200},
-        timeout=30
-    )
-    data_serie = r_serie.json()
-    contenido_serie = data_serie['choices'][0]['message']['content'] if 'choices' in data_serie else ''  
-    desc_serie = extraer_campo(contenido_serie, 'DESCRIPCION', 'TAGS') or tema_serie
-    desc_serie = limpiar_texto(desc_serie)
-    tags_serie = extraer_campo(contenido_serie, 'TAGS') or "#Ganesha #21Dias #Manifestacion #SpiritualWave"
-    tags_serie = limpiar_texto(tags_serie)
-    video_serie = montar_video(titulo_serie, duracion=1800)
-    if video_serie:
-        vid_id, url = subir_youtube(video_serie, titulo_serie, desc_serie, tags_serie, duracion_min=30, variante=4, playlist_nombre="21 Dias con Ganesha", idioma='es')
-        resultados.append({'tipo': 'SERIE 21D', 'titulo': titulo_serie, 'url': url})
-        telegram(f"✅ <b>Serie 21 Dias subido</b>\n🎬 {titulo_serie}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en serie 21 dias: {str(e)[:150]}")
-    print(f"Error serie: {e}")
-
-try:
-    tema_pt = random.choice(TEMAS_PT)
-    print(f"\n[VIDEO PT] {tema_pt}")
-    prompt_pt = f"""Voce e um especialista em conteudo espiritual do YouTube em portugues do Brasil.
-Gere conteudo VIRAL para um video sobre: {tema_pt}
-Sem acentos ou caracteres especiais nem asteriscos.
-Responda EXATAMENTE neste formato:
-TITULO: [titulo maximo 60 caracteres impactante]
-DESCRICAO: [400 palavras com palavras chave espirituais, beneficios, CTA para se inscrever em youtube.com/@SpiritualWave888]
-TAGS: [25 hashtags separadas por espacos]"""
-    r_pt = requests.post(
-        'https://api.groq.com/openai/v1/chat/completions',
-        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_pt}], 'max_tokens': 1500},
-        timeout=30
-    )
-    data_pt = r_pt.json()
-    contenido_pt = data_pt['choices'][0]['message']['content'] if 'choices' in data_pt else ''  
-    titulo_pt = extraer_campo(contenido_pt, 'TITULO', 'DESCRICAO') or tema_pt[:60]
-    titulo_pt = limpiar_texto(titulo_pt)
-    desc_pt = extraer_campo(contenido_pt, 'DESCRICAO', 'TAGS') or tema_pt
-    desc_pt = limpiar_texto(desc_pt)
-    tags_pt = extraer_campo(contenido_pt, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz"
-    tags_pt = limpiar_texto(tags_pt)
-    video_pt = montar_video(titulo_pt, duracion=3600)
-    if video_pt:
-        vid_id, url = subir_youtube(video_pt, titulo_pt, desc_pt, tags_pt, duracion_min=60, variante=5, playlist_nombre="Mantras em Portugues", idioma='pt')
-        resultados.append({'tipo': 'VIDEO PT', 'titulo': titulo_pt, 'url': url})
-        telegram(f"✅ <b>Video PT subido</b>\n🎬 {titulo_pt}\n🔗 {url}")
-except Exception as e:
-    telegram(f"⚠️ Error en video PT: {str(e)[:150]}")
-    print(f"Error PT: {e}")
+telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido...")
 
 try:
     festival = detectar_festival_hindu()
@@ -1178,35 +1063,58 @@ No asterisks, no markdown, no emojis in the title.
 Reply EXACTLY in this format:
 TITULO: [title maximum 60 characters, impactful, include Ganpati or Ganesha]
 DESCRIPCION: [400 words with devotional keywords, benefits, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi VighnahartaGanesh]"""
-    r_hi = requests.post(
-        'https://api.groq.com/openai/v1/chat/completions',
-        headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-        json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
-        timeout=30
-    )
-    data_hi = r_hi.json()
-    contenido_hi = data_hi['choices'][0]['message']['content'] if 'choices' in data_hi else ''  
-    titulo_hi = extraer_campo(contenido_hi, 'TITULO', 'DESCRIPCION') or tema_hi[:60]
-    titulo_hi = limpiar_texto(titulo_hi)
-    desc_hi = extraer_campo(contenido_hi, 'DESCRIPCION', 'TAGS') or tema_hi
-    desc_hi = limpiar_texto(desc_hi)
-    tags_hi = extraer_campo(contenido_hi, 'TAGS') or "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
-    tags_hi = limpiar_texto(tags_hi)
+TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi VighnahartaGanesh Bhakti Devotional]"""
+    try:
+        r_hi = requests.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
+            json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
+            timeout=30
+        )
+        data_hi = r_hi.json()
+        if 'choices' not in data_hi:
+            print(f"Groq error: {data_hi}")
+            titulo_hi = tema_hi[:60]
+            desc_hi = tema_hi
+            tags_hi = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave #Bhakti #Devotional"
+        else:
+            contenido_hi = data_hi['choices'][0]['message']['content']
+            titulo_hi = extraer_campo(contenido_hi, 'TITULO', 'DESCRIPCION') or tema_hi[:60]
+            titulo_hi = limpiar_texto(titulo_hi)
+            desc_hi = extraer_campo(contenido_hi, 'DESCRIPCION', 'TAGS') or tema_hi
+            desc_hi = limpiar_texto(desc_hi)
+            tags_hi = extraer_campo(contenido_hi, 'TAGS') or "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
+            tags_hi = limpiar_texto(tags_hi)
+    except Exception as e:
+        print(f"Groq exception: {e}")
+        titulo_hi = tema_hi[:60]
+        desc_hi = tema_hi
+        tags_hi = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
+
     video_hi = montar_video(titulo_hi, duracion=3600)
     if video_hi:
-        vid_id, url = subir_youtube(video_hi, titulo_hi, desc_hi, tags_hi, duracion_min=60, variante=6, playlist_nombre="Ganpati Bappa Mantras", idioma='hi')
+        vid_id, url = subir_youtube(video_hi, titulo_hi, desc_hi, tags_hi, duracion_min=60, variante=1, playlist_nombre="Ganpati Bappa Mantras", idioma='hi')
         resultados.append({'tipo': 'VIDEO HI', 'titulo': titulo_hi, 'url': url})
-        telegram(f"✅ <b>Video HI (India) subido</b>\n🎬 {titulo_hi}\n🔗 {url}")
+        telegram(f"✅ <b>Video HI subido</b>\n🎬 {titulo_hi}\n🔗 {url}")
 except Exception as e:
     telegram(f"⚠️ Error en video HI: {str(e)[:150]}")
     print(f"Error HI: {e}")
 
-resumen = f"🔱 <b>Videos completados</b>\n📅 {fecha}\n\n"
+try:
+    tema_short_hi = random.choice(TEMAS_SHORTS_EN)
+    print(f"\n[SHORT HI] {tema_short_hi}")
+    short_hi = montar_video(tema_short_hi, es_short=True)
+    if short_hi:
+        vid_id, url = subir_youtube(short_hi, tema_short_hi, f"🙏 {tema_short_hi}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti", "#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti #SpiritualWave", es_short=True, variante=2, idioma='en')
+        resultados.append({'tipo': 'SHORT HI', 'titulo': tema_short_hi, 'url': url})
+        telegram(f"✅ <b>Short subido</b>\n🎬 {tema_short_hi}\n🔗 {url}")
+except Exception as e:
+    telegram(f"⚠️ Error en Short: {str(e)[:150]}")
+    print(f"Error Short: {e}")
+
+resumen = f"🔱 <b>Contenido completado</b>\n📅 {fecha}\n\n"
 for r in resultados:
     resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
 telegram(resumen)
-
-# Directo movido a workflow separado para conservar quota de API
 
 print("\n=== PROCESO FINALIZADO ===")
