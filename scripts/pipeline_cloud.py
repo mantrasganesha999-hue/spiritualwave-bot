@@ -281,14 +281,24 @@ def get_clips_ganesha(es_short=False):
     random.shuffle(clips)
     return clips
 
-def get_musicas():
+def get_musicas(categoria='general'):
     folder = os.path.join(BASE, 'assets/music')
-    todas = [
-        os.path.join(folder, f)
-        for f in os.listdir(folder)
-        if f.endswith('.mp3')
-    ]
-    return todas
+    todos = [f for f in os.listdir(folder) if f.endswith('.mp3')]
+    mantras = [f for f in todos if any(w in f.lower() for w in ['om', 'mantra', 'chant', 'gayatri', 'shiva', 'hanuman', 'hindu', 'bhajan', 'ram', 'krishna'])]
+    meditation = [f for f in todos if any(w in f.lower() for w in ['meditation', 'meditat', 'zen', 'deep', 'buddhist', 'binaural'])]
+    ambient = [f for f in todos if any(w in f.lower() for w in ['ambient', 'calm', 'relaxing', 'dreamscape', 'flute', 'bell'])]
+    uplifting = [f for f in todos if any(w in f.lower() for w in ['uplifting', 'inspirational', 'corporate'])]
+    if categoria == 'mantra' and mantras:
+        seleccion = mantras
+    elif categoria == 'meditation' and meditation:
+        seleccion = meditation
+    elif categoria == 'ambient' and ambient:
+        seleccion = ambient
+    elif categoria == 'uplifting' and uplifting:
+        seleccion = uplifting
+    else:
+        seleccion = todos
+    return [os.path.join(folder, f) for f in seleccion]
 
 def verificar_salud():
     print("Verificando salud del sistema...")
@@ -954,7 +964,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 def montar_video_directo(titulo, duracion=6000):
     print(f"Montando video para directo {duracion//60}min...")
     imagenes = get_imagenes()
-    musicas = get_musicas()
+    musicas = get_musicas(categoria='ambient')
     if not imagenes or not musicas:
         return None
     musica = random.choice(musicas)
