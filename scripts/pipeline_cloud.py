@@ -423,7 +423,7 @@ TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms, B
         r = requests.post(
             'https://api.groq.com/openai/v1/chat/completions',
             headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-            json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000},
+            json={'model': 'openai/gpt-oss-120b', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000},
             timeout=30
         )
         data = r.json()
@@ -1078,7 +1078,7 @@ TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi Vighnah
         r_hi = requests.post(
             'https://api.groq.com/openai/v1/chat/completions',
             headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-            json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
+            json={'model': 'openai/gpt-oss-120b', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
             timeout=30
         )
         data_hi = r_hi.json()
