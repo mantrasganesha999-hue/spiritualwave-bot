@@ -11,36 +11,27 @@ TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TEMAS_ES = [
-    "mantra de Ganesha para atraer abundancia y eliminar deudas",
-    "frecuencias 528hz para sanar el cuerpo y atraer prosperidad",
-    "afirmaciones poderosas para manifestar dinero cada manana",
-    "meditacion guiada para eliminar energia negativa y atraer exito",
-    "ley de atraccion para atraer dinero abundancia y salud",
-    "mantra poderoso de Ganesha para proteccion y abundancia",
-    "musica de sanacion 432hz para dormir y restaurar el alma",
-    "ganesha mantra om gan ganapataye namaha poder y abundancia",
-    "528hz frecuencia milagro para sanar y atraer prosperidad",
-    "mantra ganesha para el trabajo exito y prosperidad economica",
-    "musica espiritual Ganesha para meditar y atraer paz interior",
-    "frecuencias binaurales para activar la abundancia mientras duermes",
-    "mantra poderoso para sanar el corazon y atraer amor divino",
-    "musica tibetana cuencos para limpiar el aura y atraer paz",
+    "mantra de Ganesha para atraer abundancia y eliminar obstaculos",
+    "meditacion guiada con Ganesha para encontrar paz interior",
+    "afirmaciones poderosas para manifestar prosperidad cada manana",
+    "musica espiritual de Ganesha para meditar profundamente",
+    "mantra om gan ganapataye namaha poder y abundancia",
+    "ganesha mantra para el trabajo exito y prosperidad economica",
+    "musica de Ganesha para dormir y despertar renovado",
+    "mantra poderoso de Ganesha para proteccion y bendiciones",
+    "meditacion con mantras para atraer amor y paz divina",
+    "musica tibetana con Ganesha para limpiar la mente",
     "afirmaciones de riqueza y exito para escuchar cada manana",
     "ganesha mantra para superar obstaculos y lograr tus metas",
-    "frecuencias de sanacion para dormir profundo y despertar renovado",
     "meditacion de 10 minutos para activar la abundancia interior",
     "musica relajante de Ganesha para reducir el estres y ansiedad",
     "mantra de la prosperidad para atraer dinero en 21 dias",
-    "musica 963hz para despertar la conciencia y conectar con lo divino",
     "mantra sagrado para limpiar el karma y atraer bendiciones",
-    "frecuencias 741hz para eliminar toxinas y pensamientos negativos",
-    "meditacion guiada para manifestar tus suenos y metas en 2026",
+    "meditacion guiada para manifestar tus suenos y metas",
     "musica para dormir con Ganesha y despertar con abundancia",
     "mantra de Lakshmi y Ganesha para atraer riqueza y prosperidad",
     "afirmaciones positivas en espanol para reprogramar tu mente",
-    "musica de sanacion cuantica para equilibrar los chakras",
     "ganesha mantra para proteger el hogar y atraer armonia familiar",
-    "frecuencias del universo para conectar con tu proposito de vida",
     "mantra de Ganesha para emprendedores que buscan su primer cliente",
     "mantra de Ganesha para estudiantes antes de un examen importante",
     "mantra de Ganesha para madres solteras que buscan estabilidad",
@@ -49,39 +40,21 @@ TEMAS_ES = [
     "mantra de Ganesha para artistas y creativos que buscan inspiracion",
     "mantra de Ganesha para quienes empiezan un negocio nuevo",
     "mantra de Ganesha para parejas que buscan reconciliacion",
+    "musica devocional de Ganesha para el alma y el corazon",
 ]
 
 TEMAS_EN = [
-    "Ganesha mantra for abundance and removing obstacles 528hz",
     "Powerful Ganesha chant to attract money and prosperity",
-    "432hz healing frequency Ganesha meditation deep sleep music",
     "Om Gan Ganapataye Namaha most powerful Ganesha mantra",
-    "Ganesha divine frequency to remove all negative energy",
-    "528hz miracle tone Ganesha blessing abundance wealth",
     "Ganesha mantra for success luck and divine protection",
-    "Deep meditation music Ganesha 432hz sleep healing",
-    "Ganesha frequency to attract love peace and abundance",
-    "741hz cleansing frequency remove toxins and negative energy",
-    "Ganesha powerful chant for financial abundance and success",
-    "963hz frequency activate pineal gland spiritual awakening",
+    "Ganesha mantra for financial abundance and career success",
     "Ganesha morning mantra for positive energy and good luck",
-    "852hz return to spiritual order Ganesha meditation music",
     "Tibetan singing bowls with Ganesha mantra deep healing",
-    "Ganesha sleep music remove obstacles while you sleep 8 hours",
-    "528hz DNA repair frequency Ganesha blessing meditation",
-    "Ganesha mantra for career success and financial freedom",
-    "432hz nature frequency Ganesha meditation stress relief",
-    "Om Namah Shivaya Ganesha powerful healing mantra 528hz",
-    "Ganesha abundance frequency attract money while you sleep",
-    "396hz liberation from fear and guilt Ganesha meditation",
+    "Ganesha sleep music remove obstacles while you sleep",
     "Ganesha mantra for students success and mental clarity",
-    "639hz harmonious relationships Ganesha divine frequency",
     "Ganesha 1000 names chant for ultimate blessing and protection",
-    "174hz pain relief frequency Ganesha healing meditation music",
-    "Ganesha mantra for new beginnings and fresh start 2026",
-    "285hz cellular healing Ganesha frequency tissue regeneration",
+    "Ganesha mantra for new beginnings and fresh start",
     "Ganesha divine music for yoga and deep meditation practice",
-    "Solfeggio frequencies complete set Ganesha healing music",
     "Ganesha mantra for entrepreneurs seeking their first client",
     "Ganesha mantra for students before an important exam",
     "Ganesha mantra for single mothers seeking stability",
@@ -90,19 +63,30 @@ TEMAS_EN = [
     "Ganesha mantra for artists and creatives seeking inspiration",
     "Ganesha mantra for those starting a new business",
     "Ganesha mantra for couples seeking reconciliation",
+    "Deep meditation music Ganesha for sleep and healing",
+    "Ganesha frequency to attract love peace and abundance",
+    "Ganesha powerful chant for abundance and divine blessing",
+    "Ganesha meditation music for stress relief and inner peace",
+    "Om Namah Shivaya Ganesha powerful healing mantra",
+    "Ganesha abundance music attract blessings while you sleep",
+    "Ganesha mantra for removing all obstacles in life",
+    "Sacred Ganesha chant for protection and prosperity",
+    "Ganesha divine music for spiritual awakening",
+    "Ganesha blessing mantra for health wealth and happiness",
+    "Ganesha meditation for beginners simple powerful practice",
 ]
 
 TEMAS_PT = [
-    "mantra de Ganesha para atrair abundancia e eliminar dividas",
-    "frequencia 528hz para curar o corpo e atrair prosperidade",
-    "afirmacoes poderosas para manifestar dinheiro todas as manhas",
+    "mantra de Ganesha para atrair abundancia e eliminar obstaculos",
     "meditacao guiada para eliminar energia negativa e atrair sucesso",
-    "lei da atracao para atrair dinheiro abundancia e saude",
-    "mantra poderoso de Ganesha para protecao e abundancia",
-    "musica de cura 432hz para dormir e restaurar a alma",
+    "afirmacoes poderosas para manifestar prosperidade todas as manhas",
+    "musica espiritual de Ganesha para meditar profundamente",
     "mantra de Ganesha om gan ganapataye namaha poder e abundancia",
-    "528hz frequencia milagre para curar e atrair prosperidade",
+    "musica de Ganesha para dormir e despertar renovado",
     "mantra de Ganesha para trabalho sucesso e prosperidade economica",
+    "meditacao com mantras para atrair amor e paz divina",
+    "afirmacoes de riqueza e sucesso para ouvir todas as manhas",
+    "musica relaxante de Ganesha para reduzir o estresse e ansiedade",
 ]
 
 TEMAS_HI = [
@@ -196,7 +180,7 @@ DIAS_SERIE_21 = [
     "Dia 21: Celebra tu transformacion y nueva abundancia",
 ]
 
-EMOJIS_COMBOS = ["✨🔱🌸", "🔥✨🕉", "🙏💫🔱", "⚡🌟🕉", "🔥🙏✨", "💫🕉🌸"]
+EMOJIS_COMBOS = ["Ô£¿­ƒö▒­ƒî©", "­ƒöÑÔ£¿­ƒòë", "­ƒÖÅ­ƒÆ½­ƒö▒", "ÔÜí­ƒîƒ­ƒòë", "­ƒöÑ­ƒÖÅÔ£¿", "­ƒÆ½­ƒòë­ƒî©"]
 
 FRASES_ES = [
     "Abro mi mente a la abundancia infinita",
@@ -322,9 +306,9 @@ def verificar_salud():
         except Exception as e:
             problemas.append(f"Token de YouTube corrupto: {str(e)[:50]}")
     if problemas:
-        msg = "⚠️ <b>Chequeo de salud - Problemas detectados</b>\n\n"
+        msg = "ÔÜá´©Å <b>Chequeo de salud - Problemas detectados</b>\n\n"
         for p in problemas:
-            msg += f"❌ {p}\n"
+            msg += f"ÔØî {p}\n"
         telegram(msg)
         print("PROBLEMAS DETECTADOS:", problemas)
     else:
@@ -401,7 +385,7 @@ El TITULO debe usar una de estas formulas probadas (elige la mejor para el tema)
 Responde EXACTAMENTE en este formato sin simbolos extra:
 TITULO: {emoji} [titulo viral usando una formula de arriba, maximo 60 caracteres, con mayusculas en palabras clave]
 DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separados por espacios incluyendo terminos de tendencia 2026, Bhakti, Devocional, JaiGanesh, SanatanDharma cuando sea relevante]"""
+TAGS: [5 hashtags separados por espacios, los mas relevantes para el video]"""
     else:
         prompt = f"""You are the best viral YouTube copywriter in the spiritual niche, expert in titles that generate massive clicks.
 Generate VIRAL content for: {tema}
@@ -417,7 +401,7 @@ The TITULO must use one of these proven formulas (choose the best for the topic)
 Reply EXACTLY in this format:
 TITULO: {emoji} [viral title using a formula above, maximum 60 characters, capitalize key words]
 DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms, Bhakti, Devotional, JaiGanesh, SanatanDharma when relevant]"""
+TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]"""
 
     try:
         r = requests.post(
@@ -429,11 +413,11 @@ TAGS: [30 relevant hashtags separated by spaces including 2026 trending terms, B
         data = r.json()
         if 'choices' not in data:
             print(f'  Groq error: {data}')
-            return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #528hz'
+            return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #Meditacion #Bhakti'
         contenido = data['choices'][0]['message']['content']
     except Exception as e:
         print(f'  Groq exception: {e}')
-        return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #528hz' 
+        return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #Meditacion #Bhakti' 
 
     titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
     titulo = limpiar_texto(titulo)
@@ -776,30 +760,9 @@ def montar_video(titulo, duracion=3600, es_short=False):
     return None
 
 def agregar_capitulos(descripcion, duracion_min):
-    caps = "\n\nCAPITULOS:\n"
-    caps += "00:00 - Introduccion y bienvenida\n"
-    caps += "00:30 - Mantra principal Om Gan Ganapataye Namaha\n"
-    paso = duracion_min // 5
-    temas = [
-        "Meditacion profunda con frecuencias sagradas",
-        "Afirmaciones de abundancia y prosperidad",
-        "Sanacion energetica y limpieza del aura",
-        "Cierre y bendicion de Ganesha"
-    ]
-    tiempos = [paso, paso*2, paso*3, paso*4]
-    for tiempo, tema in zip(tiempos, temas):
-        h = tiempo // 60
-        m = tiempo % 60
-        if h > 0:
-            caps += f"{h:01d}:{m:02d}:00 - {tema}\n"
-        else:
-            caps += f"{m:02d}:00 - {tema}\n"
-    if VIDEOS_SUBIDOS_HOY:
-        caps += f"\nContinua tu practica espiritual con nuestro video anterior:\n"
-        caps += f"https://www.youtube.com/watch?v={VIDEOS_SUBIDOS_HOY[-1]}\n"
-    caps += "\nSuscribete: youtube.com/@SpiritualWave888\n"
-    caps += "Activa la campana para no perderte nada\n"
-    return descripcion + caps
+    footer = "\n\nSuscribete: youtube.com/@SpiritualWave888\n"
+    footer += "Activa la campana para recibir mantras cada dia\n"
+    return descripcion + footer
 
 def agregar_a_playlist(youtube, video_id, playlist_nombre):
     try:
@@ -931,22 +894,22 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
 
         try:
             comentarios_es = [
-                "Que manifestaste hoy? Cuentame en los comentarios 🙏",
-                "Cual fue tu experiencia con este mantra? Comparte abajo ✨",
-                "Etiqueta a alguien que necesita escuchar esto hoy 🔱",
-                "Deja tu Om en los comentarios si sentiste la energia 🕉",
-                "Cuantos dias llevas practicando este mantra? 🙏",
-                "Comparte este video con quien necesite abundancia hoy 💫",
-                "Que frecuencia te gustaria en el proximo video? 🎵",
+                "Que manifestaste hoy? Cuentame en los comentarios ­ƒÖÅ",
+                "Cual fue tu experiencia con este mantra? Comparte abajo Ô£¿",
+                "Etiqueta a alguien que necesita escuchar esto hoy ­ƒö▒",
+                "Deja tu Om en los comentarios si sentiste la energia ­ƒòë",
+                "Cuantos dias llevas practicando este mantra? ­ƒÖÅ",
+                "Comparte este video con quien necesite abundancia hoy ­ƒÆ½",
+                "Que frecuencia te gustaria en el proximo video? ­ƒÄÁ",
             ]
             comentarios_en = [
-                "What did you manifest today? Tell me in the comments 🙏",
-                "What was your experience with this mantra? Share below ✨",
-                "Tag someone who needs to hear this today 🔱",
-                "Leave your Om below if you felt the energy 🕉",
-                "How many days have you been practicing this mantra? 🙏",
-                "Share this video with someone who needs abundance today 💫",
-                "What frequency would you like in the next video? 🎵",
+                "What did you manifest today? Tell me in the comments ­ƒÖÅ",
+                "What was your experience with this mantra? Share below Ô£¿",
+                "Tag someone who needs to hear this today ­ƒö▒",
+                "Leave your Om below if you felt the energy ­ƒòë",
+                "How many days have you been practicing this mantra? ­ƒÖÅ",
+                "Share this video with someone who needs abundance today ­ƒÆ½",
+                "What frequency would you like in the next video? ­ƒÄÁ",
             ]
             comentario = random.choice(comentarios_es if idioma == 'es' else comentarios_en)
             comment_response = youtube.commentThreads().insert(
@@ -1054,7 +1017,7 @@ fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 resultados = []
 
 verificar_salud()
-telegram(f"🔱 <b>SpiritualWave Producer iniciado</b>\n📅 {fecha}\n⏳ Generando contenido...")
+telegram(f"­ƒö▒ <b>SpiritualWave Producer iniciado</b>\n­ƒôà {fecha}\nÔÅ│ Generando contenido...")
 
 try:
     festival = detectar_festival_hindu()
@@ -1073,7 +1036,7 @@ No asterisks, no markdown, no emojis in the title.
 Reply EXACTLY in this format:
 TITULO: [title maximum 60 characters, impactful, include Ganpati or Ganesha]
 DESCRIPCION: [400 words with devotional keywords, benefits, CTA to subscribe to youtube.com/@SpiritualWave888]
-TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi VighnahartaGanesh Bhakti Devotional]"""
+TAGS: [5 hashtags separated by spaces including Ganpati and Ganesha]"""
     try:
         r_hi = requests.post(
             'https://api.groq.com/openai/v1/chat/completions',
@@ -1105,9 +1068,9 @@ TAGS: [30 hashtags separated by spaces including Ganpati GaneshChaturthi Vighnah
     if video_hi:
         vid_id, url = subir_youtube(video_hi, titulo_hi, desc_hi, tags_hi, duracion_min=60, variante=1, playlist_nombre="Ganpati Bappa Mantras", idioma='hi')
         resultados.append({'tipo': 'VIDEO HI', 'titulo': titulo_hi, 'url': url})
-        telegram(f"✅ <b>Video HI subido</b>\n🎬 {titulo_hi}\n🔗 {url}")
+        telegram(f"Ô£à <b>Video HI subido</b>\n­ƒÄ¼ {titulo_hi}\n­ƒöù {url}")
 except Exception as e:
-    telegram(f"⚠️ Error en video HI: {str(e)[:150]}")
+    telegram(f"ÔÜá´©Å Error en video HI: {str(e)[:150]}")
     print(f"Error HI: {e}")
 
 try:
@@ -1115,16 +1078,16 @@ try:
     print(f"\n[SHORT HI] {tema_short_hi}")
     short_hi = montar_video(tema_short_hi, es_short=True)
     if short_hi:
-        vid_id, url = subir_youtube(short_hi, tema_short_hi, f"🙏 {tema_short_hi}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti", "#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti #SpiritualWave", es_short=True, variante=2, idioma='en')
+        vid_id, url = subir_youtube(short_hi, tema_short_hi, f"­ƒÖÅ {tema_short_hi}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti", "#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti #SpiritualWave", es_short=True, variante=2, idioma='en')
         resultados.append({'tipo': 'SHORT HI', 'titulo': tema_short_hi, 'url': url})
-        telegram(f"✅ <b>Short subido</b>\n🎬 {tema_short_hi}\n🔗 {url}")
+        telegram(f"Ô£à <b>Short subido</b>\n­ƒÄ¼ {tema_short_hi}\n­ƒöù {url}")
 except Exception as e:
-    telegram(f"⚠️ Error en Short: {str(e)[:150]}")
+    telegram(f"ÔÜá´©Å Error en Short: {str(e)[:150]}")
     print(f"Error Short: {e}")
 
-resumen = f"🔱 <b>Contenido completado</b>\n📅 {fecha}\n\n"
+resumen = f"­ƒö▒ <b>Contenido completado</b>\n­ƒôà {fecha}\n\n"
 for r in resultados:
-    resumen += f"✅ {r['tipo']}: {r['titulo'][:40]}\n"
+    resumen += f"Ô£à {r['tipo']}: {r['titulo'][:40]}\n"
 telegram(resumen)
 
 print("\n=== PROCESO FINALIZADO ===")
