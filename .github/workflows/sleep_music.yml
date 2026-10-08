@@ -1,35 +1,28 @@
 name: SpiritualWave Sleep Music
 
 on:
-  schedule:
-    - cron: '0 8 * * *'
-    - cron: '0 20 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 1'
+    - cron: '0 8 * * 4'
 
 jobs:
-  producir-sleep:
+  sleep:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
-
+    timeout-minutes: 180
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Instalar dependencias
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
-        pip install requests google-api-python-client google-auth-oauthlib Pillow
-
-    - name: Generar video sleep 8 horas
-      env:
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        python scripts/pipeline_sleep.py
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install --break-system-packages requests pillow google-api-python-client google-auth-oauthlib google-auth-httplib2 python-dotenv
+          sudo apt-get install -y ffmpeg fonts-dejavu
+      - name: Run sleep pipeline
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/pipeline_sleep.py

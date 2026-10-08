@@ -1,47 +1,28 @@
 name: SpiritualWave Auto Producer
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 14 * * *'
-    - cron: '0 18 * * *'
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 22 * * *'
 
 jobs:
-  producir-video:
+  producir:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
-    permissions:
-      contents: write
-
+    timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Instalar dependencias
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
-        pip install requests gtts google-api-python-client google-auth-oauthlib Pillow
-
-    - name: Generar y subir video
-      env:
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        python scripts/pipeline_cloud.py
-
-    - name: Guardar progreso de la serie
-      if: always()
-      run: |
-        git config user.name "SpiritualWave Bot"
-        git config user.email "bot@spiritualwave.com"
-        git add serie_dia.txt || true
-        git diff --staged --quiet || git commit -m "Actualizar dia de la serie [skip ci]"
-        git push || true
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install --break-system-packages requests gtts pillow google-api-python-client google-auth-oauthlib google-auth-httplib2 python-dotenv
+          sudo apt-get install -y ffmpeg fonts-dejavu
+      - name: Run pipeline
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/pipeline_cloud.py

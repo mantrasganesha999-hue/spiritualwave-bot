@@ -12,81 +12,71 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TEMAS_ES = [
     "mantra de Ganesha para atraer abundancia y eliminar obstaculos",
-    "meditacion guiada con Ganesha para encontrar paz interior",
-    "afirmaciones poderosas para manifestar prosperidad cada manana",
     "musica espiritual de Ganesha para meditar profundamente",
-    "mantra om gan ganapataye namaha poder y abundancia",
-    "ganesha mantra para el trabajo exito y prosperidad economica",
-    "musica de Ganesha para dormir y despertar renovado",
+    "om gan ganapataye namaha el mantra mas poderoso de Ganesha",
+    "ganesha mantra para el trabajo el exito y la prosperidad",
+    "musica de Ganesha para dormir en paz y despertar renovado",
     "mantra poderoso de Ganesha para proteccion y bendiciones",
-    "meditacion con mantras para atraer amor y paz divina",
-    "musica tibetana con Ganesha para limpiar la mente",
-    "afirmaciones de riqueza y exito para escuchar cada manana",
+    "musica tibetana con Ganesha para calmar la mente",
     "ganesha mantra para superar obstaculos y lograr tus metas",
-    "meditacion de 10 minutos para activar la abundancia interior",
-    "musica relajante de Ganesha para reducir el estres y ansiedad",
-    "mantra de la prosperidad para atraer dinero en 21 dias",
-    "mantra sagrado para limpiar el karma y atraer bendiciones",
-    "meditacion guiada para manifestar tus suenos y metas",
-    "musica para dormir con Ganesha y despertar con abundancia",
-    "mantra de Lakshmi y Ganesha para atraer riqueza y prosperidad",
-    "afirmaciones positivas en espanol para reprogramar tu mente",
-    "ganesha mantra para proteger el hogar y atraer armonia familiar",
-    "mantra de Ganesha para emprendedores que buscan su primer cliente",
-    "mantra de Ganesha para estudiantes antes de un examen importante",
-    "mantra de Ganesha para madres solteras que buscan estabilidad",
-    "mantra de Ganesha para quienes buscan trabajo urgente",
-    "mantra de Ganesha para sanar deudas y salir de crisis financiera",
-    "mantra de Ganesha para artistas y creativos que buscan inspiracion",
-    "mantra de Ganesha para quienes empiezan un negocio nuevo",
-    "mantra de Ganesha para parejas que buscan reconciliacion",
+    "musica de Ganesha para reducir el estres y encontrar calma",
+    "mantra de la prosperidad con Ganesha para 21 dias",
+    "mantra sagrado de Ganesha para atraer bendiciones diarias",
+    "musica con mantras de Ganesha para atraer amor y paz",
+    "mantra de Lakshmi y Ganesha para riqueza y prosperidad",
     "musica devocional de Ganesha para el alma y el corazon",
+    "ganesha mantra para proteger el hogar y la familia",
+    "mantra de Ganesha para emprendedores en busca de exito",
+    "mantra de Ganesha para estudiantes antes de un examen",
+    "mantra de Ganesha para quienes buscan trabajo urgente",
+    "mantra de Ganesha para sanar deudas y crisis financiera",
+    "mantra de Ganesha para artistas que buscan inspiracion",
+    "mantra de Ganesha para parejas que buscan reconciliacion",
+    "bhajan de Ganesha para celebrar y agradecer",
+    "musica de cuencos tibetanos con mantra de Ganesha",
+    "ganesha mantra para la mañana llena de energia positiva",
+    "mantra de Ganesha para dormir sin preocupaciones",
 ]
 
 TEMAS_EN = [
-    "Powerful Ganesha chant to attract money and prosperity",
-    "Om Gan Ganapataye Namaha most powerful Ganesha mantra",
-    "Ganesha mantra for success luck and divine protection",
-    "Ganesha mantra for financial abundance and career success",
+    "Powerful Ganesha chant to attract abundance and remove obstacles",
+    "Om Gan Ganapataye Namaha the most powerful Ganesha mantra",
+    "Ganesha mantra for success career and financial prosperity",
     "Ganesha morning mantra for positive energy and good luck",
-    "Tibetan singing bowls with Ganesha mantra deep healing",
-    "Ganesha sleep music remove obstacles while you sleep",
+    "Tibetan singing bowls with Ganesha mantra for deep focus",
+    "Ganesha sleep music to remove obstacles while you rest",
     "Ganesha mantra for students success and mental clarity",
-    "Ganesha 1000 names chant for ultimate blessing and protection",
-    "Ganesha mantra for new beginnings and fresh start",
-    "Ganesha divine music for yoga and deep meditation practice",
+    "Ganesha 1000 names chant for blessing and protection",
+    "Ganesha mantra for new beginnings and a fresh start",
+    "Ganesha divine music for yoga and deep meditation",
     "Ganesha mantra for entrepreneurs seeking their first client",
-    "Ganesha mantra for students before an important exam",
-    "Ganesha mantra for single mothers seeking stability",
     "Ganesha mantra for urgent job search success",
-    "Ganesha mantra to heal debt and financial crisis",
+    "Ganesha mantra to overcome debt and financial difficulty",
     "Ganesha mantra for artists and creatives seeking inspiration",
-    "Ganesha mantra for those starting a new business",
     "Ganesha mantra for couples seeking reconciliation",
-    "Deep meditation music Ganesha for sleep and healing",
-    "Ganesha frequency to attract love peace and abundance",
-    "Ganesha powerful chant for abundance and divine blessing",
-    "Ganesha meditation music for stress relief and inner peace",
-    "Om Namah Shivaya Ganesha powerful healing mantra",
-    "Ganesha abundance music attract blessings while you sleep",
-    "Ganesha mantra for removing all obstacles in life",
-    "Sacred Ganesha chant for protection and prosperity",
-    "Ganesha divine music for spiritual awakening",
-    "Ganesha blessing mantra for health wealth and happiness",
-    "Ganesha meditation for beginners simple powerful practice",
+    "Deep meditation music with Ganesha chant for inner peace",
+    "Sacred Ganesha bhajan for daily devotion and gratitude",
+    "Ganesha mantra for protection of home and family",
+    "Om Namah Shivaya with Ganesha mantra devotional music",
+    "Ganesha blessing chant for health wealth and happiness",
+    "Ganesha meditation for beginners simple and powerful",
+    "Ganesha mantra to start the day with positive intention",
+    "Devotional Ganesha music for evening prayer and peace",
+    "Ganesha chant to calm the mind before sleeping",
+    "Powerful Ganpati mantra for removing all life obstacles",
 ]
 
 TEMAS_PT = [
     "mantra de Ganesha para atrair abundancia e eliminar obstaculos",
-    "meditacao guiada para eliminar energia negativa e atrair sucesso",
-    "afirmacoes poderosas para manifestar prosperidade todas as manhas",
     "musica espiritual de Ganesha para meditar profundamente",
-    "mantra de Ganesha om gan ganapataye namaha poder e abundancia",
-    "musica de Ganesha para dormir e despertar renovado",
-    "mantra de Ganesha para trabalho sucesso e prosperidade economica",
-    "meditacao com mantras para atrair amor e paz divina",
-    "afirmacoes de riqueza e sucesso para ouvir todas as manhas",
-    "musica relaxante de Ganesha para reduzir o estresse e ansiedade",
+    "mantra de Ganesha om gan ganapataye namaha poder e prosperidade",
+    "musica de Ganesha para dormir em paz e despertar renovado",
+    "mantra de Ganesha para trabalho sucesso e prosperidade",
+    "meditacao com mantras de Ganesha para paz interior",
+    "musica relaxante de Ganesha para reduzir o estresse",
+    "mantra de Ganesha para superar obstaculos e atingir metas",
+    "bhajan devocional de Ganesha para gratidao diaria",
+    "mantra de Ganesha para proteger o lar e a familia",
 ]
 
 TEMAS_HI = [
@@ -371,36 +361,24 @@ def generar_guion(tema, lang='es'):
     print(f"[1/4] Generando guion {lang}...")
     emoji = random.choice(EMOJIS_COMBOS)
     if lang == 'es':
-        prompt = f"""Eres el mejor copywriter viral de YouTube en nicho espiritual, experto en titulos que generan clicks masivos.
-Genera contenido VIRAL para un video sobre: {tema}
+        prompt = f"""Eres experto en contenido espiritual para YouTube. Crea contenido honesto y devocional sobre: {tema}
 Sin tildes ni caracteres especiales ni asteriscos ni markdown.
-
-El TITULO debe usar una de estas formulas probadas (elige la mejor para el tema):
-- Pregunta directa que genera curiosidad: "Por que Ganesha no te ha respondido aun?"
-- Numero + promesa especifica: "3 Minutos Que Cambiaran Tu Suerte Hoy"
-- Urgencia + accion: "Escucha ESTO Antes De Dormir Esta Noche"
-- Secreto revelado: "Lo Que Nadie Te Conto Sobre El Dinero y Ganesha"
-- Contraste inesperado: "Deje de Pedir Dinero y Empece a Recibirlo Asi"
+No hagas promesas de salud, curacion o resultados garantizados.
+El titulo debe describir exactamente lo que contiene el video.
 
 Responde EXACTAMENTE en este formato sin simbolos extra:
-TITULO: {emoji} [titulo viral usando una formula de arriba, maximo 60 caracteres, con mayusculas en palabras clave]
-DESCRIPCION: [500 palabras con keywords espirituales de tendencia, beneficios, instrucciones de uso, CTA para suscribirse a youtube.com/@SpiritualWave888]
+TITULO: {emoji} [titulo descriptivo, maximo 60 caracteres, con mayusculas en palabras clave]
+DESCRIPCION: [300 palabras describiendo el contenido del video, beneficios espirituales de la practica del mantra, CTA para suscribirse a youtube.com/@SpiritualWave888. Incluir al final: "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."]
 TAGS: [5 hashtags separados por espacios, los mas relevantes para el video]"""
     else:
-        prompt = f"""You are the best viral YouTube copywriter in the spiritual niche, expert in titles that generate massive clicks.
-Generate VIRAL content for: {tema}
+        prompt = f"""You are an expert in spiritual content for YouTube. Create honest and devotional content about: {tema}
 No asterisks, no markdown, no special symbols.
-
-The TITULO must use one of these proven formulas (choose the best for the topic):
-- Direct question that creates curiosity: "Why Hasn't Ganesha Answered You Yet?"
-- Number + specific promise: "3 Minutes That Will Change Your Luck Today"
-- Urgency + action: "Listen To THIS Before You Sleep Tonight"
-- Secret revealed: "What Nobody Told You About Money and Ganesha"
-- Unexpected contrast: "I Stopped Asking For Money And Started Receiving It Like This"
+Do not make health claims, healing promises, or guaranteed results.
+The title must describe exactly what the video contains.
 
 Reply EXACTLY in this format:
-TITULO: {emoji} [viral title using a formula above, maximum 60 characters, capitalize key words]
-DESCRIPCION: [500 words with trending spiritual keywords, benefits, how to use, CTA to subscribe to youtube.com/@SpiritualWave888]
+TITULO: {emoji} [descriptive title, maximum 60 characters, capitalize key words]
+DESCRIPCION: [300 words describing the video content, spiritual benefits of mantra practice, CTA to subscribe to youtube.com/@SpiritualWave888. Include at the end: "The music, images and videos were created with artificial intelligence tools."]
 TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]"""
 
     try:
@@ -413,11 +391,11 @@ TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]
         data = r.json()
         if 'choices' not in data:
             print(f'  Groq error: {data}')
-            return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #Meditacion #Bhakti'
+            return f'{emoji} {tema[:55]}', f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.', '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave'
         contenido = data['choices'][0]['message']['content']
     except Exception as e:
         print(f'  Groq exception: {e}')
-        return f'{emoji} {tema[:55]}', f'Video sobre {tema}', '#Ganesha #Mantra #Espiritual #Meditacion #Bhakti' 
+        return f'{emoji} {tema[:55]}', f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.', '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave' 
 
     titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
     titulo = limpiar_texto(titulo)
@@ -761,7 +739,8 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
 def agregar_capitulos(descripcion, duracion_min):
     footer = "\n\nSuscribete: youtube.com/@SpiritualWave888\n"
-    footer += "Activa la campana para recibir mantras cada dia\n"
+    footer += "Activa la campana para recibir mantras cada dia\n\n"
+    footer += "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."
     return descripcion + footer
 
 def agregar_a_playlist(youtube, video_id, playlist_nombre):
@@ -893,32 +872,13 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         # Subtitulos desactivados para conservar quota de API
 
         try:
-            comentarios_es = [
-                "Que manifestaste hoy? Cuentame en los comentarios ­ƒÖÅ",
-                "Cual fue tu experiencia con este mantra? Comparte abajo Ô£¿",
-                "Etiqueta a alguien que necesita escuchar esto hoy ­ƒö▒",
-                "Deja tu Om en los comentarios si sentiste la energia ­ƒòë",
-                "Cuantos dias llevas practicando este mantra? ­ƒÖÅ",
-                "Comparte este video con quien necesite abundancia hoy ­ƒÆ½",
-                "Que frecuencia te gustaria en el proximo video? ­ƒÄÁ",
-            ]
-            comentarios_en = [
-                "What did you manifest today? Tell me in the comments ­ƒÖÅ",
-                "What was your experience with this mantra? Share below Ô£¿",
-                "Tag someone who needs to hear this today ­ƒö▒",
-                "Leave your Om below if you felt the energy ­ƒòë",
-                "How many days have you been practicing this mantra? ­ƒÖÅ",
-                "Share this video with someone who needs abundance today ­ƒÆ½",
-                "What frequency would you like in the next video? ­ƒÄÁ",
-            ]
-            comentario = random.choice(comentarios_es if idioma == 'es' else comentarios_en)
+            # Comentario fijo neutral para fijar en el video
+            comentario_fijo = "Om Gan Ganapataye Namaha. Namaste." if idioma not in ['es', 'pt'] else "Om Gan Ganapataye Namaha. Namaste."
             comment_response = youtube.commentThreads().insert(
                 part="snippet",
-                body={"snippet": {"videoId": video_id, "topLevelComment": {"snippet": {"textOriginal": comentario}}}}
+                body={"snippet": {"videoId": video_id, "topLevelComment": {"snippet": {"textOriginal": comentario_fijo}}}}
             ).execute()
-            comment_id = comment_response['id']
-            youtube.comments().setModerationStatus(id=comment_id, moderationStatus="published").execute()
-            print("  Comentario publicado")
+            print("  Comentario fijo publicado")
         except Exception as e:
             print(f"  Comentario error: {e}")
 
