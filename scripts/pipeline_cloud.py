@@ -367,7 +367,7 @@ No hagas promesas de salud, curacion o resultados garantizados.
 El titulo debe describir exactamente lo que contiene el video.
 
 Responde EXACTAMENTE en este formato sin simbolos extra:
-TITULO: {emoji} [titulo descriptivo, maximo 60 caracteres, con mayusculas en palabras clave]
+TITULO: {emoji} [titulo descriptivo, maximo 90 caracteres, con mayusculas en palabras clave, que genere curiosidad y engagement]
 DESCRIPCION: [300 palabras describiendo el contenido del video, beneficios espirituales de la practica del mantra, CTA para suscribirse a youtube.com/@SpiritualWave888. Incluir al final: "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."]
 TAGS: [5 hashtags separados por espacios, los mas relevantes para el video]"""
     else:
@@ -397,10 +397,10 @@ TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]
         print(f'  Groq exception: {e}')
         return f'{emoji} {tema[:55]}', f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.', '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave' 
 
-    titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:55]}"
+    titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:90]}"
     titulo = limpiar_texto(titulo)
-    if len(titulo) > 65:
-        titulo = titulo[:65].strip()
+    if len(titulo) > 95:
+        titulo = titulo[:95].strip()
 
     descripcion = extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or f"Video sobre {tema}"
     descripcion = limpiar_texto(descripcion)
@@ -420,34 +420,42 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
         img_path = imagenes[variante % len(imagenes)]
         img = Image.open(img_path).resize((1920, 1080)).convert('RGB')
 
+        # Saturacion y contraste mas vibrantes
         enhancer = ImageEnhance.Color(img)
-        img = enhancer.enhance(1.3)
+        img = enhancer.enhance(1.6)
         enhancer = ImageEnhance.Contrast(img)
-        img = enhancer.enhance(1.1)
+        img = enhancer.enhance(1.2)
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(1.05)
 
         paletas_borde = [
-            (201, 168, 76),
-            (180, 50, 50),
-            (60, 90, 180),
-            (150, 60, 180),
-            (30, 150, 100),
+            (255, 200, 0),    # Oro brillante
+            (255, 140, 0),    # Naranja dorado
+            (220, 60, 0),     # Naranja fuego
+            (180, 0, 180),    # Purpura sagrado
+            (0, 180, 120),    # Verde esmeralda
         ]
         color_base = paletas_borde[variante % len(paletas_borde)]
 
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
 
-        for i in range(350):
-            alpha = int(220 * (i / 350))
+        # Gradiente inferior dramatico - mas alto (400px)
+        for i in range(400):
+            alpha = int(240 * (i / 400) ** 0.7)
             d.rectangle(
-                [(0, img.height - 350 + i), (img.width, img.height - 349 + i)],
+                [(0, img.height - 400 + i), (img.width, img.height - 399 + i)],
                 fill=(0, 0, 0, alpha)
             )
 
-        d.rectangle([(0, 0), (img.width, 120)], fill=(0, 0, 0, 185))
+        # Barra superior con tono dorado oscuro
+        for i in range(140):
+            alpha = int(200 * (1 - i/140) ** 0.5)
+            d.rectangle([(0, i), (img.width, i+1)], fill=(20, 10, 0, alpha))
 
-        for thickness in range(10):
-            factor = max(0.5, 1 - thickness * 0.05)
+        # Borde dorado dramatico - 16px
+        for thickness in range(16):
+            factor = max(0.4, 1 - thickness * 0.04)
             color_borde = (int(color_base[0]*factor), int(color_base[1]*factor), int(color_base[2]*factor))
             d.rectangle(
                 [(thickness, thickness), (img.width-1-thickness, img.height-1-thickness)],
@@ -459,9 +467,9 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
         draw = ImageDraw.Draw(img)
 
         try:
-            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 88)
-            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 44)
-            font_sub = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 30)
+            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 96)
+            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 52)
+            font_sub = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 34)
         except:
             font_titulo = ImageFont.load_default()
             font_canal = ImageFont.load_default()
@@ -471,24 +479,30 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
         bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
         cx = (img.width - w) // 2
-        sombra_color = tuple(int(c*0.4) for c in color_base)
-        draw.text((cx+5, 35), canal, fill=sombra_color, font=font_canal)
-        draw.text((cx+3, 33), canal, fill=tuple(int(c*0.7) for c in color_base), font=font_canal)
-        draw.text((cx, 30), canal, fill=(255, 220, 50), font=font_canal)
+        # Glow efecto para nombre del canal
+        for glow_r in range(8, 0, -2):
+            glow_alpha = int(80 * (1 - glow_r/10))
+            for gdx in range(-glow_r, glow_r+1, 2):
+                for gdy in range(-glow_r, glow_r+1, 2):
+                    draw.text((cx+gdx, 32+gdy), canal, fill=(255, 180, 0, glow_alpha), font=font_canal)
+        draw.text((cx+5, 37), canal, fill=(100, 60, 0), font=font_canal)
+        draw.text((cx+3, 35), canal, fill=(180, 120, 0), font=font_canal)
+        draw.text((cx, 32), canal, fill=(255, 230, 60), font=font_canal)
 
         sub = subtexto
         bbox = draw.textbbox((0, 0), sub, font=font_sub)
         w = bbox[2] - bbox[0]
-        draw.text(((img.width-w)//2, 85), sub, fill=(230, 200, 130), font=font_sub)
+        draw.text(((img.width-w)//2+2, 97), sub, fill=(100, 70, 0), font=font_sub)
+        draw.text(((img.width-w)//2, 95), sub, fill=(240, 200, 80), font=font_sub)
 
-        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:55]
+        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:65]
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
         for p in palabras:
             test = linea + " " + p if linea else p
             bbox_test = draw.textbbox((0, 0), test, font=font_titulo)
-            if bbox_test[2] - bbox_test[0] < img.width - 60:
+            if bbox_test[2] - bbox_test[0] < img.width - 80:
                 linea = test
             else:
                 if linea:
@@ -498,18 +512,27 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
             lineas.append(linea)
 
         total_lines = min(len(lineas), 3)
-        line_height = 100
+        line_height = 110
         total_height = total_lines * line_height
-        y_start = img.height - 330 + (330 - total_height) // 2
+        y_start = img.height - 380 + (380 - total_height) // 2
 
         for linea in lineas[:3]:
             bbox = draw.textbbox((0, 0), linea, font=font_titulo)
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
 
-            for dx, dy in [(-4,4),(4,4),(4,-4),(-4,-4),(0,5),(5,0),(0,-5),(-5,0),(-3,3),(3,3),(3,-3),(-3,-3)]:
+            # Glow dorado suave detras del texto blanco
+            for glow_r in [6, 4, 2]:
+                glow_color = (255, 180, 0, int(60 * (1 - glow_r/8)))
+                for gdx in range(-glow_r, glow_r+1, 2):
+                    for gdy in range(-glow_r, glow_r+1, 2):
+                        draw.text((x+gdx, y_start+gdy), linea, fill=glow_color, font=font_titulo)
+
+            # Sombra negra fuerte
+            for dx, dy in [(-5,5),(5,5),(5,-5),(-5,-5),(0,6),(6,0),(0,-6),(-6,0),(-4,4),(4,4),(4,-4),(-4,-4)]:
                 draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
 
+            # Texto blanco brillante
             draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
             y_start += line_height
 
@@ -541,30 +564,39 @@ def generar_thumbnail_short(titulo, variante=1):
             img = img.crop((0, top, w, top + new_h))
         img = img.resize((1080, 1920)).convert('RGB')
 
+        # Saturacion y contraste muy vibrantes para SHORT
         enhancer = ImageEnhance.Color(img)
-        img = enhancer.enhance(1.35)
+        img = enhancer.enhance(1.65)
         enhancer = ImageEnhance.Contrast(img)
-        img = enhancer.enhance(1.15)
+        img = enhancer.enhance(1.2)
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(1.05)
 
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(overlay)
-        for i in range(500):
-            alpha = int(230 * (i / 500))
-            d.rectangle([(0, img.height - 500 + i), (img.width, img.height - 499 + i)], fill=(0, 0, 0, alpha))
-        d.rectangle([(0, 0), (img.width, 160)], fill=(0, 0, 0, 190))
-        for thickness in range(6):
-            color_val = max(150, 201 - thickness * 10)
+        # Gradiente inferior largo y dramatico
+        for i in range(600):
+            alpha = int(245 * (i / 600) ** 0.7)
+            d.rectangle([(0, img.height - 600 + i), (img.width, img.height - 599 + i)], fill=(0, 0, 0, alpha))
+        # Barra superior con tono calido
+        for i in range(180):
+            alpha = int(210 * (1 - i/180) ** 0.5)
+            d.rectangle([(0, i), (img.width, i+1)], fill=(20, 10, 0, alpha))
+        # Borde dorado dramatico
+        for thickness in range(14):
+            factor = max(0.4, 1 - thickness * 0.04)
+            color_val = int(255 * factor)
             d.rectangle(
                 [(thickness, thickness), (img.width-1-thickness, img.height-1-thickness)],
-                outline=(color_val, int(color_val * 0.83), int(color_val * 0.37)),
+                outline=(color_val, int(color_val * 0.78), 0),
                 width=1
             )
         img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(img)
 
         try:
-            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 68)
-            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 46)
+            font_titulo = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 76)
+            font_canal = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 54)
         except:
             font_titulo = ImageFont.load_default()
             font_canal = ImageFont.load_default()
@@ -573,10 +605,16 @@ def generar_thumbnail_short(titulo, variante=1):
         bbox = draw.textbbox((0, 0), canal, font=font_canal)
         w = bbox[2] - bbox[0]
         cx = (img.width - w) // 2
-        draw.text((cx+4, 44), canal, fill=(100, 75, 0), font=font_canal)
-        draw.text((cx, 40), canal, fill=(255, 220, 50), font=font_canal)
+        # Glow dorado para canal
+        for glow_r in [8, 5, 3]:
+            for gdx in range(-glow_r, glow_r+1, 3):
+                for gdy in range(-glow_r, glow_r+1, 3):
+                    draw.text((cx+gdx, 45+gdy), canal, fill=(255, 160, 0, int(50*(1-glow_r/10))), font=font_canal)
+        draw.text((cx+5, 50), canal, fill=(100, 60, 0), font=font_canal)
+        draw.text((cx+3, 48), canal, fill=(180, 120, 0), font=font_canal)
+        draw.text((cx, 45), canal, fill=(255, 230, 60), font=font_canal)
 
-        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:60]
+        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:65]
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
@@ -593,15 +631,20 @@ def generar_thumbnail_short(titulo, variante=1):
             lineas.append(linea)
 
         total_lines = min(len(lineas), 4)
-        line_height = 80
+        line_height = 88
         total_height = total_lines * line_height
-        y_start = img.height - 470 + (470 - total_height) // 2
+        y_start = img.height - 560 + (560 - total_height) // 2
 
         for linea in lineas[:4]:
             bbox = draw.textbbox((0, 0), linea, font=font_titulo)
             w = bbox[2] - bbox[0]
             x = (img.width - w) // 2
-            for dx, dy in [(-3,3),(3,3),(3,-3),(-3,-3),(0,4),(4,0),(0,-4),(-4,0)]:
+            # Glow dorado suave
+            for glow_r in [5, 3]:
+                for gdx in range(-glow_r, glow_r+1, 2):
+                    for gdy in range(-glow_r, glow_r+1, 2):
+                        draw.text((x+gdx, y_start+gdy), linea, fill=(255, 180, 0, int(55*(1-glow_r/7))), font=font_titulo)
+            for dx, dy in [(-4,4),(4,4),(4,-4),(-4,-4),(0,5),(5,0),(0,-5),(-5,0)]:
                 draw.text((x+dx, y_start+dy), linea, fill=(0, 0, 0), font=font_titulo)
             draw.text((x, y_start), linea, fill=(255, 255, 255), font=font_titulo)
             y_start += line_height
@@ -704,11 +747,11 @@ def montar_video(titulo, duracion=3600, es_short=False):
                     f.write(f"file '{clip}'\n")
 
     filtro_texto = (
-        f"drawtext=text='{titulo_clean}':fontcolor=white:fontsize={38 if es_short else 52}:"
-        f"x=(w-text_w)/2:y=h-{180 if es_short else 90}:"
-        "shadowcolor=0x000000EE:shadowx=3:shadowy=3:borderw=2:bordercolor=black,"
-        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={32 if es_short else 28}:"
-        f"x=(w-text_w)/2:y={70 if es_short else 25}:shadowcolor=black:shadowx=2:shadowy=2"
+        f"drawtext=text='{titulo_clean}':fontcolor=0xFFD700:fontsize={46 if es_short else 64}:"
+        f"x=(w-text_w)/2:y=h-{200 if es_short else 100}:"
+        "shadowcolor=0x000000FF:shadowx=4:shadowy=4:borderw=3:bordercolor=0x000000FF,"
+        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={38 if es_short else 36}:"
+        f"x=(w-text_w)/2:y={80 if es_short else 28}:shadowcolor=0x000000FF:shadowx=3:shadowy=3:borderw=2:bordercolor=black"
     )
 
     t = '58' if es_short else str(duracion)
@@ -869,7 +912,27 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         if playlist_nombre:
             agregar_a_playlist(youtube, video_id, playlist_nombre)
 
-        # Subtitulos desactivados para conservar quota de API
+        # Subtitulos activados
+        try:
+            srt_path = generar_srt(titulo, duracion_min, idioma)
+            if srt_path and os.path.exists(srt_path):
+                lang_code = idioma if idioma in ['es', 'en', 'pt'] else 'en'
+                lang_name = {'es': 'Español', 'en': 'English', 'pt': 'Português'}.get(lang_code, 'English')
+                youtube.captions().insert(
+                    part='snippet',
+                    body={
+                        'snippet': {
+                            'videoId': video_id,
+                            'language': lang_code,
+                            'name': lang_name,
+                            'isDraft': False
+                        }
+                    },
+                    media_body=MediaFileUpload(srt_path, mimetype='application/octet-stream')
+                ).execute()
+                print(f"  Subtitulos {lang_name} OK")
+        except Exception as e:
+            print(f"  Subtitulos error (no critico): {e}")
 
         try:
             # Comentario fijo neutral para fijar en el video
