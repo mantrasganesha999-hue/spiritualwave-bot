@@ -33,16 +33,47 @@ def get_clips():
     return []
 
 def get_musicas():
-    todas = []
-    for i in range(1, 22):
-        p = os.path.join(BASE, f'assets/music/suno_{i}.mp3')
-        if os.path.exists(p):
-            todas.append(p)
-    for i in range(1, 4):
-        p = os.path.join(BASE, f'assets/music/mezcla_{i}.mp3')
-        if os.path.exists(p):
-            todas.append(p)
-    return todas
+    folder = os.path.join(BASE, 'assets/music')
+    return [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith('.mp3')]
+
+def crear_mezcla_audio(duracion, salida='/tmp/mezcla_directo.m4a'):
+    musicas = get_musicas()
+    if not musicas:
+        return None
+    orden, total, ultimo = [], 0.0, None
+    largos = {}
+    for m in musicas:
+        r = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+                            '-of', 'default=nw=1:nk=1', m], capture_output=True, text=True)
+        try:
+            largos[m] = float(r.stdout.strip())
+        except ValueError:
+            pass
+    musicas = [m for m in musicas if m in largos and largos[m] > 20]
+    if not musicas:
+        return None
+    while total < duracion + 10:
+        ciclo = musicas.copy()
+        random.shuffle(ciclo)
+        if len(ciclo) > 1 and ciclo[0] == ultimo:
+            ciclo[0], ciclo[-1] = ciclo[-1], ciclo[0]
+        for m in ciclo:
+            orden.append(m)
+            total += largos[m]
+            ultimo = m
+            if total >= duracion + 10:
+                break
+    with open('/tmp/lista_audio_directo.txt', 'w') as f:
+        for m in orden:
+            f.write("file '" + m.replace("'", "'\\''") + "'\n")
+    af = "loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:st=0:d=3"
+    cmd = ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', '/tmp/lista_audio_directo.txt',
+           '-t', str(duracion), '-af', af, '-ar', '44100', '-ac', '2',
+           '-c:a', 'aac', '-b:a', '192k', salida]
+    subprocess.run(cmd, capture_output=True, text=True)
+    if os.path.exists(salida) and os.path.getsize(salida) > 100000:
+        return salida
+    return None
 
 def montar_video_directo(duracion=6000):
     print(f"Montando video para directo {duracion//60}min...")
@@ -52,7 +83,9 @@ def montar_video_directo(duracion=6000):
     if not musicas:
         return None
 
-    musica = random.choice(musicas)
+    mezcla = crear_mezcla_audio(duracion)
+    if not mezcla:
+        return None
     lista_path = '/tmp/lista_directo.txt'
     salida = '/tmp/video_directo.mp4'
 
@@ -88,14 +121,14 @@ def montar_video_directo(duracion=6000):
         "scale=1920:1080:force_original_aspect_ratio=decrease,"
         "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
         "format=yuv420p,"
-        "drawtext=text='Ganesha 528Hz Live':fontcolor=white:fontsize=44:"
+        "drawtext=text='Ganesha 528Hz Live':fontcolor=0xFFD700:fontsize=56:borderw=3:bordercolor=black:"
         "x=(w-text_w)/2:y=h-80:shadowcolor=black:shadowx=3:shadowy=3,"
-        "drawtext=text='SpiritualWave LIVE':fontcolor=0xFFD700:fontsize=32:"
+        "drawtext=text='SpiritualWave LIVE':fontcolor=0xFFD700:fontsize=34:borderw=2:bordercolor=black:"
         "x=(w-text_w)/2:y=25:shadowcolor=black:shadowx=2:shadowy=2"
     )
 
     cmd = ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista_path,
-           '-stream_loop', '-1', '-i', musica, '-map', '0:v', '-map', '1:a',
+           '-i', mezcla, '-map', '0:v', '-map', '1:a',
            '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
            '-t', str(duracion), '-vf', filtro, '-preset', 'fast', '-crf', '20', salida]
     subprocess.run(cmd, capture_output=True)

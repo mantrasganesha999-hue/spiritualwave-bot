@@ -657,6 +657,59 @@ def generar_thumbnail_short(titulo, variante=1):
         print(f"  Thumbnail Short error: {e}")
         return None
 
+def crear_mezcla_audio(duracion, salida='/tmp/mezcla_audio.m4a'):
+    """Playlist de varias canciones (sin repetir seguidas) con volumen
+    normalizado y fade in/out, en vez de una sola cancion en loop."""
+    musicas = get_musicas()
+    if not musicas:
+        return None
+    try:
+        largos = {}
+        for m in musicas:
+            r = subprocess.run(
+                ['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+                 '-of', 'default=nw=1:nk=1', m],
+                capture_output=True, text=True)
+            try:
+                largos[m] = float(r.stdout.strip())
+            except ValueError:
+                pass
+        musicas = [m for m in musicas if m in largos and largos[m] > 20]
+        if not musicas:
+            return None
+
+        orden, total, ultimo = [], 0.0, None
+        while total < duracion + 10:
+            ciclo = musicas.copy()
+            random.shuffle(ciclo)
+            if len(ciclo) > 1 and ciclo[0] == ultimo:
+                ciclo[0], ciclo[-1] = ciclo[-1], ciclo[0]
+            for m in ciclo:
+                orden.append(m)
+                total += largos[m]
+                ultimo = m
+                if total >= duracion + 10:
+                    break
+
+        lista = '/tmp/lista_audio.txt'
+        with open(lista, 'w') as f:
+            for m in orden:
+                f.write("file '" + m.replace("'", "'\\''") + "'\n")
+
+        fade_out_ini = max(0, duracion - 6)
+        af = (f"loudnorm=I=-16:TP=-1.5:LRA=11,"
+              f"afade=t=in:st=0:d=3,afade=t=out:st={fade_out_ini}:d=6")
+        cmd = ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
+               '-t', str(duracion), '-af', af, '-ar', '44100', '-ac', '2',
+               '-c:a', 'aac', '-b:a', '192k', salida]
+        subprocess.run(cmd, capture_output=True, text=True)
+        if os.path.exists(salida) and os.path.getsize(salida) > 100000:
+            print(f"  Mezcla de audio OK: {len(orden)} pistas, {len(set(orden))} distintas")
+            return salida
+    except Exception as e:
+        print(f"  Mezcla audio error: {e}")
+    return None
+
 def montar_video(titulo, duracion=3600, es_short=False):
     print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
     clips_reales = get_clips_ganesha(es_short=es_short)
@@ -756,10 +809,13 @@ def montar_video(titulo, duracion=3600, es_short=False):
 
     t = '58' if es_short else str(duracion)
 
+    mezcla = None if es_short else crear_mezcla_audio(int(duracion))
+    entrada_audio = ['-i', mezcla] if mezcla else ['-stream_loop', '-1', '-i', musica]
+
     cmd = [
         'ffmpeg', '-y',
         '-f', 'concat', '-safe', '0', '-i', lista_path,
-        '-stream_loop', '-1', '-i', musica,
+        *entrada_audio,
         '-map', '0:v', '-map', '1:a',
         '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
         '-t', t, '-vf', filtro_texto,
