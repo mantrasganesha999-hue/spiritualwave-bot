@@ -1,6 +1,7 @@
 import os, random, base64, pickle, requests
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
+import notificar
 
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
@@ -26,16 +27,6 @@ RESPUESTAS_EN = [
     "Your devotion reaches Ganesha's heart. May his blessings be yours today 🙏💎",
 ]
 
-def telegram(msg):
-    try:
-        requests.post(
-            f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT, 'text': msg, 'parse_mode': 'HTML'},
-            timeout=10
-        )
-    except:
-        pass
-
 def get_youtube():
     from google.auth.transport.requests import Request
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
@@ -49,6 +40,7 @@ def responder_comentarios():
     youtube = get_youtube()
     respondidos = 0
     errores = 0
+    revisados = 0
 
     try:
         videos = youtube.search().list(
@@ -73,6 +65,7 @@ def responder_comentarios():
                 ).execute()
 
                 for item in comentarios.get('items', []):
+                    revisados += 1
                     snippet = item['snippet']['topLevelComment']['snippet']
                     texto = snippet.get('textDisplay', '').lower()
                     autor = snippet.get('authorDisplayName', '')
@@ -115,11 +108,10 @@ def responder_comentarios():
 
     except Exception as e:
         print(f"Error general: {e}")
-        telegram(f"❌ Error en responder comentarios: {str(e)[:150]}")
+        notificar.error('Responder comentarios', e)
         return
 
-    msg = f"💬 <b>Comentarios respondidos</b>\n✅ Respondidos: {respondidos}\n❌ Errores: {errores}"
-    telegram(msg)
+    notificar.comentarios(respondidos, errores, revisados)
     print(f"Listo: {respondidos} respondidos, {errores} errores")
 
 responder_comentarios()

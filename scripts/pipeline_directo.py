@@ -15,9 +15,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pipeline_cloud as pc  # helpers compartidos (xfade, mezcla de audio, miniaturas)
+import notificar
 
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
-telegram = pc.telegram
 
 W, H, FPS = 1920, 1080, 30
 ENC_LIVE = ['-c:v', 'libx264', '-preset', 'veryfast',
@@ -194,17 +194,29 @@ def transmitir(base, audio, destino, duracion):
         time.sleep(15)
 
 
-def verificar_en_vivo(youtube, broadcast_id):
+def verificar_en_vivo(youtube, broadcast_id, titulo):
+    url = f"https://www.youtube.com/watch?v={broadcast_id}"
     try:
         r = youtube.liveBroadcasts().list(part='status', id=broadcast_id).execute()
         estado = r['items'][0]['status']['lifeCycleStatus']
         if estado == 'live':
-            telegram(f"\U0001F534 <b>EN VIVO</b>\n\U0001F517 https://www.youtube.com/watch?v={broadcast_id}")
+            notificar.directo_en_vivo(titulo, url)
         else:
-            telegram(f"⚠️ El directo sigue en estado '{estado}' tras 3 min. Revisa YouTube Studio.\n"
-                     f"https://www.youtube.com/watch?v={broadcast_id}")
+            notificar.directo_sin_vivo(estado, url)
     except Exception as e:
         print(f"  No se pudo verificar el estado: {e}")
+
+
+def progreso_horario(youtube, broadcast_id, inicio, total, parar):
+    """Cada hora avisa (en silencio) cuanto lleva el directo y cuanta gente lo ve."""
+    while not parar.wait(3600):
+        espectadores = None
+        try:
+            r = youtube.videos().list(part='liveStreamingDetails', id=broadcast_id).execute()
+            espectadores = r['items'][0]['liveStreamingDetails'].get('concurrentViewers')
+        except Exception as e:
+            print(f"  No se pudo leer espectadores: {e}")
+        notificar.directo_progreso(time.time() - inicio, total, espectadores)
 
 
 def main():
@@ -214,13 +226,13 @@ def main():
     except ValueError:
         horas = 4.0
     duracion = int(max(0.25, min(horas, 5.0)) * 3600)
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
     tema, titulo, descripcion = datos_live()
-    telegram(f"\U0001F534 <b>Preparando directo</b> ({duracion/3600:.1f} h)\n\U0001F4C5 {fecha}\n\U0001F3AC {titulo}")
+    notificar.directo_preparando(titulo, duracion / 3600)
 
     trabajo = '/tmp/live_trabajo'
     shutil.rmtree(trabajo, ignore_errors=True)
     os.makedirs(trabajo, exist_ok=True)
+    parar = threading.Event()
     try:
         base = construir_base(trabajo)
         if not base:
@@ -231,24 +243,31 @@ def main():
 
         youtube = conectar_youtube()
         broadcast_id, destino = crear_directo(youtube, tema, titulo, descripcion)
-        print(f"  Broadcast: https://www.youtube.com/watch?v={broadcast_id}")
-        chequeo = threading.Timer(180, verificar_en_vivo, args=(youtube, broadcast_id))
+        url = f"https://www.youtube.com/watch?v={broadcast_id}"
+        print(f"  Broadcast: {url}")
+        inicio = time.time()
+        chequeo = threading.Timer(180, verificar_en_vivo, args=(youtube, broadcast_id, titulo))
         chequeo.daemon = True
         chequeo.start()
+        progreso = threading.Thread(target=progreso_horario, args=(youtube, broadcast_id, inicio, duracion, parar),
+                                    daemon=True)
+        progreso.start()
 
         transmitir(base, audio, destino, duracion)
+        parar.set()
 
         try:
             youtube.liveBroadcasts().transition(broadcastStatus='complete', id=broadcast_id, part='status').execute()
         except Exception:
             pass  # enableAutoStop ya lo cierra
-        telegram(f"✅ <b>Directo finalizado</b>\n\U0001F517 https://www.youtube.com/watch?v={broadcast_id}")
+        notificar.directo_finalizado(titulo, url, time.time() - inicio)
         print("=== DIRECTO FINALIZADO ===")
     except Exception as e:
         print(f"ERROR en directo: {e}")
-        telegram(f"⚠️ Error en directo: {str(e)[:250]}")
+        notificar.error('Directo en vivo', e)
         sys.exit(1)
     finally:
+        parar.set()
         shutil.rmtree(trabajo, ignore_errors=True)
 
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+import notificar
 
 GROQ_KEY = os.environ.get('GROQ_API_KEY')
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
@@ -27,16 +28,6 @@ TEMAS_SLEEP_INDIA = [
     "8 Hours Ganpati Mantra Sleep Music Prosperity While You Sleep",
     "8 Hours Shubh Ganesha Sleep Music Good Luck Devotional Chant",
 ]
-def telegram(msg):
-    try:
-        requests.post(
-            f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT, 'text': msg, 'parse_mode': 'HTML'},
-            timeout=10
-        )
-    except:
-        pass
-
 def get_imagenes():
     folder = os.path.join(BASE, 'assets/backgrounds')
     imgs = [os.path.join(folder, f) for f in os.listdir(folder) if f.startswith('ganesha') and f.endswith('.jpg')]
@@ -253,7 +244,7 @@ def subir_youtube_sleep(video_path, titulo, descripcion, tags):
 # MAIN
 print("=== SLEEP MUSIC PRODUCER ===")
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
-telegram(f"🌙 <b>Sleep Music Producer iniciado</b>\n📅 {fecha}")
+notificar.mensaje('🌙', 'SLEEP MUSIC INICIADO', [notificar.campo('⏱', 'Duración', '8 horas'), '🛠 Montando el video (puede tardar un buen rato)...'], silencioso=True)
 
 try:
     todos_los_temas = TEMAS_SLEEP + TEMAS_SLEEP_INDIA
@@ -262,9 +253,9 @@ try:
     video = montar_video_8h(titulo)
     if video:
         vid_id, url = subir_youtube_sleep(video, titulo, descripcion, tags)
-        telegram(f"✅ <b>Video 8H Sleep subido</b>\n🎬 {titulo}\n🔗 {url}")
+        notificar.video_subido('sleep', 'en', titulo, url, duracion='8 h')
     else:
-        telegram("❌ Error generando video de 8 horas")
+        notificar.error('Sleep Music', 'No se pudo generar el video de 8 horas')
 except Exception as e:
-    telegram(f"⚠️ Error video sleep: {str(e)[:150]}")
+    notificar.error('Sleep Music', e)
     print(f"Error sleep: {e}")

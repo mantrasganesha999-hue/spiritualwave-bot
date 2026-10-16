@@ -1,5 +1,6 @@
 import os, requests
 from datetime import datetime
+import notificar
 
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
@@ -17,19 +18,9 @@ POSTS = [
     "⚡ Como te sientes despues de escuchar mantras de Ganesha? Cuentanos 🔱",
 ]
 
-def telegram(msg):
-    try:
-        requests.post(
-            f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT, 'text': msg, 'parse_mode': 'HTML'},
-            timeout=10
-        )
-    except:
-        pass
-
 import random
 post = random.choice(POSTS)
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-telegram(f"📢 <b>Post sugerido para Comunidad</b>\n📅 {fecha}\n\n{post}\n\n<i>Publica este post manualmente en la pestaña Comunidad de YouTube Studio</i>")
+notificar.post_comunidad(post)
 print(f"Post enviado a Telegram: {post[:60]}...")

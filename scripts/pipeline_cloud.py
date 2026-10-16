@@ -9,6 +9,8 @@ YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import notificar
 
 TEMAS_ES = [
     "mantra de Ganesha para atraer abundancia y eliminar obstaculos",
@@ -170,7 +172,8 @@ DIAS_SERIE_21 = [
     "Dia 21: Celebra tu transformacion y nueva abundancia",
 ]
 
-EMOJIS_COMBOS = ["Ô£¿­ƒö▒­ƒî©", "­ƒöÑÔ£¿­ƒòë", "­ƒÖÅ­ƒÆ½­ƒö▒", "ÔÜí­ƒîƒ­ƒòë", "­ƒöÑ­ƒÖÅÔ£¿", "­ƒÆ½­ƒòë­ƒî©"]
+EMOJIS_COMBOS = ["\u2728\U0001F531\U0001F338", "\U0001F525\u2728\U0001F549", "\U0001F64F\U0001F4AB\U0001F531",
+                 "\u26A1\U0001F31F\U0001F549", "\U0001F525\U0001F64F\u2728", "\U0001F4AB\U0001F549\U0001F338"]
 
 FRASES_ES = [
     "Abro mi mente a la abundancia infinita",
@@ -203,16 +206,11 @@ FRASES_EN = [
 ]
 
 VIDEOS_SUBIDOS_HOY = []
+DETALLE_SUBIDA = {}  # lo que salio bien/mal en la ultima subida (para el aviso de Telegram)
 
 def telegram(mensaje):
-    try:
-        requests.post(
-            f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT, 'text': mensaje, 'parse_mode': 'HTML'},
-            timeout=10
-        )
-    except Exception as e:
-        print(f"Telegram error: {e}")
+    """Compatibilidad: envia texto HTML ya formateado."""
+    return notificar.enviar(mensaje)
 
 def get_imagenes():
     folder = os.path.join(BASE, 'assets/backgrounds')
@@ -296,10 +294,7 @@ def verificar_salud():
         except Exception as e:
             problemas.append(f"Token de YouTube corrupto: {str(e)[:50]}")
     if problemas:
-        msg = "ÔÜá´©Å <b>Chequeo de salud - Problemas detectados</b>\n\n"
-        for p in problemas:
-            msg += f"ÔØî {p}\n"
-        telegram(msg)
+        notificar.salud(problemas)
         print("PROBLEMAS DETECTADOS:", problemas)
     else:
         print("Sistema saludable, todo OK")
@@ -1000,8 +995,10 @@ def agregar_a_playlist(youtube, video_id, playlist_nombre):
             body={'snippet': {'playlistId': playlist_id, 'resourceId': {'kind': 'youtube#video', 'videoId': video_id}}}
         ).execute()
         print(f"  Agregado a playlist: {playlist_nombre}")
+        return True
     except Exception as e:
         print(f"  Playlist error: {e}")
+        return False
 
 
 def generar_srt(titulo, duracion_min, idioma='es'):
@@ -1074,11 +1071,17 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         'status': {'privacyStatus': 'public'}
     }
 
+    DETALLE_SUBIDA.clear()
+    DETALLE_SUBIDA['mb'] = os.path.getsize(video_path) // 1024 // 1024
     media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
     response = youtube.videos().insert(part='snippet,status', body=body, media_body=media).execute()
     video_id = response['id']
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"  SUBIDO: {url}")
+    DETALLE_SUBIDA.update(miniatura=False,
+                          subtitulos=None if es_short else False,
+                          comentario=None if es_short else False,
+                          playlist_ok=None if es_short else False)
 
     if es_short:
         thumb = generar_thumbnail_short(titulo, variante)
@@ -1086,6 +1089,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             try:
                 youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb, mimetype='image/jpeg')).execute()
                 print("  Thumbnail Short OK")
+                DETALLE_SUBIDA['miniatura'] = True
             except Exception as e:
                 print(f"  Thumbnail Short error: {e}")
     else:
@@ -1096,6 +1100,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
             try:
                 youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb, mimetype='image/jpeg')).execute()
                 print("  Thumbnail OK")
+                DETALLE_SUBIDA['miniatura'] = True
             except Exception as e:
                 print(f"  Thumbnail error: {e}")
 
@@ -1104,7 +1109,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         VIDEOS_SUBIDOS_HOY.append(video_id)
 
         if playlist_nombre:
-            agregar_a_playlist(youtube, video_id, playlist_nombre)
+            DETALLE_SUBIDA['playlist_ok'] = agregar_a_playlist(youtube, video_id, playlist_nombre)
 
         # Subtitulos activados
         try:
@@ -1125,6 +1130,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                     media_body=MediaFileUpload(srt_path, mimetype='application/octet-stream')
                 ).execute()
                 print(f"  Subtitulos {lang_name} OK")
+                DETALLE_SUBIDA['subtitulos'] = True
         except Exception as e:
             print(f"  Subtitulos error (no critico): {e}")
 
@@ -1136,6 +1142,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                 body={"snippet": {"videoId": video_id, "topLevelComment": {"snippet": {"textOriginal": comentario_fijo}}}}
             ).execute()
             print("  Comentario fijo publicado")
+            DETALLE_SUBIDA['comentario'] = True
         except Exception as e:
             print(f"  Comentario error: {e}")
 
@@ -1291,7 +1298,7 @@ TAGS: [5 hashtags separated by spaces including Ganpati and Ganesha]"""
 
 
 def producir_largo(idioma):
-    """Video horizontal largo. Devuelve (titulo, url)."""
+    """Video horizontal largo. Devuelve dict con titulo, url y detalles de la subida."""
     if idioma == 'hi':
         titulo, desc, tags = generar_hi()
         playlist = "Ganpati Bappa Mantras"
@@ -1305,11 +1312,12 @@ def producir_largo(idioma):
         raise RuntimeError("No se pudo montar el video largo (2 intentos)")
     _, url = subir_youtube(video, titulo, desc, tags, duracion_min=DURACION_LARGO // 60,
                            variante=random.randint(0, 9), playlist_nombre=playlist, idioma=idioma)
-    return titulo, url
+    return {**DETALLE_SUBIDA, 'titulo': titulo, 'url': url, 'duracion': f"{DURACION_LARGO // 60} min",
+            'playlist': playlist}
 
 
 def producir_short(idioma):
-    """Short vertical. Devuelve (titulo, url)."""
+    """Short vertical. Devuelve dict con titulo, url y detalles de la subida."""
     temas = TEMAS_SHORTS_HI if idioma == 'hi' else TEMAS_SHORTS_EN
     tema = random.choice(temas)
     print(f"\n[SHORT {idioma.upper()}] {tema}")
@@ -1322,37 +1330,37 @@ def producir_short(idioma):
             "The music, images and videos were created with artificial intelligence tools.")
     _, url = subir_youtube(short, tema, desc, hashtags, es_short=True,
                            variante=random.randint(0, 9), idioma=idioma)
-    return tema, url
+    return {**DETALLE_SUBIDA, 'titulo': tema, 'url': url, 'duracion': '58 s'}
 
 
 def main():
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
+    t0 = time.time()
     idioma = (os.environ.get('RUN_IDIOMA') or '').strip().lower()
     if idioma not in ('en', 'hi'):
         # 14:00 UTC -> ingles, 22:00 UTC -> hindi
         idioma = 'en' if datetime.utcnow().hour < 18 else 'hi'
-    print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} | {fecha} ===")
+    print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} ===")
 
     verificar_salud()
-    telegram(f"\U0001F531 <b>SpiritualWave Producer</b> [{idioma.upper()}]\n\U0001F4C5 {fecha}\n⏳ Generando video largo y short...")
+    notificar.produccion_iniciada(
+        idioma, [f"\U0001F3AC Video largo de {DURACION_LARGO // 60} min", "\U0001F4F1 Short de 1 min"],
+        estimado_min=25)
 
     resultados, errores = [], []
-    for nombre, funcion in (("VIDEO LARGO", producir_largo), ("SHORT", producir_short)):
+    for nombre, tipo, funcion in (("Video largo", 'largo', producir_largo), ("Short", 'short', producir_short)):
         try:
-            titulo, url = funcion(idioma)
-            resultados.append((nombre, titulo, url))
-            telegram(f"✅ <b>{nombre} {idioma.upper()} subido</b>\n\U0001F3AC {titulo}\n\U0001F517 {url}")
+            d = funcion(idioma)
+            resultados.append((nombre, d['titulo'], d['url']))
+            notificar.video_subido(
+                tipo, idioma, d['titulo'], d['url'], duracion=d.get('duracion'), mb=d.get('mb'),
+                playlist=d.get('playlist') if d.get('playlist_ok') else None,
+                miniatura=d.get('miniatura'), subtitulos=d.get('subtitulos'), comentario=d.get('comentario'))
         except Exception as e:
-            errores.append(f"{nombre}: {str(e)[:200]}")
+            errores.append(f"{nombre}: {str(e)[:120]}")
             print(f"ERROR en {nombre}: {e}")
-            telegram(f"⚠️ Error en {nombre} {idioma.upper()}: {str(e)[:200]}")
+            notificar.error(nombre, e, idioma)
 
-    resumen = f"\U0001F531 <b>Ejecucion terminada</b> [{idioma.upper()}]\n"
-    for nombre, titulo, url in resultados:
-        resumen += f"✅ {nombre}: {titulo[:45]}\n"
-    for err in errores:
-        resumen += f"❌ {err[:80]}\n"
-    telegram(resumen)
+    notificar.resumen_ejecucion(idioma, resultados, errores, time.time() - t0)
     print("\n=== PROCESO FINALIZADO ===")
     if not resultados:
         # Que el workflow quede en ROJO si no se produjo nada

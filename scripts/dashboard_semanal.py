@@ -1,22 +1,13 @@
 import requests, base64, pickle, os, json
 from datetime import datetime, timedelta
 from googleapiclient.discovery import build
+import notificar
 
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HISTORIAL_PATH = os.path.join(BASE, 'historial_dashboard.json')
-
-def telegram(msg):
-    try:
-        requests.post(
-            f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT, 'text': msg, 'parse_mode': 'HTML'},
-            timeout=10
-        )
-    except Exception as e:
-        print(f"Telegram error: {e}")
 
 def get_youtube_service():
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)
@@ -133,16 +124,15 @@ try:
     historial = cargar_historial()
     semana_anterior = historial[-1] if historial else None
 
-    mensaje = f"📊 <b>DASHBOARD SEMANAL - SpiritualWave</b>\n📅 {fecha}\n\n"
+    lineas = []
 
     if stats_canal:
         subs_ant = semana_anterior['subs_total'] if semana_anterior else None
         vistas_ant = semana_anterior['vistas_totales'] if semana_anterior else None
-
-        mensaje += f"🔱 <b>Canal Total</b>\n"
-        mensaje += f"👥 Suscriptores: {formatear_comparativa(stats_canal['subs'], subs_ant, 'subs')}\n"
-        mensaje += f"👁 Vistas totales: {formatear_comparativa(stats_canal['vistas_totales'], vistas_ant, 'vistas')}\n"
-        mensaje += f"🎬 Videos totales: {stats_canal['videos_totales']}\n\n"
+        lineas += ["🔱 <b>Canal (total)</b>",
+                   f"👥 Suscriptores: {formatear_comparativa(stats_canal['subs'], subs_ant, 'subs')}",
+                   f"👁 Vistas totales: {formatear_comparativa(stats_canal['vistas_totales'], vistas_ant, 'vistas')}",
+                   f"🎬 Videos publicados: {stats_canal['videos_totales']}", ""]
 
     if stats_semana:
         vistas_sem_ant = semana_anterior['vistas_semana'] if semana_anterior else None
@@ -150,21 +140,23 @@ try:
         subs_gan_ant = semana_anterior['subs_ganados'] if semana_anterior else None
         likes_ant = semana_anterior['likes'] if semana_anterior else None
         comentarios_ant = semana_anterior['comentarios'] if semana_anterior else None
+        lineas += ["📈 <b>Esta semana vs la anterior</b>",
+                   f"👁 Vistas: {formatear_comparativa(stats_semana['vistas_semana'], vistas_sem_ant, 'vistas')}",
+                   f"⏱ Horas vistas: {formatear_comparativa(stats_semana['horas_semana'], horas_sem_ant, 'horas', es_decimal=True)}",
+                   f"➕ Suscriptores ganados: {formatear_comparativa(stats_semana['subs_ganados'], subs_gan_ant, 'subs')}",
+                   f"❤️ Likes: {formatear_comparativa(stats_semana['likes'], likes_ant, 'likes')}",
+                   f"💬 Comentarios: {formatear_comparativa(stats_semana['comentarios'], comentarios_ant, 'comentarios')}", ""]
 
-        mensaje += f"📈 <b>Esta Semana vs Anterior</b>\n"
-        mensaje += f"👁 Vistas: {formatear_comparativa(stats_semana['vistas_semana'], vistas_sem_ant, 'vistas')}\n"
-        mensaje += f"⏱ Horas vistas: {formatear_comparativa(stats_semana['horas_semana'], horas_sem_ant, 'horas', es_decimal=True)}\n"
-        mensaje += f"➕ Subs ganados: {formatear_comparativa(stats_semana['subs_ganados'], subs_gan_ant, 'subs')}\n"
-        mensaje += f"❤️ Likes: {formatear_comparativa(stats_semana['likes'], likes_ant, 'likes')}\n"
-        mensaje += f"💬 Comentarios: {formatear_comparativa(stats_semana['comentarios'], comentarios_ant, 'comentarios')}\n\n"
-
+    botones = []
     if top_video_id:
-        mensaje += f"🏆 <b>Video mas visto esta semana</b>\n"
-        mensaje += f"🎬 {top_video_titulo[:60]}\n"
-        mensaje += f"👁 {top_video_vistas} vistas\n"
-        mensaje += f"🔗 https://www.youtube.com/watch?v={top_video_id}\n"
+        lineas += ["🏆 <b>Video más visto de la semana</b>",
+                   f"🎬 {notificar.esc(top_video_titulo[:70])}",
+                   f"👁 {top_video_vistas} vistas"]
+        botones.append(('▶️ Ver el video', f"https://www.youtube.com/watch?v={top_video_id}"))
+    if lineas and lineas[-1] == "":
+        lineas.pop()
 
-    telegram(mensaje)
+    notificar.mensaje('📊', f'DASHBOARD SEMANAL · {fecha}', lineas, botones=botones)
     print("Dashboard enviado OK")
 
     nuevo_registro = {
@@ -183,5 +175,5 @@ try:
     print("Historial actualizado OK")
 
 except Exception as e:
-    telegram(f"⚠️ Error generando dashboard semanal: {str(e)[:200]}")
+    notificar.error('Dashboard semanal', e)
     print(f"Error: {e}")
