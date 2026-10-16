@@ -1,4 +1,4 @@
-import requests, subprocess, os, random, base64, pickle, io, json, time
+import requests, subprocess, os, random, base64, pickle, io, json, time, re, sys, shutil, textwrap
 from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -391,11 +391,11 @@ TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]
         data = r.json()
         if 'choices' not in data:
             print(f'  Groq error: {data}')
-            return f'{emoji} {tema[:55]}', f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.', '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave'
+            return f'{emoji} {tema[:55]}', desc_fallback(tema, lang), '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave'
         contenido = data['choices'][0]['message']['content']
     except Exception as e:
         print(f'  Groq exception: {e}')
-        return f'{emoji} {tema[:55]}', f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.', '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave' 
+        return f'{emoji} {tema[:55]}', desc_fallback(tema, lang), '#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave' 
 
     titulo = extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or f"{emoji} {tema[:90]}"
     titulo = limpiar_texto(titulo)
@@ -495,7 +495,7 @@ def generar_thumbnail(titulo, variante=1, texto_marca='SpiritualWave', subtexto=
         draw.text(((img.width-w)//2+2, 97), sub, fill=(100, 70, 0), font=font_sub)
         draw.text(((img.width-w)//2, 95), sub, fill=(240, 200, 80), font=font_sub)
 
-        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:65]
+        titulo_clean = texto_visual(titulo, 65)
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
@@ -614,7 +614,7 @@ def generar_thumbnail_short(titulo, variante=1):
         draw.text((cx+3, 48), canal, fill=(180, 120, 0), font=font_canal)
         draw.text((cx, 45), canal, fill=(255, 230, 60), font=font_canal)
 
-        titulo_clean = limpiar_texto(titulo.replace('#Shorts', ''))[:65]
+        titulo_clean = texto_visual(titulo, 65)
         palabras = titulo_clean.split()
         lineas = []
         linea = ""
@@ -710,137 +710,272 @@ def crear_mezcla_audio(duracion, salida='/tmp/mezcla_audio.m4a'):
         print(f"  Mezcla audio error: {e}")
     return None
 
-def montar_video(titulo, duracion=3600, es_short=False):
-    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(duracion//60) + 'min'} HD...")
-    clips_reales = get_clips_ganesha(es_short=es_short)
-    imagenes = get_imagenes_shorts() if es_short else get_imagenes()
-    musicas = get_musicas()
+FUENTE_BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+TRANSICIONES = ['fade', 'dissolve']  # cruces suaves; el negro solo en los extremos de cada segmento
+# Tratamiento de color (saturacion/contraste) aplicado a cada segmento
+GRADE_VIDEO = ",eq=saturation=1.18:contrast=1.05:brightness=0.01"
+DURACION_LARGO = int(os.environ.get('DURACION_LARGO', 900))  # 15 min por defecto
 
-    if not musicas:
+
+def texto_visual(texto, maxlen=60):
+    """Texto seguro para dibujar (FFmpeg drawtext / PIL): sin emojis ni signos raros."""
+    t = limpiar_texto((texto or '').replace('#Shorts', ''))
+    t = re.sub(r"[^\w\s\-\.\!\?&,]", '', t)
+    t = ' '.join(t.split())
+    if len(t) > maxlen:
+        t = t[:maxlen].rsplit(' ', 1)[0]
+    return t.strip()
+
+
+def lista_tags(tags):
+    """Tags reales de YouTube (sin #), mezcla de los generados y los base del canal."""
+    base = ['Ganesha mantra', 'Om Gan Ganapataye Namaha', 'Ganpati Bappa',
+            'meditation music', 'spiritual music', '528hz']
+    propios = [t.strip('#').strip() for t in (tags or '').split() if t.strip('#').strip()]
+    salida, total, vistos = [], 0, set()
+    for t in propios + base:
+        if t.lower() in vistos:
+            continue
+        if total + len(t) + 1 > 450:
+            break
+        vistos.add(t.lower())
+        salida.append(t)
+        total += len(t) + 1
+    return salida
+
+
+def desc_fallback(tema, lang):
+    if lang == 'es':
+        return f'Video sobre {tema}\n\nLa musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial.'
+    return f'Video about {tema}\n\nThe music, images and videos were created with artificial intelligence tools.'
+
+
+def duracion_media(path):
+    r = subprocess.run(
+        ['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+         '-of', 'default=nw=1:nk=1', path],
+        capture_output=True, text=True)
+    try:
+        return float(r.stdout.strip())
+    except ValueError:
+        return 0.0
+
+
+def normalizar_clip(clip, salida, w, h, fps, max_seg=8):
+    """Escala/recorta un clip al formato final. Devuelve su duracion (0 si falla)."""
+    vf = (f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
+          f"setsar=1,fps={fps},format=yuv420p")
+    subprocess.run(
+        ['ffmpeg', '-y', '-i', clip, '-vf', vf, '-an', '-t', str(max_seg),
+         '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '18', salida],
+        capture_output=True, text=True)
+    if os.path.exists(salida):
+        d = duracion_media(salida)
+        if d >= 3:
+            return d
+    return 0.0
+
+
+def render_segmento(clips, durs, salida, w, h, fps, vf_post='', xd=1.2,
+                    enc=None):
+    """Une clips con transiciones xfade + fade in/out en los extremos.
+    Devuelve la duracion total del segmento o None si falla."""
+    n = len(clips)
+    if n == 0:
+        return None
+    cmd = ['ffmpeg', '-y']
+    for c in clips:
+        cmd += ['-i', c]
+    partes = []
+    prev = '[0:v]'
+    acum = durs[0]
+    for k in range(1, n):
+        off = acum - xd
+        trans = random.choice(TRANSICIONES)
+        out = f'[v{k}]'
+        partes.append(f"{prev}[{k}:v]xfade=transition={trans}:duration={xd}:offset={off:.3f}{out}")
+        prev = out
+        acum = acum + durs[k] - xd
+    total = acum
+    partes.append(
+        f"{prev}fade=t=in:st=0:d=0.8,fade=t=out:st={max(0, total - 0.8):.3f}:d=0.8"
+        f"{vf_post},format=yuv420p[vout]")
+    if enc is None:
+        enc = ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-r', str(fps)]
+    cmd += ['-filter_complex', ';'.join(partes), '-map', '[vout]', '-an', *enc, salida]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if os.path.exists(salida) and os.path.getsize(salida) > 10000:
+        return total
+    print(f"  Segmento error: {r.stderr[-400:]}")
+    return None
+
+
+def construir_segmentos(es_short, w, h, fps, trabajo, n_clips, por_segmento,
+                        vf_post='', enc=None):
+    """Normaliza clips reales (o imagenes con zoom como respaldo) y arma segmentos."""
+    normalizados = []  # (path, duracion)
+    clips = get_clips_ganesha(es_short=es_short)
+    if len(clips) >= 3:
+        print(f"  Usando clips de video reales ({len(clips)} disponibles, {n_clips} en este video)")
+        for idx, clip in enumerate(clips[:n_clips]):
+            p = f'{trabajo}/n{idx}.mp4'
+            d = normalizar_clip(clip, p, w, h, fps)
+            if d:
+                normalizados.append((p, d))
+    if len(normalizados) < 3:
+        print("  Usando imagenes con zoom (respaldo)")
+        normalizados = []
+        imagenes = get_imagenes_shorts() if es_short else get_imagenes()
+        dur_img = 6
+        for idx, img in enumerate(imagenes[:max(8, por_segmento)]):
+            p = f'{trabajo}/z{idx}.mp4'
+            zoom_expr = ("min(zoom+0.0012,1.25)" if idx % 2 == 0
+                         else "if(eq(on,1),1.25,max(1.0,zoom-0.0012))")
+            vf = (f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,crop={w*2}:{h*2},"
+                  f"zoompan=z='{zoom_expr}':d={dur_img*fps}:s={w}x{h}:fps={fps},format=yuv420p")
+            subprocess.run(
+                ['ffmpeg', '-y', '-loop', '1', '-i', img, '-vf', vf, '-t', str(dur_img),
+                 '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '20', p],
+                capture_output=True, text=True)
+            if os.path.exists(p):
+                d = duracion_media(p)
+                if d >= 3:
+                    normalizados.append((p, d))
+    segmentos = []
+    for i in range(0, len(normalizados), por_segmento):
+        grupo = normalizados[i:i + por_segmento]
+        if len(grupo) < 3 and segmentos:
+            break
+        seg = f'{trabajo}/seg{len(segmentos)}.mp4'
+        total = render_segmento([g[0] for g in grupo], [g[1] for g in grupo],
+                                seg, w, h, fps, vf_post=vf_post, enc=enc)
+        if total:
+            segmentos.append((seg, total))
+    return segmentos
+
+
+def filtros_texto(titulo_txt, es_short, t_total):
+    """Titulo (en varias lineas) que aparece/desaparece, marca fija y CTA final."""
+    font = f"fontfile={FUENTE_BOLD}:" if os.path.exists(FUENTE_BOLD) else ""
+    borde = "borderw=3:bordercolor=black:shadowcolor=black:shadowx=3:shadowy=3"
+    if es_short:
+        ciclo, visible, tam, base, ancho = 100000, 6, 52, 300, 1080
+        marca_tam, marca_x, marca_y = 36, '(w-text_w)/2', 110
+    else:
+        ciclo, visible, tam, base, ancho = 300, 12, 64, 120, 1920
+        marca_tam, marca_x, marca_y = 32, 'w-text_w-40', 30
+    m = f"mod(t,{ciclo})"
+    por_linea = max(12, int(ancho * 0.88 / (tam * 0.70)))
+    lineas = textwrap.wrap(titulo_txt, width=por_linea, break_long_words=False)[:3] or [titulo_txt]
+    alto = int(tam * 1.25)
+    filtros = []
+    for i, linea in enumerate(lineas):
+        y = f"h-{base + (len(lineas) - 1 - i) * alto}"
+        filtros.append(
+            f"drawtext={font}text='{linea}':fontcolor=0xFFD700:fontsize={tam}:"
+            f"x=(w-text_w)/2:y={y}:{borde}:"
+            f"enable='lt({m},{visible})':alpha='min(1,min({m},{visible}-{m}))'")
+    filtros.append(
+        f"drawtext={font}text='SpiritualWave':fontcolor=0xFFD700@0.85:fontsize={marca_tam}:"
+        f"x={marca_x}:y={marca_y}:borderw=2:bordercolor=black@0.8")
+    if not es_short and t_total > 120:
+        filtros.append(
+            f"drawtext={font}text='Subscribe for daily Ganesha mantras':fontcolor=white:fontsize=54:"
+            f"x=(w-text_w)/2:y=(h-text_h)/2:{borde}:"
+            f"enable='gt(t,{t_total - 20})':alpha='min(1,(t-{t_total - 20})/2)'")
+    filtros.append(f"fade=t=out:st={max(0, t_total - 3)}:d=3")
+    return ','.join(filtros)
+
+
+def montar_video(titulo, duracion=None, es_short=False):
+    duracion = duracion or DURACION_LARGO
+    t_total = 58 if es_short else int(duracion)
+    print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(t_total//60) + 'min'} HD con transiciones...")
+    if not get_musicas():
         print("ERROR: Falta musica")
         return None
 
-    musica = random.choice(musicas)
-    titulo_clean = limpiar_texto(titulo)[:35 if es_short else 45].replace("'","").replace('"','').replace(':','-').replace('#','')
-
     w, h = (1080, 1920) if es_short else (1920, 1080)
+    fps = 25
     salida = '/tmp/short.mp4' if es_short else '/tmp/video_final.mp4'
-    lista_path = '/tmp/lista.txt'
+    trabajo = '/tmp/mv_trabajo'
+    shutil.rmtree(trabajo, ignore_errors=True)
+    os.makedirs(trabajo, exist_ok=True)
 
-    usar_clips = len(clips_reales) >= 3
+    n_clips, por_seg = (14, 14) if es_short else (32, 8)
+    segmentos = construir_segmentos(es_short, w, h, fps, trabajo, n_clips, por_seg,
+                                    vf_post=GRADE_VIDEO)
+    if not segmentos:
+        print("ERROR: No se pudo generar ningun segmento de video")
+        return None
+    print(f"  {len(segmentos)} segmentos de video listos")
 
-    if usar_clips:
-        print(f"  Usando {len(clips_reales)} clips de video reales")
-        clips_normalizados = []
-        num_clips = min(15, len(clips_reales))
-        clips_uso = random.sample(clips_reales, num_clips)
+    # Secuencia: segmentos barajados, sin repetir el mismo dos veces seguidas
+    lista_path = f'{trabajo}/lista.txt'
+    acumulado, ultimo = 0.0, None
+    with open(lista_path, 'w') as f:
+        while acumulado < t_total + 5:
+            ciclo = segmentos.copy()
+            random.shuffle(ciclo)
+            if len(ciclo) > 1 and ciclo[0][0] == ultimo:
+                ciclo[0], ciclo[-1] = ciclo[-1], ciclo[0]
+            for seg, d in ciclo:
+                f.write(f"file '{seg}'\n")
+                acumulado += d
+                ultimo = seg
+                if acumulado >= t_total + 5:
+                    break
 
-        for idx, clip in enumerate(clips_uso):
-            norm_path = f'/tmp/norm_{idx}.mp4'
-            filtro_norm = f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,fps=25"
-            cmd_norm = [
-                'ffmpeg', '-y', '-i', clip,
-                '-vf', filtro_norm, '-an', '-t', '8',
-                '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
-                norm_path
-            ]
-            result = subprocess.run(cmd_norm, capture_output=True, text=True)
-            if os.path.exists(norm_path):
-                clips_normalizados.append(norm_path)
+    mezcla = crear_mezcla_audio(t_total, salida=f'{trabajo}/audio.m4a')
+    if mezcla:
+        entrada_audio, codec_audio = ['-i', mezcla], ['-c:a', 'copy']
+    else:
+        musica = random.choice(get_musicas())
+        entrada_audio = ['-stream_loop', '-1', '-i', musica]
+        codec_audio = ['-c:a', 'aac', '-b:a', '192k']
 
-        if not clips_normalizados:
-            usar_clips = False
-        else:
-            with open(lista_path, 'w') as f:
-                repeticiones = max(1, duracion // (8 * len(clips_normalizados)) + 1)
-                for _ in range(repeticiones):
-                    clips_shuffled = clips_normalizados.copy()
-                    random.shuffle(clips_shuffled)
-                    for clip in clips_shuffled:
-                        f.write(f"file '{clip}'\n")
+    titulo_txt = texto_visual(titulo, 60 if es_short else 80)
+    vf = filtros_texto(titulo_txt, es_short, t_total)
 
-    if not usar_clips:
-        print("  Usando imagenes con zoom (respaldo)")
-        if not imagenes:
-            print("ERROR: Faltan imagenes o clips")
-            return None
-        dur_img = 8 if es_short else 12
-        num_imagenes = min(8, len(imagenes)) if not es_short else min(6, len(imagenes))
-        imagenes_uso = random.sample(imagenes, num_imagenes)
-        clips_normalizados = []
-
-        for idx, img in enumerate(imagenes_uso):
-            clip_path = f'/tmp/clip_{idx}.mp4'
-            zoom_in = idx % 2 == 0
-            zoom_expr = f"min(zoom+0.0012,1.25)" if zoom_in else f"if(eq(on,1),1.25,max(1.0,zoom-0.0012))"
-            filtro_clip = (
-                f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
-                f"crop={w*2}:{h*2},"
-                f"zoompan=z='{zoom_expr}':d={dur_img*25}:s={w}x{h}:fps=25,"
-                "format=yuv420p"
-            )
-            cmd_clip = [
-                'ffmpeg', '-y', '-loop', '1', '-i', img,
-                '-vf', filtro_clip, '-t', str(dur_img),
-                '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
-                clip_path
-            ]
-            result = subprocess.run(cmd_clip, capture_output=True, text=True)
-            if os.path.exists(clip_path):
-                clips_normalizados.append(clip_path)
-
-        if not clips_normalizados:
-            print("ERROR: No se genero ningun clip")
-            return None
-
-        with open(lista_path, 'w') as f:
-            repeticiones = max(1, duracion // (dur_img * len(clips_normalizados)) + 1)
-            for _ in range(repeticiones):
-                for clip in clips_normalizados:
-                    f.write(f"file '{clip}'\n")
-
-    filtro_texto = (
-        f"drawtext=text='{titulo_clean}':fontcolor=0xFFD700:fontsize={46 if es_short else 64}:"
-        f"x=(w-text_w)/2:y=h-{200 if es_short else 100}:"
-        "shadowcolor=0x000000FF:shadowx=4:shadowy=4:borderw=3:bordercolor=0x000000FF,"
-        f"drawtext=text='SpiritualWave':fontcolor=0xFFD700:fontsize={38 if es_short else 36}:"
-        f"x=(w-text_w)/2:y={80 if es_short else 28}:shadowcolor=0x000000FF:shadowx=3:shadowy=3:borderw=2:bordercolor=black"
-    )
-
-    t = '58' if es_short else str(duracion)
-
-    mezcla = None if es_short else crear_mezcla_audio(int(duracion))
-    entrada_audio = ['-i', mezcla] if mezcla else ['-stream_loop', '-1', '-i', musica]
-
-    cmd = [
-        'ffmpeg', '-y',
-        '-f', 'concat', '-safe', '0', '-i', lista_path,
-        *entrada_audio,
-        '-map', '0:v', '-map', '1:a',
-        '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
-        '-t', t, '-vf', filtro_texto,
-        '-preset', 'fast', '-crf', '20',
-        salida
-    ]
+    cmd = ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista_path,
+           *entrada_audio, '-map', '0:v', '-map', '1:a',
+           '-vf', vf, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22',
+           '-maxrate', '7M', '-bufsize', '14M',
+           '-r', str(fps), '-pix_fmt', 'yuv420p', *codec_audio,
+           '-t', str(t_total), '-movflags', '+faststart', salida]
     result = subprocess.run(cmd, capture_output=True, text=True)
+    shutil.rmtree(trabajo, ignore_errors=True)
 
-    for clip in clips_normalizados:
-        try:
-            os.remove(clip)
-        except:
-            pass
-
-    if os.path.exists(salida):
+    if os.path.exists(salida) and os.path.getsize(salida) > 100000:
         print(f"  OK HD: {os.path.getsize(salida)//1024//1024}MB")
         return salida
-    print(f"  Error: {result.stderr[-500:]}")
+    print(f"  Error: {result.stderr[-600:]}")
     return None
 
-def agregar_capitulos(descripcion, duracion_min):
-    footer = "\n\nSuscribete: youtube.com/@SpiritualWave888\n"
-    footer += "Activa la campana para recibir mantras cada dia\n\n"
-    footer += "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."
-    return descripcion + footer
+
+def agregar_capitulos(descripcion, duracion_min, idioma='es'):
+    """Capitulos reales (timestamps) para videos largos + pie de pagina."""
+    capitulos = ""
+    if duracion_min >= 9:
+        nombres = ["Opening Mantra", "Deep Focus", "Inner Calm", "Sacred Frequency",
+                   "Blessing Flow", "Gratitude", "Abundance Mindset", "Closing Blessing"]
+        n = min(len(nombres), max(3, duracion_min // 2))
+        paso = (duracion_min * 60) // n
+        lineas = []
+        for i in range(n):
+            seg = i * paso
+            lineas.append(f"{seg // 60:02d}:{seg % 60:02d} {nombres[i]}")
+        capitulos = "\n\nChapters:\n" + "\n".join(lineas)
+    if idioma in ('es', 'pt'):
+        footer = "\n\nSuscribete: youtube.com/@SpiritualWave888\n"
+        footer += "Activa la campana para recibir mantras cada dia\n\n"
+        footer += "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."
+    else:
+        footer = "\n\nSubscribe: youtube.com/@SpiritualWave888\n"
+        footer += "Turn on the bell to get new mantras every day\n\n"
+        footer += "The music, images and videos were created with artificial intelligence tools."
+    return descripcion + capitulos + footer
+
 
 def agregar_a_playlist(youtube, video_id, playlist_nombre):
     try:
@@ -922,13 +1057,16 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
     youtube = build('youtube', 'v3', credentials=creds)
 
     titulo_final = f"{titulo} #Shorts" if es_short else titulo
-    desc_final = descripcion if es_short else agregar_capitulos(descripcion, duracion_min)
+    desc_final = descripcion if es_short else agregar_capitulos(descripcion, duracion_min, idioma)
+
+    if tags and tags.split()[0] not in desc_final:
+        desc_final = desc_final + "\n\n" + tags
 
     body = {
         'snippet': {
             'title': titulo_final[:100],
             'description': desc_final[:4900],
-            'tags': tags.split()[:30],
+            'tags': lista_tags(tags),
             'categoryId': '22',
             'defaultLanguage': idioma,
             'defaultAudioLanguage': idioma
@@ -952,7 +1090,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                 print(f"  Thumbnail Short error: {e}")
     else:
         texto_marca = 'Ganpati Bappa' if idioma == 'hi' else 'SpiritualWave'
-        subtexto = 'Vighnaharta Ganesha Mantras' if idioma == 'hi' else 'Mantras & Frecuencias Divinas'
+        subtexto = {'hi': 'Vighnaharta Ganesha Mantras', 'en': 'Sacred Ganesha Mantras'}.get(idioma, 'Mantras & Frecuencias Divinas')
         thumb = generar_thumbnail(titulo, variante, texto_marca, subtexto)
         if thumb:
             try:
@@ -1093,80 +1231,133 @@ def crear_directo_youtube(titulo, descripcion, video_path):
 # MAIN
 print("\n=== SPIRITUALWAVE AUTO PRODUCER HD ===")
 fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
-resultados = []
 
-verificar_salud()
-telegram(f"­ƒö▒ <b>SpiritualWave Producer iniciado</b>\n­ƒôà {fecha}\nÔÅ│ Generando contenido...")
 
-try:
+TEMAS_SHORTS_HI = [
+    "Ganpati Bappa Morya mantra that opens closed doors",
+    "Why Vighnaharta removes obstacles before you ask",
+    "Om Gan Ganapataye Namaha 21 times and feel the shift",
+    "The Ganesha mantra Indian families chant every morning",
+    "Shubh Labh Ganesha blessing for money and good luck",
+    "What Ganpati Bappa teaches about letting go of fear",
+    "Start your day with this Ganesha mantra",
+    "Why we chant Ganesha first before anything new",
+    "Vakratunda Mahakaya mantra for a fresh beginning",
+    "Ganesh mantra for peace when life feels heavy",
+    "Listen to this Ganpati chant before an important day",
+    "The meaning of Ganpati Bappa Morya most people miss",
+]
+
+
+def generar_hi():
+    """Guion del video largo en hindi-ingles (con deteccion de festivales)."""
     festival = detectar_festival_hindu()
     if festival:
-        tema_hi = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026"
-        print(f"\n[VIDEO HI - FESTIVAL: {festival}] {tema_hi}")
+        tema = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026"
+        print(f"\n[VIDEO HI - FESTIVAL: {festival}] {tema}")
     else:
-        tema_hi = random.choice(TEMAS_HI)
-        print(f"\n[VIDEO HI] {tema_hi}")
-    contexto_festival = f"IMPORTANT: Today is during {festival} celebration, make the title and description specifically celebrate this festival with festive greetings." if festival else ""
-    prompt_hi = f"""You are an expert in Hindu spiritual YouTube content for Indian audience.
-Generate VIRAL content for a video about: {tema_hi}
-{contexto_festival}
+        tema = random.choice(TEMAS_HI)
+        print(f"\n[VIDEO HI] {tema}")
+    contexto = (f"IMPORTANT: Today is during {festival} celebration, make the title and description "
+                f"specifically celebrate this festival with festive greetings.") if festival else ""
+    prompt = f"""You are an expert in Hindu spiritual YouTube content for Indian audience.
+Generate engaging, honest content for a video about: {tema}
+{contexto}
 Use English but include devotional Hindi terms like Ganpati Bappa, Vighnaharta, Shubh, Mangal when natural.
+Do not make health claims or guaranteed-result promises.
 No asterisks, no markdown, no emojis in the title.
 Reply EXACTLY in this format:
-TITULO: [title maximum 60 characters, impactful, include Ganpati or Ganesha]
-DESCRIPCION: [400 words with devotional keywords, benefits, CTA to subscribe to youtube.com/@SpiritualWave888]
+TITULO: [title maximum 70 characters, impactful, include Ganpati or Ganesha]
+DESCRIPCION: [300 words with devotional keywords, benefits of mantra practice, CTA to subscribe to youtube.com/@SpiritualWave888. End with: "The music, images and videos were created with artificial intelligence tools."]
 TAGS: [5 hashtags separated by spaces including Ganpati and Ganesha]"""
+    base_tags = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
     try:
-        r_hi = requests.post(
+        r = requests.post(
             'https://api.groq.com/openai/v1/chat/completions',
             headers={'Authorization': f'Bearer {GROQ_KEY}', 'Content-Type': 'application/json'},
-            json={'model': 'openai/gpt-oss-120b', 'messages': [{'role': 'user', 'content': prompt_hi}], 'max_tokens': 1500},
-            timeout=30
-        )
-        data_hi = r_hi.json()
-        if 'choices' not in data_hi:
-            print(f"Groq error: {data_hi}")
-            titulo_hi = tema_hi[:60]
-            desc_hi = tema_hi
-            tags_hi = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave #Bhakti #Devotional"
-        else:
-            contenido_hi = data_hi['choices'][0]['message']['content']
-            titulo_hi = extraer_campo(contenido_hi, 'TITULO', 'DESCRIPCION') or tema_hi[:60]
-            titulo_hi = limpiar_texto(titulo_hi)
-            desc_hi = extraer_campo(contenido_hi, 'DESCRIPCION', 'TAGS') or tema_hi
-            desc_hi = limpiar_texto(desc_hi)
-            tags_hi = extraer_campo(contenido_hi, 'TAGS') or "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
-            tags_hi = limpiar_texto(tags_hi)
+            json={'model': 'openai/gpt-oss-120b', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 1800},
+            timeout=40)
+        data = r.json()
+        if 'choices' not in data:
+            raise RuntimeError(str(data)[:200])
+        contenido = data['choices'][0]['message']['content']
+        titulo = limpiar_texto(extraer_campo(contenido, 'TITULO', 'DESCRIPCION') or tema[:70])
+        desc = limpiar_texto(extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or desc_fallback(tema, 'en'))
+        tags = limpiar_texto(extraer_campo(contenido, 'TAGS') or base_tags)
     except Exception as e:
-        print(f"Groq exception: {e}")
-        titulo_hi = tema_hi[:60]
-        desc_hi = tema_hi
-        tags_hi = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
+        print(f"Groq HI error: {e}")
+        titulo, desc, tags = tema[:70], desc_fallback(tema, 'en'), base_tags
+    return titulo[:95].strip(), desc, tags
 
-    video_hi = montar_video(titulo_hi, duracion=3600)
-    if video_hi:
-        vid_id, url = subir_youtube(video_hi, titulo_hi, desc_hi, tags_hi, duracion_min=60, variante=1, playlist_nombre="Ganpati Bappa Mantras", idioma='hi')
-        resultados.append({'tipo': 'VIDEO HI', 'titulo': titulo_hi, 'url': url})
-        telegram(f"Ô£à <b>Video HI subido</b>\n­ƒÄ¼ {titulo_hi}\n­ƒöù {url}")
-except Exception as e:
-    telegram(f"ÔÜá´©Å Error en video HI: {str(e)[:150]}")
-    print(f"Error HI: {e}")
 
-try:
-    tema_short_hi = random.choice(TEMAS_SHORTS_EN)
-    print(f"\n[SHORT HI] {tema_short_hi}")
-    short_hi = montar_video(tema_short_hi, es_short=True)
-    if short_hi:
-        vid_id, url = subir_youtube(short_hi, tema_short_hi, f"­ƒÖÅ {tema_short_hi}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti", "#Ganesha #Shorts #Mantra #Spiritual #Ganpati #Bhakti #SpiritualWave", es_short=True, variante=2, idioma='en')
-        resultados.append({'tipo': 'SHORT HI', 'titulo': tema_short_hi, 'url': url})
-        telegram(f"Ô£à <b>Short subido</b>\n­ƒÄ¼ {tema_short_hi}\n­ƒöù {url}")
-except Exception as e:
-    telegram(f"ÔÜá´©Å Error en Short: {str(e)[:150]}")
-    print(f"Error Short: {e}")
+def producir_largo(idioma):
+    """Video horizontal largo. Devuelve (titulo, url)."""
+    if idioma == 'hi':
+        titulo, desc, tags = generar_hi()
+        playlist = "Ganpati Bappa Mantras"
+    else:
+        tema = random.choice(TEMAS_EN)
+        print(f"\n[VIDEO EN] {tema}")
+        titulo, desc, tags = generar_guion(tema, 'en')
+        playlist = "Ganesha Mantras English"
+    video = montar_video(titulo, duracion=DURACION_LARGO) or montar_video(titulo, duracion=DURACION_LARGO)
+    if not video:
+        raise RuntimeError("No se pudo montar el video largo (2 intentos)")
+    _, url = subir_youtube(video, titulo, desc, tags, duracion_min=DURACION_LARGO // 60,
+                           variante=random.randint(0, 9), playlist_nombre=playlist, idioma=idioma)
+    return titulo, url
 
-resumen = f"­ƒö▒ <b>Contenido completado</b>\n­ƒôà {fecha}\n\n"
-for r in resultados:
-    resumen += f"Ô£à {r['tipo']}: {r['titulo'][:40]}\n"
-telegram(resumen)
 
-print("\n=== PROCESO FINALIZADO ===")
+def producir_short(idioma):
+    """Short vertical. Devuelve (titulo, url)."""
+    temas = TEMAS_SHORTS_HI if idioma == 'hi' else TEMAS_SHORTS_EN
+    tema = random.choice(temas)
+    print(f"\n[SHORT {idioma.upper()}] {tema}")
+    short = montar_video(tema, es_short=True) or montar_video(tema, es_short=True)
+    if not short:
+        raise RuntimeError("No se pudo montar el short (2 intentos)")
+    hashtags = ("#Ganpati #Ganesha #Shorts #Mantra #Bhakti #SpiritualWave" if idioma == 'hi'
+                else "#Ganesha #Shorts #Mantra #Spiritual #Meditation #SpiritualWave")
+    desc = (f"{tema}\n\nSubscribe: youtube.com/@SpiritualWave888\n\n{hashtags}\n\n"
+            "The music, images and videos were created with artificial intelligence tools.")
+    _, url = subir_youtube(short, tema, desc, hashtags, es_short=True,
+                           variante=random.randint(0, 9), idioma=idioma)
+    return tema, url
+
+
+def main():
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
+    idioma = (os.environ.get('RUN_IDIOMA') or '').strip().lower()
+    if idioma not in ('en', 'hi'):
+        # 14:00 UTC -> ingles, 22:00 UTC -> hindi
+        idioma = 'en' if datetime.utcnow().hour < 18 else 'hi'
+    print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} | {fecha} ===")
+
+    verificar_salud()
+    telegram(f"\U0001F531 <b>SpiritualWave Producer</b> [{idioma.upper()}]\n\U0001F4C5 {fecha}\n⏳ Generando video largo y short...")
+
+    resultados, errores = [], []
+    for nombre, funcion in (("VIDEO LARGO", producir_largo), ("SHORT", producir_short)):
+        try:
+            titulo, url = funcion(idioma)
+            resultados.append((nombre, titulo, url))
+            telegram(f"✅ <b>{nombre} {idioma.upper()} subido</b>\n\U0001F3AC {titulo}\n\U0001F517 {url}")
+        except Exception as e:
+            errores.append(f"{nombre}: {str(e)[:200]}")
+            print(f"ERROR en {nombre}: {e}")
+            telegram(f"⚠️ Error en {nombre} {idioma.upper()}: {str(e)[:200]}")
+
+    resumen = f"\U0001F531 <b>Ejecucion terminada</b> [{idioma.upper()}]\n"
+    for nombre, titulo, url in resultados:
+        resumen += f"✅ {nombre}: {titulo[:45]}\n"
+    for err in errores:
+        resumen += f"❌ {err[:80]}\n"
+    telegram(resumen)
+    print("\n=== PROCESO FINALIZADO ===")
+    if not resultados:
+        # Que el workflow quede en ROJO si no se produjo nada
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
