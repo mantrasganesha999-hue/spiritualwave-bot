@@ -2,15 +2,19 @@ name: SpiritualWave Directo
 
 on:
   schedule:
-    - cron: '30 2 * * *'
-    - cron: '30 8 * * *'
+    # 1 directo diario de ~4 horas: 14:30 UTC = 20:00 India / 09:30 Colombia
     - cron: '30 14 * * *'
   workflow_dispatch:
+    inputs:
+      horas:
+        description: 'Duracion del directo en horas (por defecto 4)'
+        required: false
+        default: ''
 
 jobs:
   transmitir:
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 330
 
     steps:
     - uses: actions/checkout@v4
@@ -31,5 +35,6 @@ jobs:
         YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        DIRECTO_HORAS: ${{ github.event.inputs.horas }}
       run: |
         python scripts/pipeline_directo.py
