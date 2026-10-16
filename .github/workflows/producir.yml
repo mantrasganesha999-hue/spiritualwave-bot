@@ -8,7 +8,7 @@ on:
         required: false
         default: ''
   schedule:
-    # 14:00 UTC = ingles | 22:00 UTC = hindi
+    # 14:00 UTC = hindi (19:30 India) | 22:00 UTC = ingles (18:00 Nueva York)
     - cron: '0 14 * * *'
     - cron: '0 22 * * *'
 

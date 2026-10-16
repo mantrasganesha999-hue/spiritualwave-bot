@@ -1337,8 +1337,8 @@ def main():
     t0 = time.time()
     idioma = (os.environ.get('RUN_IDIOMA') or '').strip().lower()
     if idioma not in ('en', 'hi'):
-        # 14:00 UTC -> ingles, 22:00 UTC -> hindi
-        idioma = 'en' if datetime.utcnow().hour < 18 else 'hi'
+        # 14:00 UTC (19:30 India) -> hindi, 22:00 UTC (18:00 Nueva York) -> ingles
+        idioma = 'hi' if 10 <= datetime.utcnow().hour < 18 else 'en'
     print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} ===")
 
     verificar_salud()
