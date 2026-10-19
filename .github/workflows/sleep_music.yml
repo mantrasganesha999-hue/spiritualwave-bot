@@ -2,9 +2,7 @@ name: SpiritualWave Sleep Music
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 8 * * 1'
-    - cron: '0 8 * * 4'
+  # Programacion desactivada (ahorra ~1,700 de cuota y evita videos de 8 h con 'hz'); solo manual
 
 jobs:
   sleep:

@@ -3,7 +3,14 @@ from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+import re
 import notificar
+
+
+def pc_sin_hz(texto):
+    t = re.sub(r'#(\d+)\s*[Hh][Zz]\b', r'#Frequency\1', texto or '')
+    return re.sub(r'(\d+)\s*[Hh][Zz]\b', r'Frequency \1', t)
+
 
 GROQ_KEY = os.environ.get('GROQ_API_KEY')
 YOUTUBE_TOKEN_B64 = os.environ.get('YOUTUBE_TOKEN')
@@ -196,9 +203,9 @@ def subir_youtube_sleep(video_path, titulo, descripcion, tags):
 
     body = {
         'snippet': {
-            'title': titulo[:100],
-            'description': descripcion[:4900],
-            'tags': tags.split()[:30],
+            'title': pc_sin_hz(titulo)[:100],
+            'description': pc_sin_hz(descripcion)[:4900],
+            'tags': pc_sin_hz(tags).split()[:30],
             'categoryId': '22'
         },
         'status': {'privacyStatus': 'public'}

@@ -1042,7 +1042,18 @@ def generar_srt(titulo, duracion_min, idioma='es'):
         f.write(srt)
     return path
 
+_HZ_HASHTAG = re.compile(r'#(\d+)\s*[Hh][Zz]\b')
+_HZ_TEXTO = re.compile(r'(\d+)\s*[Hh][Zz]\b')
+
+
+def sin_hz(texto):
+    """528Hz / 528 hz -> Frequency 528 (evita titulos y tags con 'hz' que YouTube penaliza)."""
+    t = _HZ_HASHTAG.sub(r'#Frequency\1', texto or '')
+    return _HZ_TEXTO.sub(r'Frequency \1', t)
+
+
 def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracion_min=60, variante=1, playlist_nombre=None, idioma='es'):
+    titulo, descripcion, tags = sin_hz(titulo), sin_hz(descripcion), sin_hz(tags)
     print(f"Subiendo {'SHORT' if es_short else 'VIDEO'} a YouTube...")
     from google.auth.transport.requests import Request
     token_data = base64.b64decode(YOUTUBE_TOKEN_B64)

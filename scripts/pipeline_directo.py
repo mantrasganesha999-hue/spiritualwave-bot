@@ -32,7 +32,7 @@ TEMAS_LIVE = [
     "Ganpati Bappa Morya Devotional Live",
     "Ganesha Sleep Music Live to Remove Obstacles",
     "Powerful Ganesha Mantra for a Fresh Start",
-    "528Hz Ganesha Frequency Music Live",
+    "528 Frequency Ganesha Music Live",
     "Vighnaharta Ganesha Mantras Live Stream",
     "Ganesha Morning Mantra for Positive Energy",
     "Ganesha Evening Prayer Music Live",
@@ -136,6 +136,7 @@ def obtener_stream(youtube):
 
 
 def crear_directo(youtube, tema, titulo, descripcion):
+    titulo, descripcion = pc.sin_hz(titulo), pc.sin_hz(descripcion)
     inicio = (datetime.utcnow() + timedelta(minutes=2)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
     broadcast = youtube.liveBroadcasts().insert(
         part="snippet,status,contentDetails",
@@ -195,16 +196,20 @@ def transmitir(base, audio, destino, duracion):
 
 
 def verificar_en_vivo(youtube, broadcast_id, titulo):
+    """Mira hasta 10 min (cada 60 s) si YouTube ya lo marca 'live'; avisa solo si de verdad no arranco."""
     url = f"https://www.youtube.com/watch?v={broadcast_id}"
-    try:
-        r = youtube.liveBroadcasts().list(part='status', id=broadcast_id).execute()
-        estado = r['items'][0]['status']['lifeCycleStatus']
-        if estado == 'live':
-            notificar.directo_en_vivo(titulo, url)
-        else:
-            notificar.directo_sin_vivo(estado, url)
-    except Exception as e:
-        print(f"  No se pudo verificar el estado: {e}")
+    estado = '?'
+    for _ in range(10):
+        try:
+            r = youtube.liveBroadcasts().list(part='status', id=broadcast_id).execute()
+            estado = r['items'][0]['status']['lifeCycleStatus']
+            if estado == 'live':
+                notificar.directo_en_vivo(titulo, url)
+                return
+        except Exception as e:
+            print(f"  No se pudo verificar el estado: {e}")
+        time.sleep(60)
+    notificar.directo_sin_vivo(estado, url)
 
 
 def progreso_horario(youtube, broadcast_id, inicio, total, parar):
@@ -246,7 +251,7 @@ def main():
         url = f"https://www.youtube.com/watch?v={broadcast_id}"
         print(f"  Broadcast: {url}")
         inicio = time.time()
-        chequeo = threading.Timer(180, verificar_en_vivo, args=(youtube, broadcast_id, titulo))
+        chequeo = threading.Timer(120, verificar_en_vivo, args=(youtube, broadcast_id, titulo))
         chequeo.daemon = True
         chequeo.start()
         progreso = threading.Thread(target=progreso_horario, args=(youtube, broadcast_id, inicio, duracion, parar),
