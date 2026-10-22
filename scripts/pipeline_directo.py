@@ -135,8 +135,30 @@ def obtener_stream(youtube):
     ).execute()
 
 
+def limpiar_pendientes(youtube):
+    """Borra directos viejos que quedaron en 'created/ready/testing' sin emitirse.
+    Si quedan, YouTube enciende ESE (viejo, con otro titulo) en vez del de hoy, porque comparten la clave de
+    transmision. Nunca toca uno que este en vivo. Cuesta ~50 unidades por directo borrado."""
+    borrados = 0
+    try:
+        r = youtube.liveBroadcasts().list(part='id,status', broadcastStatus='all', maxResults=50).execute()
+        for b in r.get('items', []):
+            if b['status']['lifeCycleStatus'] in ('created', 'ready', 'testing'):
+                try:
+                    youtube.liveBroadcasts().delete(id=b['id']).execute()
+                    borrados += 1
+                except Exception as e:
+                    print(f"  No se pudo borrar el directo viejo {b['id']}: {e}")
+    except Exception as e:
+        print(f"  No se pudo revisar directos pendientes: {e}")
+    if borrados:
+        print(f"  Directos viejos sin emitir borrados: {borrados}")
+    return borrados
+
+
 def crear_directo(youtube, tema, titulo, descripcion):
     titulo, descripcion = pc.sin_hz(titulo), pc.sin_hz(descripcion)
+    limpiar_pendientes(youtube)
     inicio = (datetime.utcnow() + timedelta(minutes=2)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
     broadcast = youtube.liveBroadcasts().insert(
         part="snippet,status,contentDetails",
