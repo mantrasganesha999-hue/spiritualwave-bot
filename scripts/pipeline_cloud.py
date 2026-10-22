@@ -755,7 +755,13 @@ FUENTE_BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 TRANSICIONES = ['fade', 'dissolve']  # cruces suaves; el negro solo en los extremos de cada segmento
 # Tratamiento de color (saturacion/contraste) aplicado a cada segmento
 GRADE_VIDEO = ",eq=saturation=1.18:contrast=1.05:brightness=0.01"
-DURACION_LARGO = int(os.environ.get('DURACION_LARGO', 900))  # 15 min por defecto
+# Cada video largo dura distinto (entre 11:30 y 17:30) para que el canal no se vea robotico.
+# Si se define DURACION_LARGO (en segundos) se usa ese valor fijo.
+DURACION_LARGO = int(os.environ.get('DURACION_LARGO') or random.randint(690, 1050))
+
+
+def duracion_txt_largo():
+    return f"{DURACION_LARGO // 60} min {DURACION_LARGO % 60:02d} s"
 
 
 def texto_visual(texto, maxlen=60):
@@ -1370,7 +1376,7 @@ def producir_largo(idioma):
         raise RuntimeError("No se pudo montar el video largo (2 intentos)")
     _, url = subir_youtube(video, titulo, desc, tags, duracion_min=DURACION_LARGO // 60,
                            variante=random.randint(0, 9), playlist_nombre=playlist, idioma=idioma)
-    return {**DETALLE_SUBIDA, 'titulo': titulo, 'url': url, 'duracion': f"{DURACION_LARGO // 60} min",
+    return {**DETALLE_SUBIDA, 'titulo': titulo, 'url': url, 'duracion': duracion_txt_largo(),
             'playlist': playlist}
 
 
@@ -1418,7 +1424,7 @@ def main():
     verificar_salud()
     plan = []
     if 'largo' in tareas:
-        plan.append(f"\U0001F3AC Video largo de {DURACION_LARGO // 60} min")
+        plan.append(f"\U0001F3AC Video largo de {duracion_txt_largo()}")
     if 'short' in tareas:
         plan.append("\U0001F4F1 Short de 1 min")
     notificar.produccion_iniciada(idioma, plan, estimado_min=25 if 'largo' in tareas else 8)
