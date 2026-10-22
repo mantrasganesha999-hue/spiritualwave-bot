@@ -10,6 +10,10 @@ on:
         description: 'Duracion del directo en horas (por defecto 4)'
         required: false
         default: ''
+      forzar:
+        description: 'Escribe 1 para saltarse el tope (1 directo por dia)'
+        required: false
+        default: ''
 
 jobs:
   transmitir:
@@ -36,5 +40,6 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         DIRECTO_HORAS: ${{ github.event.inputs.horas }}
+        FORZAR: ${{ github.event.inputs.forzar }}
       run: |
         python scripts/pipeline_directo.py

@@ -1,5 +1,5 @@
 import requests, subprocess, os, random, base64, pickle, io, json, time, re, sys, shutil, textwrap
-from datetime import datetime
+from datetime import datetime, timedelta
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
@@ -271,6 +271,46 @@ def get_musicas(categoria='general'):
     else:
         seleccion = todos
     return [os.path.join(folder, f) for f in seleccion]
+
+def inicio_dia_colombia():
+    """Inicio del dia actual en Colombia (00:00 COT = 05:00 UTC), como datetime UTC sin zona."""
+    ahora = datetime.utcnow()
+    ini = ahora.replace(hour=5, minute=0, second=0, microsecond=0)
+    return ini if ahora >= ini else ini - timedelta(days=1)
+
+
+def _fecha_yt(texto):
+    return datetime.strptime(texto[:19], '%Y-%m-%dT%H:%M:%S')
+
+
+def ya_hecho_hoy():
+    """Conjunto de (idioma, tipo) que ya se subieron HOY (hora Colombia), leidos de las etiquetas
+    sw_<idioma>_<largo|short> del propio canal. Cuesta 3 unidades de cuota. Si falla, no bloquea."""
+    try:
+        from google.auth.transport.requests import Request
+        creds = pickle.loads(base64.b64decode(YOUTUBE_TOKEN_B64))
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        yt = build('youtube', 'v3', credentials=creds)
+        canal = yt.channels().list(part='contentDetails', mine=True).execute()
+        subidas = canal['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        items = yt.playlistItems().list(part='contentDetails', playlistId=subidas, maxResults=20).execute()
+        ini = inicio_dia_colombia()
+        ids = [i['contentDetails']['videoId'] for i in items.get('items', [])
+               if i['contentDetails'].get('videoPublishedAt') and _fecha_yt(i['contentDetails']['videoPublishedAt']) >= ini]
+        hechos = set()
+        if ids:
+            for v in yt.videos().list(part='snippet', id=','.join(ids)).execute().get('items', []):
+                for t in v['snippet'].get('tags', []):
+                    m = re.fullmatch(r'sw_(hi|en)_(largo|short)', t)
+                    if m:
+                        hechos.add((m.group(1), m.group(2)))
+        print(f"  Ya subido hoy: {sorted(hechos) or 'nada'}")
+        return hechos
+    except Exception as e:
+        print(f"  No se pudo revisar lo de hoy ({e}); se produce normal")
+        return set()
+
 
 def verificar_salud():
     print("Verificando salud del sistema...")
@@ -725,7 +765,7 @@ def texto_visual(texto, maxlen=60):
 def lista_tags(tags):
     """Tags reales de YouTube (sin #), mezcla de los generados y los base del canal."""
     base = ['Ganesha mantra', 'Om Gan Ganapataye Namaha', 'Ganpati Bappa',
-            'meditation music', 'spiritual music', '528hz']
+            'meditation music', 'spiritual music', '528 frequency']
     propios = [t.strip('#').strip() for t in (tags or '').split() if t.strip('#').strip()]
     salida, total, vistos = [], 0, set()
     for t in propios + base:
@@ -1074,7 +1114,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         'snippet': {
             'title': titulo_final[:100],
             'description': desc_final[:4900],
-            'tags': lista_tags(tags),
+            'tags': lista_tags(tags) + [f"sw_{idioma}_{'short' if es_short else 'largo'}"],
             'categoryId': '22',
             'defaultLanguage': idioma,
             'defaultAudioLanguage': idioma
@@ -1347,18 +1387,39 @@ def producir_short(idioma):
 def main():
     t0 = time.time()
     idioma = (os.environ.get('RUN_IDIOMA') or '').strip().lower()
-    if idioma not in ('en', 'hi'):
+    explicito = idioma in ('en', 'hi')
+    if not explicito:
         # 14:00 UTC (19:30 India) -> hindi, 22:00 UTC (18:00 Nueva York) -> ingles
         idioma = 'hi' if 10 <= datetime.utcnow().hour < 18 else 'en'
-    print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} ===")
+
+    # Tope diario: 1 largo + 1 short por idioma. GitHub retrasa los cron horas y las corridas manuales
+    # pueden duplicarse; asi nunca se sube de mas. FORZAR=1 se salta esta revision.
+    forzar = (os.environ.get('FORZAR') or '').strip().lower() in ('1', 'true', 'si')
+    hechos = set() if forzar else ya_hecho_hoy()
+    candidatos = [idioma] if explicito else [idioma, 'en' if idioma == 'hi' else 'hi']
+    tareas = []
+    for cand in candidatos:
+        tareas = [t for t in ('largo', 'short') if (cand, t) not in hechos]
+        if tareas:
+            idioma = cand
+            break
+    if not tareas:
+        print("Cupo de hoy completo para este idioma (o ambos): no se produce nada. Usa FORZAR para saltarlo.")
+        return
+    print(f"=== SPIRITUALWAVE PRODUCER | idioma de esta ejecucion: {idioma} | tareas: {tareas} ===")
 
     verificar_salud()
-    notificar.produccion_iniciada(
-        idioma, [f"\U0001F3AC Video largo de {DURACION_LARGO // 60} min", "\U0001F4F1 Short de 1 min"],
-        estimado_min=25)
+    plan = []
+    if 'largo' in tareas:
+        plan.append(f"\U0001F3AC Video largo de {DURACION_LARGO // 60} min")
+    if 'short' in tareas:
+        plan.append("\U0001F4F1 Short de 1 min")
+    notificar.produccion_iniciada(idioma, plan, estimado_min=25 if 'largo' in tareas else 8)
 
     resultados, errores = [], []
     for nombre, tipo, funcion in (("Video largo", 'largo', producir_largo), ("Short", 'short', producir_short)):
+        if tipo not in tareas:
+            continue
         try:
             d = funcion(idioma)
             resultados.append((nombre, d['titulo'], d['url']))

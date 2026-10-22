@@ -224,8 +224,27 @@ def progreso_horario(youtube, broadcast_id, inicio, total, parar):
         notificar.directo_progreso(time.time() - inicio, total, espectadores)
 
 
+def directo_ya_hecho_hoy():
+    """True si ya hay un directo de hoy (hora Colombia) en curso, programado o terminado. Cuesta 1 unidad."""
+    try:
+        r = conectar_youtube().liveBroadcasts().list(
+            part='snippet,status', broadcastStatus='all', maxResults=10).execute()
+        ini = pc.inicio_dia_colombia()
+        for b in r.get('items', []):
+            t = b['snippet'].get('actualStartTime') or b['snippet'].get('scheduledStartTime')
+            if t and pc._fecha_yt(t) >= ini:
+                print(f"  Ya hay un directo de hoy: {b['id']} ({b['status']['lifeCycleStatus']})")
+                return True
+    except Exception as e:
+        print(f"  No se pudo revisar directos de hoy ({e}); se transmite normal")
+    return False
+
+
 def main():
     print("=== SPIRITUALWAVE DIRECTO ===")
+    if (os.environ.get('FORZAR') or '').strip().lower() not in ('1', 'true', 'si') and directo_ya_hecho_hoy():
+        print("Ya hubo un directo hoy: no se abre otro. Usa FORZAR para saltarlo.")
+        return
     try:
         horas = float(os.environ.get('DIRECTO_HORAS') or 4)
     except ValueError:

@@ -7,6 +7,10 @@ on:
         description: 'Idioma de esta ejecucion (en o hi). Vacio = automatico por hora'
         required: false
         default: ''
+      forzar:
+        description: 'Escribe 1 para saltarse el tope diario (1 largo + 1 short por idioma)'
+        required: false
+        default: ''
   schedule:
     # 14:00 UTC = hindi (19:30 India) | 22:00 UTC = ingles (18:00 Nueva York)
     - cron: '0 14 * * *'
@@ -32,4 +36,5 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RUN_IDIOMA: ${{ github.event.inputs.idioma }}
+          FORZAR: ${{ github.event.inputs.forzar }}
         run: python scripts/pipeline_cloud.py
