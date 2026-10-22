@@ -131,6 +131,12 @@ TEMAS_SHORTS_EN = [
     "How to manifest money while you sleep",
     "Why this mantra opens closed doors",
     "What to do when you feel blocked from abundance",
+    "What to do when nothing is going your way",
+    "What to say when you feel stuck in life",
+    "What to do when money keeps slipping away",
+    "What to chant when you are afraid of the future",
+    "What to do when every door seems closed",
+    "What to listen to when you cannot sleep from worry",
     "How to activate your luck with this audio",
     "The 60 second ritual to attract prosperity",
     "Why Ganesha is the most powerful god for money",
@@ -1358,6 +1364,7 @@ def producir_largo(idioma):
         print(f"\n[VIDEO EN] {tema}")
         titulo, desc, tags = generar_guion(tema, 'en')
         playlist = "Ganesha Mantras English"
+    titulo = sin_hz(titulo)
     video = montar_video(titulo, duracion=DURACION_LARGO) or montar_video(titulo, duracion=DURACION_LARGO)
     if not video:
         raise RuntimeError("No se pudo montar el video largo (2 intentos)")
@@ -1370,7 +1377,7 @@ def producir_largo(idioma):
 def producir_short(idioma):
     """Short vertical. Devuelve dict con titulo, url y detalles de la subida."""
     temas = TEMAS_SHORTS_HI if idioma == 'hi' else TEMAS_SHORTS_EN
-    tema = random.choice(temas)
+    tema = sin_hz(random.choice(temas))
     print(f"\n[SHORT {idioma.upper()}] {tema}")
     short = montar_video(tema, es_short=True) or montar_video(tema, es_short=True)
     if not short:
