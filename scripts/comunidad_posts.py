@@ -9,7 +9,7 @@ POSTS = [
     "🔱 Buenos dias! Que mantra de Ganesha escuchas hoy para atraer abundancia? Cuentanos abajo 🙏✨",
     "💫 PREGUNTA DEL DIA: Si Ganesha te concediera UN deseo hoy, cual seria? Escribelo en los comentarios 🕉🔱",
     "🌟 Tip espiritual: Repite 108 veces OM GAN GANAPATAYE NAMAHA antes de dormir y observa los cambios 🙏",
-    "⚡ Cual es tu frecuencia favorita para meditar? 528hz, 432hz o 963hz? Vota en los comentarios 🎵✨",
+    "⚡ Cual es tu frecuencia favorita para meditar? 528, 432 o 963? Vota en los comentarios 🎵✨",
     "🔥 El secreto de Ganesha: La abundancia llega cuando dejas de pedir y empiezas a agradecer 🙏🌸",
     "💎 RETO 21 DIAS: Escucha un mantra de Ganesha cada manana por 21 dias. Quien se une? 🔱",
     "🌙 Antes de dormir: Pon un mantra de Ganesha. Tu subconsciente manifestara mientras duermes ✨",
