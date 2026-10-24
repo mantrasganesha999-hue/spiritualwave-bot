@@ -300,22 +300,51 @@ def ya_hecho_hoy():
         yt = build('youtube', 'v3', credentials=creds)
         canal = yt.channels().list(part='contentDetails', mine=True).execute()
         subidas = canal['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        items = yt.playlistItems().list(part='contentDetails', playlistId=subidas, maxResults=20).execute()
+        items = yt.playlistItems().list(part='contentDetails', playlistId=subidas, maxResults=50).execute()
         ini = inicio_dia_colombia()
-        ids = [i['contentDetails']['videoId'] for i in items.get('items', [])
-               if i['contentDetails'].get('videoPublishedAt') and _fecha_yt(i['contentDetails']['videoPublishedAt']) >= ini]
+        semana = datetime.utcnow() - timedelta(days=7)
+        fechas = {i['contentDetails']['videoId']: _fecha_yt(i['contentDetails']['videoPublishedAt'])
+                  for i in items.get('items', []) if i['contentDetails'].get('videoPublishedAt')}
+        ids = [v for v, f in fechas.items() if f >= semana]
         hechos = set()
         if ids:
-            for v in yt.videos().list(part='snippet', id=','.join(ids)).execute().get('items', []):
+            for v in yt.videos().list(part='snippet', id=','.join(ids[:50])).execute().get('items', []):
+                f = fechas.get(v['id'])
                 for t in v['snippet'].get('tags', []):
                     m = re.fullmatch(r'sw_(hi|en)_(largo|short)', t)
-                    if m:
+                    if m and f and f >= ini:
                         hechos.add((m.group(1), m.group(2)))
-        print(f"  Ya subido hoy: {sorted(hechos) or 'nada'}")
+                    m2 = re.fullmatch(r'sw_t_([0-9a-f]{6})', t)
+                    if m2 and f and (m2.group(1) not in TEMAS_RECIENTES or TEMAS_RECIENTES[m2.group(1)] < f):
+                        TEMAS_RECIENTES[m2.group(1)] = f
+        print(f"  Ya subido hoy: {sorted(hechos) or 'nada'} | temas de la semana: {len(TEMAS_RECIENTES)}")
         return hechos
     except Exception as e:
         print(f"  No se pudo revisar lo de hoy ({e}); se produce normal")
         return set()
+
+
+TEMAS_RECIENTES = {}   # hash del tema -> fecha (UTC) de su ultima publicacion, ultimos 7 dias
+TEMA_ACTUAL = {'tema': None}
+
+
+def hash_tema(tema):
+    import hashlib
+    return hashlib.md5(sin_hz(tema or '').strip().lower().encode()).hexdigest()[:6]
+
+
+def dias_desde_uso(tema):
+    """Dias desde que se uso este tema (None si no se uso en los ultimos 7 dias)."""
+    f = TEMAS_RECIENTES.get(hash_tema(tema))
+    return None if f is None else (datetime.utcnow() - f).total_seconds() / 86400
+
+
+def elegir_tema(lista):
+    """Elige un tema que no se haya usado en los ultimos 7 dias; si todos se usaron, el menos reciente."""
+    libres = [t for t in lista if dias_desde_uso(t) is None]
+    if libres:
+        return random.choice(libres)
+    return max(lista, key=lambda t: dias_desde_uso(t) or 0)
 
 
 def verificar_salud():
@@ -383,19 +412,15 @@ def detectar_festival_hindu():
     hoy = datetime.now()
     mes = hoy.month
     dia = hoy.day
-    festivales = {
-        (8, 15): "Ganesh Chaturthi", (8, 16): "Ganesh Chaturthi", (8, 17): "Ganesh Chaturthi",
-        (8, 18): "Ganesh Chaturthi", (8, 19): "Ganesh Chaturthi", (8, 20): "Ganesh Chaturthi",
-        (8, 21): "Ganesh Chaturthi", (8, 22): "Ganesh Chaturthi", (8, 23): "Ganesh Chaturthi",
-        (8, 24): "Ganesh Chaturthi", (8, 25): "Ganesh Chaturthi",
-        (10, 1): "Navratri", (10, 2): "Navratri", (10, 3): "Navratri", (10, 4): "Navratri",
-        (10, 5): "Navratri", (10, 6): "Navratri", (10, 7): "Navratri", (10, 8): "Navratri",
-        (10, 9): "Navratri", (10, 10): "Navratri",
-        (10, 20): "Diwali", (10, 21): "Diwali", (10, 22): "Diwali", (10, 23): "Diwali",
-        (10, 24): "Diwali", (10, 25): "Diwali", (10, 26): "Diwali", (10, 27): "Diwali",
-        (10, 28): "Diwali", (10, 29): "Diwali", (10, 30): "Diwali", (10, 31): "Diwali",
-        (11, 1): "Diwali", (11, 2): "Diwali",
-    }
+    # Fechas 2026 (Diwali = domingo 8 de noviembre; Ganesh Chaturthi = 14 de septiembre)
+    festivales = {}
+    for d in range(14, 25):
+        festivales[(9, d)] = "Ganesh Chaturthi"
+    for d in range(11, 20):
+        festivales[(10, d)] = "Navratri"
+    festivales[(10, 20)] = "Dussehra"
+    for d in range(4, 11):
+        festivales[(11, d)] = "Diwali"
     return festivales.get((mes, dia), None)
 
 def generar_guion(tema, lang='es'):
@@ -1126,7 +1151,8 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         'snippet': {
             'title': titulo_final[:100],
             'description': desc_final[:4900],
-            'tags': lista_tags(tags) + [f"sw_{idioma}_{'short' if es_short else 'largo'}"],
+            'tags': lista_tags(tags) + [f"sw_{idioma}_{'short' if es_short else 'largo'}"]
+                    + ([f"sw_t_{hash_tema(TEMA_ACTUAL['tema'])}"] if TEMA_ACTUAL['tema'] else []),
             'categoryId': '22',
             'defaultLanguage': idioma,
             'defaultAudioLanguage': idioma
@@ -1322,12 +1348,16 @@ TEMAS_SHORTS_HI = [
 def generar_hi():
     """Guion del video largo en hindi-ingles (con deteccion de festivales)."""
     festival = detectar_festival_hindu()
-    if festival:
-        tema = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026"
+    tema_fest = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026" if festival else None
+    # el tema de festival solo si no se uso en los ultimos 3 dias (para no repetir el mismo titulo todos los dias)
+    if festival and (dias_desde_uso(tema_fest) is None or dias_desde_uso(tema_fest) > 3):
+        tema = tema_fest
         print(f"\n[VIDEO HI - FESTIVAL: {festival}] {tema}")
     else:
-        tema = random.choice(TEMAS_HI)
+        festival = None
+        tema = elegir_tema(TEMAS_HI)
         print(f"\n[VIDEO HI] {tema}")
+    TEMA_ACTUAL['tema'] = tema
     contexto = (f"IMPORTANT: Today is during {festival} celebration, make the title and description "
                 f"specifically celebrate this festival with festive greetings.") if festival else ""
     prompt = f"""You are an expert in Hindu spiritual YouTube content for Indian audience.
@@ -1366,7 +1396,8 @@ def producir_largo(idioma):
         titulo, desc, tags = generar_hi()
         playlist = "Ganpati Bappa Mantras"
     else:
-        tema = random.choice(TEMAS_EN)
+        tema = elegir_tema(TEMAS_EN)
+        TEMA_ACTUAL['tema'] = tema
         print(f"\n[VIDEO EN] {tema}")
         titulo, desc, tags = generar_guion(tema, 'en')
         playlist = "Ganesha Mantras English"
@@ -1383,7 +1414,8 @@ def producir_largo(idioma):
 def producir_short(idioma):
     """Short vertical. Devuelve dict con titulo, url y detalles de la subida."""
     temas = TEMAS_SHORTS_HI if idioma == 'hi' else TEMAS_SHORTS_EN
-    tema = sin_hz(random.choice(temas))
+    tema = sin_hz(elegir_tema(temas))
+    TEMA_ACTUAL['tema'] = tema
     print(f"\n[SHORT {idioma.upper()}] {tema}")
     short = montar_video(tema, es_short=True) or montar_video(tema, es_short=True)
     if not short:
