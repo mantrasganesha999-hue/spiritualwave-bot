@@ -41,17 +41,24 @@ TEMAS_LIVE = [
 ]
 
 
-def datos_live():
-    festival = pc.detectar_festival_hindu()
+HORA_LIVE_UTC = (15, 10)   # 10:10 am Colombia = 8:40 pm India
+
+
+def datos_live(dias=0):
+    """Tema, titulo y descripcion del directo de hoy (dias=0) o de otro dia (dias=1 -> manana)."""
+    ref = datetime.utcnow() + timedelta(days=dias)
+    festival = pc.detectar_festival_hindu(ref - timedelta(hours=5))
     if festival:
         tema = f"{festival} Special Ganesha Mantra Live"
     else:
-        tema = TEMAS_LIVE[datetime.utcnow().timetuple().tm_yday % len(TEMAS_LIVE)]
+        tema = TEMAS_LIVE[ref.timetuple().tm_yday % len(TEMAS_LIVE)]
     titulo = f"\U0001F534 LIVE: {tema} | SpiritualWave"
     descripcion = (
         f"{tema}\n\n"
         "Join this live stream of Ganesha mantras and devotional music. "
         "Relax, breathe and let the sacred sound of Om Gan Ganapataye Namaha fill your space.\n\n"
+        "\U0001F514 Live every day at 15:10 UTC (8:40 PM India | 10:10 AM Colombia). "
+        "Tap the reminder so you don't miss it, and tell us in the chat where you are watching from.\n\n"
         "Subscribe: youtube.com/@SpiritualWave888\n\n"
         "#Ganesha #Mantra #Live #Meditation #GanpatiBappa #SpiritualWave\n\n"
         "The music, images and videos were created with artificial intelligence tools."
@@ -135,20 +142,44 @@ def obtener_stream(youtube):
     ).execute()
 
 
-def limpiar_pendientes(youtube):
+def _hora(b):
+    t = b['snippet'].get('scheduledStartTime')
+    return pc._fecha_yt(t) if t else None
+
+
+def buscar_programado(youtube):
+    """Directo de hoy ya programado de antemano (sin conectar, 'created', dentro de las proximas 14 h)."""
+    try:
+        r = youtube.liveBroadcasts().list(part='snippet,status,contentDetails',
+                                          broadcastStatus='all', maxResults=50).execute()
+        ahora = datetime.utcnow()
+        cands = [b for b in r.get('items', [])
+                 if b['status']['lifeCycleStatus'] == 'created' and not b.get('contentDetails', {}).get('boundStreamId')
+                 and _hora(b) and ahora - timedelta(hours=3) <= _hora(b) <= ahora + timedelta(hours=14)]
+        return min(cands, key=_hora) if cands else None
+    except Exception as e:
+        print(f"  No se pudo buscar directo programado: {e}")
+        return None
+
+
+def limpiar_pendientes(youtube, conservar=None):
     """Borra directos viejos que quedaron en 'created/ready/testing' sin emitirse.
     Si quedan, YouTube enciende ESE (viejo, con otro titulo) en vez del de hoy, porque comparten la clave de
-    transmision. Nunca toca uno que este en vivo. Cuesta ~50 unidades por directo borrado."""
+    transmision. Nunca toca uno en vivo, el que se va a reutilizar (conservar) ni uno programado para despues."""
     borrados = 0
     try:
-        r = youtube.liveBroadcasts().list(part='id,status', broadcastStatus='all', maxResults=50).execute()
+        r = youtube.liveBroadcasts().list(part='id,snippet,status', broadcastStatus='all', maxResults=50).execute()
+        ahora = datetime.utcnow()
         for b in r.get('items', []):
-            if b['status']['lifeCycleStatus'] in ('created', 'ready', 'testing'):
-                try:
-                    youtube.liveBroadcasts().delete(id=b['id']).execute()
-                    borrados += 1
-                except Exception as e:
-                    print(f"  No se pudo borrar el directo viejo {b['id']}: {e}")
+            if b['status']['lifeCycleStatus'] not in ('created', 'ready', 'testing') or b['id'] == conservar:
+                continue
+            if _hora(b) and _hora(b) > ahora + timedelta(hours=14):
+                continue   # el de manana, programado de antemano
+            try:
+                youtube.liveBroadcasts().delete(id=b['id']).execute()
+                borrados += 1
+            except Exception as e:
+                print(f"  No se pudo borrar el directo viejo {b['id']}: {e}")
     except Exception as e:
         print(f"  No se pudo revisar directos pendientes: {e}")
     if borrados:
@@ -156,25 +187,20 @@ def limpiar_pendientes(youtube):
     return borrados
 
 
-def crear_directo(youtube, tema, titulo, descripcion):
-    titulo, descripcion = pc.sin_hz(titulo), pc.sin_hz(descripcion)
-    limpiar_pendientes(youtube)
-    inicio = (datetime.utcnow() + timedelta(minutes=2)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-    broadcast = youtube.liveBroadcasts().insert(
+def _insertar_broadcast(youtube, titulo, descripcion, inicio):
+    return youtube.liveBroadcasts().insert(
         part="snippet,status,contentDetails",
         body={
-            "snippet": {"title": titulo, "description": descripcion, "scheduledStartTime": inicio},
+            "snippet": {"title": titulo, "description": descripcion,
+                        "scheduledStartTime": inicio.strftime("%Y-%m-%dT%H:%M:%S.000Z")},
             "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
             "contentDetails": {"enableAutoStart": True, "enableAutoStop": True,
                                "recordFromStart": True, "enableDvr": True}
         }
     ).execute()
-    broadcast_id = broadcast['id']
-    stream = obtener_stream(youtube)
-    youtube.liveBroadcasts().bind(part="id,contentDetails", id=broadcast_id, streamId=stream['id']).execute()
-    ing = stream['cdn']['ingestionInfo']
-    destino = f"{ing['ingestionAddress']}/{ing['streamName']}"
 
+
+def _poner_miniatura(youtube, broadcast_id, tema):
     thumb = miniatura_live(tema)
     if thumb:
         try:
@@ -183,7 +209,54 @@ def crear_directo(youtube, tema, titulo, descripcion):
             print("  Miniatura del directo OK")
         except Exception as e:
             print(f"  Miniatura del directo error (no critico): {e}")
-    return broadcast_id, destino
+
+
+def crear_directo(youtube, tema, titulo, descripcion):
+    """Usa el directo ya programado de antemano si existe; si no, crea uno nuevo.
+    Devuelve (broadcast_id, destino_rtmp, titulo_real)."""
+    titulo, descripcion = pc.sin_hz(titulo), pc.sin_hz(descripcion)
+    previo = buscar_programado(youtube)
+    limpiar_pendientes(youtube, conservar=previo['id'] if previo else None)
+    stream = obtener_stream(youtube)
+    ing = stream['cdn']['ingestionInfo']
+    destino = f"{ing['ingestionAddress']}/{ing['streamName']}"
+
+    if previo:
+        try:
+            youtube.liveBroadcasts().bind(part="id,contentDetails", id=previo['id'], streamId=stream['id']).execute()
+            print(f"  Usando el directo programado de antemano: {previo['id']}")
+            return previo['id'], destino, previo['snippet']['title']
+        except Exception as e:
+            print(f"  No se pudo usar el programado ({e}); se crea uno nuevo")
+            try:
+                youtube.liveBroadcasts().delete(id=previo['id']).execute()
+            except Exception:
+                pass
+
+    broadcast = _insertar_broadcast(youtube, titulo, descripcion, datetime.utcnow() + timedelta(minutes=2))
+    broadcast_id = broadcast['id']
+    youtube.liveBroadcasts().bind(part="id,contentDetails", id=broadcast_id, streamId=stream['id']).execute()
+    _poner_miniatura(youtube, broadcast_id, tema)
+    return broadcast_id, destino, titulo
+
+
+def programar_siguiente(youtube):
+    """Crea (sin conectar a la transmision) el directo de la proxima salida para que aparezca como
+    'Proximo directo' con recordatorio ~24 h antes. Si falla, no pasa nada: manana se crea uno normal."""
+    try:
+        ahora = datetime.utcnow()
+        t = ahora.replace(hour=HORA_LIVE_UTC[0], minute=HORA_LIVE_UTC[1], second=0, microsecond=0)
+        while t < ahora + timedelta(hours=6):
+            t += timedelta(days=1)
+        dias = (t.date() - (ahora - timedelta(hours=5)).date()).days
+        tema, titulo, desc = datos_live(max(1, dias))
+        b = _insertar_broadcast(youtube, pc.sin_hz(titulo), pc.sin_hz(desc), t)
+        _poner_miniatura(youtube, b['id'], tema)
+        print(f"  Directo de manana programado: https://www.youtube.com/watch?v={b['id']} ({t:%d %H:%M} UTC)")
+        return b['id']
+    except Exception as e:
+        print(f"  No se pudo programar el directo de manana (no critico): {e}")
+        return None
 
 
 def transmitir(base, audio, destino, duracion):
@@ -247,15 +320,22 @@ def progreso_horario(youtube, broadcast_id, inicio, total, parar):
 
 
 def directo_ya_hecho_hoy():
-    """True si ya hay un directo de hoy (hora Colombia) en curso, programado o terminado. Cuesta 1 unidad."""
+    """True si hoy (hora Colombia) ya hay un directo en vivo, preparandose o terminado.
+    Los directos 'created' sin conectar (el de manana, programado de antemano) NO cuentan. Cuesta 1 unidad."""
     try:
         r = conectar_youtube().liveBroadcasts().list(
-            part='snippet,status', broadcastStatus='all', maxResults=10).execute()
+            part='snippet,status,contentDetails', broadcastStatus='all', maxResults=10).execute()
         ini = pc.inicio_dia_colombia()
         for b in r.get('items', []):
-            t = b['snippet'].get('actualStartTime') or b['snippet'].get('scheduledStartTime')
-            if t and pc._fecha_yt(t) >= ini:
-                print(f"  Ya hay un directo de hoy: {b['id']} ({b['status']['lifeCycleStatus']})")
+            est = b['status']['lifeCycleStatus']
+            real = b['snippet'].get('actualStartTime')
+            prog = b['snippet'].get('scheduledStartTime')
+            empezo_hoy = bool(real) and pc._fecha_yt(real) >= ini
+            en_curso = est in ('live', 'liveStarting', 'testing')
+            conectado_hoy = (est == 'ready' and b.get('contentDetails', {}).get('boundStreamId')
+                             and prog and pc._fecha_yt(prog) >= ini)
+            if empezo_hoy or en_curso or conectado_hoy:
+                print(f"  Ya hay un directo de hoy: {b['id']} ({est})")
                 return True
     except Exception as e:
         print(f"  No se pudo revisar directos de hoy ({e}); se transmite normal")
@@ -288,7 +368,7 @@ def main():
             raise RuntimeError("No se pudo construir la mezcla de audio (revisa assets/music)")
 
         youtube = conectar_youtube()
-        broadcast_id, destino = crear_directo(youtube, tema, titulo, descripcion)
+        broadcast_id, destino, titulo = crear_directo(youtube, tema, titulo, descripcion)
         url = f"https://www.youtube.com/watch?v={broadcast_id}"
         print(f"  Broadcast: {url}")
         inicio = time.time()
@@ -306,6 +386,7 @@ def main():
             youtube.liveBroadcasts().transition(broadcastStatus='complete', id=broadcast_id, part='status').execute()
         except Exception:
             pass  # enableAutoStop ya lo cierra
+        programar_siguiente(youtube)   # el de manana queda como 'Proximo directo' con recordatorio
         notificar.directo_finalizado(titulo, url, time.time() - inicio)
         print("=== DIRECTO FINALIZADO ===")
     except Exception as e:

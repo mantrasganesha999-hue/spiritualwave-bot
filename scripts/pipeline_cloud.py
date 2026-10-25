@@ -408,8 +408,8 @@ def obtener_dia_serie():
         f.write(str(dia_actual))
     return dia_actual
 
-def detectar_festival_hindu():
-    hoy = datetime.now()
+def detectar_festival_hindu(hoy=None):
+    hoy = hoy or datetime.now()
     mes = hoy.month
     dia = hoy.day
     # Fechas 2026 (Diwali = domingo 8 de noviembre; Ganesh Chaturthi = 14 de septiembre)
