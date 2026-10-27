@@ -1,9 +1,6 @@
 name: SpiritualWave Comentarios
 
 on:
-  schedule:
-    - cron: '0 16 * * *'
-    - cron: '0 22 * * *'
   workflow_dispatch:
 
 jobs:

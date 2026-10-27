@@ -6,16 +6,16 @@ TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
 
 POSTS = [
-    "🔱 Buenos dias! Que mantra de Ganesha escuchas hoy para atraer abundancia? Cuentanos abajo 🙏✨",
-    "💫 PREGUNTA DEL DIA: Si Ganesha te concediera UN deseo hoy, cual seria? Escribelo en los comentarios 🕉🔱",
-    "🌟 Tip espiritual: Repite 108 veces OM GAN GANAPATAYE NAMAHA antes de dormir y observa los cambios 🙏",
-    "⚡ Cual es tu frecuencia favorita para meditar? 528, 432 o 963? Vota en los comentarios 🎵✨",
-    "🔥 El secreto de Ganesha: La abundancia llega cuando dejas de pedir y empiezas a agradecer 🙏🌸",
-    "💎 RETO 21 DIAS: Escucha un mantra de Ganesha cada manana por 21 dias. Quien se une? 🔱",
-    "🌙 Antes de dormir: Pon un mantra de Ganesha. Tu subconsciente manifestara mientras duermes ✨",
-    "🕉 Dato sagrado: El numero 108 es sagrado en el hinduismo. Sabias esto? 🔱",
-    "🙏 Comparte este canal con alguien que necesite paz y abundancia hoy 💫",
-    "⚡ Como te sientes despues de escuchar mantras de Ganesha? Cuentanos 🔱",
+    "Buenos dias! Que mantra o musica de Ganesha te acompana hoy? Cuentanos abajo 🙏",
+    "Pregunta del dia: que significa Ganesha para ti en tu practica diaria? Te leemos en los comentarios 🕉",
+    "Cuando prefieres escuchar musica devocional: por la manana, por la tarde o antes de dormir? 🎵",
+    "Desde que pais nos escuchas hoy? Cuentanos en los comentarios 🌍",
+    "Que bhajan o mantra de Ganesha te gustaria escuchar en un proximo video? 🙏",
+    "Una pausa de un minuto para respirar y agradecer. Que agradeces hoy? ✨",
+    "Hoy transmitimos en vivo musica devocional de Ganesha a las 10:00 a. m. (Colombia). Activa el recordatorio 🔔",
+    "Comparte este canal con alguien a quien le guste la musica devocional 💫",
+    "Que momento del dia es tu favorito para la musica de meditacion? 🕉",
+    "Gracias por acompanarnos. Cuentanos como usas la musica de Ganesha: estudio, trabajo, descanso o puja 🙏",
 ]
 
 import random

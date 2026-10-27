@@ -13,169 +13,122 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import notificar
 
 TEMAS_ES = [
-    "mantra de Ganesha para atraer abundancia y eliminar obstaculos",
-    "musica espiritual de Ganesha para meditar profundamente",
-    "om gan ganapataye namaha el mantra mas poderoso de Ganesha",
-    "ganesha mantra para el trabajo el exito y la prosperidad",
-    "musica de Ganesha para dormir en paz y despertar renovado",
-    "mantra poderoso de Ganesha para proteccion y bendiciones",
-    "musica tibetana con Ganesha para calmar la mente",
-    "ganesha mantra para superar obstaculos y lograr tus metas",
-    "musica de Ganesha para reducir el estres y encontrar calma",
-    "mantra de la prosperidad con Ganesha para 21 dias",
-    "mantra sagrado de Ganesha para atraer bendiciones diarias",
-    "musica con mantras de Ganesha para atraer amor y paz",
-    "mantra de Lakshmi y Ganesha para riqueza y prosperidad",
-    "musica devocional de Ganesha para el alma y el corazon",
-    "ganesha mantra para proteger el hogar y la familia",
-    "mantra de Ganesha para emprendedores en busca de exito",
-    "mantra de Ganesha para estudiantes antes de un examen",
-    "mantra de Ganesha para quienes buscan trabajo urgente",
-    "mantra de Ganesha para sanar deudas y crisis financiera",
-    "mantra de Ganesha para artistas que buscan inspiracion",
-    "mantra de Ganesha para parejas que buscan reconciliacion",
-    "bhajan de Ganesha para celebrar y agradecer",
-    "musica de cuencos tibetanos con mantra de Ganesha",
-    "ganesha mantra para la mañana llena de energia positiva",
-    "mantra de Ganesha para dormir sin preocupaciones",
+    "musica devocional de Ganesha para empezar el dia con calma",
+    "mantra Om Gan Ganapataye Namaha con musica devocional",
+    "musica de Ganesha para la oracion de la tarde y la gratitud",
+    "musica de Ganesha para concentrarse al estudiar",
+    "musica suave de Ganesha para una noche tranquila",
+    "bhajan de Ganesha para la devocion diaria",
+    "musica de Ganesha para meditar y respirar con calma",
+    "musica de Ganesha para el puja en casa",
+    "mantra Vakratunda Mahakaya con musica de meditacion",
+    "musica devocional de Ganesha para un momento de pausa",
 ]
 
 TEMAS_EN = [
-    "Powerful Ganesha chant to attract abundance and remove obstacles",
-    "Om Gan Ganapataye Namaha the most powerful Ganesha mantra",
-    "Ganesha mantra for success career and financial prosperity",
-    "Ganesha morning mantra for positive energy and good luck",
-    "Tibetan singing bowls with Ganesha mantra for deep focus",
-    "Ganesha sleep music to remove obstacles while you rest",
-    "Ganesha mantra for students success and mental clarity",
-    "Ganesha 1000 names chant for blessing and protection",
-    "Ganesha mantra for new beginnings and a fresh start",
-    "Ganesha divine music for yoga and deep meditation",
-    "Ganesha mantra for entrepreneurs seeking their first client",
-    "Ganesha mantra for urgent job search success",
-    "Ganesha mantra to overcome debt and financial difficulty",
-    "Ganesha mantra for artists and creatives seeking inspiration",
-    "Ganesha mantra for couples seeking reconciliation",
-    "Deep meditation music with Ganesha chant for inner peace",
-    "Sacred Ganesha bhajan for daily devotion and gratitude",
-    "Ganesha mantra for protection of home and family",
-    "Om Namah Shivaya with Ganesha mantra devotional music",
-    "Ganesha blessing chant for health wealth and happiness",
-    "Ganesha meditation for beginners simple and powerful",
-    "Ganesha mantra to start the day with positive intention",
-    "Devotional Ganesha music for evening prayer and peace",
-    "Ganesha chant to calm the mind before sleeping",
-    "Powerful Ganpati mantra for removing all life obstacles",
+    "Om Gan Ganapataye Namaha chanting with devotional Ganesha music",
+    "Ganesha morning prayer music to start the day with calm",
+    "Ganesha evening devotional music for quiet reflection",
+    "Ganesha mantra music for focus while studying",
+    "Ganesha mantra music for focus at work",
+    "Soft Ganesha chanting for a quiet night",
+    "Vakratunda Mahakaya mantra with meditation music",
+    "Ganesha Gayatri mantra music for daily practice",
+    "Ganesha bhajan for daily devotion and gratitude",
+    "Instrumental Ganesha devotional music for relaxing",
+    "Ganesha music for yoga practice and slow breathing",
+    "Peaceful Ganesha music for reading and quiet time",
+    "Ganesha devotional music for new beginnings, the traditional first prayer",
+    "Ganesha, the remover of obstacles: devotional chant and music",
+    "Ganesha music for winding down in the evening",
+    "Sacred Ganesha music as background for home puja",
+    "Slow devotional Ganesha music for deep breathing",
+    "Ganesha music for a peaceful Sunday morning",
+    "Ganesha mantra music for mindful work breaks",
+    "Ganesha devotional songs for gratitude and thanksgiving",
+    "Om chanting with Ganesha music for meditation",
+    "Ganesha devotional music for a calm commute or walk",
+    "Ganesha chant for a quiet start to the week",
+    "Gentle Ganesha music for a calm afternoon",
+    "Ganesha devotional music for family prayer time",
 ]
 
 TEMAS_PT = [
-    "mantra de Ganesha para atrair abundancia e eliminar obstaculos",
-    "musica espiritual de Ganesha para meditar profundamente",
-    "mantra de Ganesha om gan ganapataye namaha poder e prosperidade",
-    "musica de Ganesha para dormir em paz e despertar renovado",
-    "mantra de Ganesha para trabalho sucesso e prosperidade",
-    "meditacao com mantras de Ganesha para paz interior",
-    "musica relaxante de Ganesha para reduzir o estresse",
-    "mantra de Ganesha para superar obstaculos e atingir metas",
-    "bhajan devocional de Ganesha para gratidao diaria",
-    "mantra de Ganesha para proteger o lar e a familia",
+    "musica devocional de Ganesha para comecar o dia com calma",
+    "mantra Om Gan Ganapataye Namaha com musica devocional",
+    "musica de Ganesha para a oracao da tarde e a gratidao",
+    "musica suave de Ganesha para uma noite tranquila",
+    "bhajan de Ganesha para a devocao diaria",
+    "musica de Ganesha para meditar e respirar com calma",
 ]
 
 TEMAS_HI = [
-    "Ganesha mantra Om Gan Ganapataye Namaha for wealth and success",
-    "Ganpati Bappa mantra to remove all obstacles and bring luck",
-    "Powerful Ganesh mantra for money abundance and prosperity",
-    "Vighnaharta Ganesha mantra to destroy all problems in life",
-    "Ganpati mantra for business success and financial growth",
-    "Shubh Ganesha mantra for good luck and positive energy",
-    "Ganesh chaturthi special mantra for blessings and abundance",
-    "Ganpati Bappa Morya mantra for happiness and prosperity",
+    "Ganpati Bappa Morya devotional chanting and music",
+    "Vighnaharta Ganesha mantra music for daily prayer",
+    "Om Gan Ganapataye Namaha devotional chant with soft music",
+    "Shubh Ganesha morning mantra music",
+    "Ganpati devotional music for evening prayer",
+    "Ganesha bhajan music for a peaceful morning puja",
+    "Vakratunda Mahakaya Ganesha mantra music",
+    "Ganpati Bappa devotional music for meditation",
+    "Ganesha mantra music for a calm and focused mind",
+    "Shree Ganesh vandana devotional music",
+    "Ganesh ji devotional music for the home puja",
+    "Mangal Murti Ganesha devotional music",
+    "Ekdanta Ganesha mantra music for meditation",
+    "Ganpati Bappa devotional songs for gratitude",
+    "Ganesha music for the start of a new work day",
+    "Lambodara Ganesha chant with slow devotional music",
+    "Ganesha mantra music for a quiet evening",
+    "Sacred Om chanting and Ganesha music for calm",
+    "Ganesh ji bhajan music for family prayer time",
+    "Siddhivinayak devotional Ganesha music",
+    "Ganpati Bappa Morya chant for gratitude",
+    "Gajanana devotional chant with soft music",
+    "Shubh Ganesha blessing music for the home",
+    "Ganpati devotional music for a calm weekend morning",
 ]
 
 TEMAS_SHORTS_ES = [
-    "Por que Ganesha elimina obstaculos al instante",
-    "Que pasa si repites este mantra 21 veces",
-    "Como atraer dinero en 60 segundos con Ganesha",
-    "El error que comete el 90 porciento al pedir abundancia",
-    "Por que 528hz cambia tu cerebro en un minuto",
-    "Que significa realmente Om Gan Ganapataye Namaha",
-    "Como saber si Ganesha ya escucho tu peticion",
-    "El mantra que los ricos repiten cada manana",
-    "Por que debes escuchar esto antes de dormir",
-    "Como eliminar la mala suerte en 60 segundos",
-    "Que frecuencia usar cuando todo sale mal",
-    "El secreto de Ganesha que nadie te conto",
-    "Como manifestar dinero mientras duermes",
-    "Por que este mantra abre puertas cerradas",
-    "Que hacer cuando sientes bloqueada tu abundancia",
-    "Como activar tu suerte con este audio",
-    "El ritual de 60 segundos para atraer prosperidad",
-    "Por que Ganesha es el dios mas poderoso para el dinero",
-    "Que pasa si escuchas 528hz siete dias seguidos",
-    "Como limpiar tu energia en un minuto",
+    "Un minuto de calma con musica devocional de Ganesha",
+    "Om Gan Ganapataye Namaha un minuto de canto",
+    "Mantra corto de Ganesha para una manana tranquila",
+    "Un minuto de Ganesha para respirar con calma",
+    "Musica corta de Ganesha para una pausa",
+    "Canto de Ganesha para cerrar el dia con gratitud",
+    "Melodia devocional de Ganesha para un descanso corto",
+    "Bhajan corto de Ganesha para la manana",
 ]
 
 TEMAS_SHORTS_EN = [
-    "Why Ganesha removes obstacles instantly",
-    "What happens if you repeat this mantra 21 times",
-    "How to attract money in 60 seconds with Ganesha",
-    "The mistake 90 percent make when asking for abundance",
-    "Why 528hz changes your brain in one minute",
-    "What Om Gan Ganapataye Namaha really means",
-    "How to know if Ganesha already heard your request",
-    "The mantra rich people repeat every morning",
-    "Why you should listen to this before sleeping",
-    "How to remove bad luck in 60 seconds",
-    "What frequency to use when everything goes wrong",
-    "The Ganesha secret nobody told you",
-    "How to manifest money while you sleep",
-    "Why this mantra opens closed doors",
-    "What to do when you feel blocked from abundance",
-    "What to do when nothing is going your way",
-    "What to say when you feel stuck in life",
-    "What to do when money keeps slipping away",
-    "What to chant when you are afraid of the future",
-    "What to do when every door seems closed",
-    "What to listen to when you cannot sleep from worry",
-    "How to activate your luck with this audio",
-    "The 60 second ritual to attract prosperity",
-    "Why Ganesha is the most powerful god for money",
-    "What happens if you listen to 528hz for 7 days",
-    "How to clean your energy in one minute",
+    "Om Gan Ganapataye Namaha, one minute of Ganesha chanting",
+    "One minute of calm with Ganesha devotional music",
+    "Ganpati Bappa Morya, short devotional chant",
+    "Short Ganesha mantra for a calm morning",
+    "A quiet minute with Ganesha music",
+    "Ganesha chant to pause and breathe",
+    "Short Vakratunda Mahakaya mantra music",
+    "Ganesha evening chant, one minute of gratitude",
+    "Ganesha devotional melody for a short break",
+    "Soft Ganesha music for a peaceful pause",
+    "Ganesha bhajan snippet for your morning",
+    "Om chanting with Ganesha music, one minute",
+    "Short Ganesha prayer music for the start of the day",
+    "Ganesha mantra music for a mindful minute",
+    "Listen to Ganesha devotional music while you breathe slowly",
+    "A short Ganesha chant for gratitude",
+    "Short Ganesha devotional clip for a calm moment",
+    "Ganesha music for a calm pause at work",
+    "Morning Ganesha devotion in one minute",
+    "Ganesha devotional music to wind down",
 ]
 TEMAS_SHORTS_DEVOCIONAL = [
-    "Jai Maa Kali mantra para proteccion y poder divino",
-    "Mantra de Durga para eliminar todo mal",
-    "Om Namah Shivaya para paz y transformacion interior",
-    "Mantra de Lakshmi para riqueza instantanea",
-    "Aarti poderosa para bendiciones diarias",
-    "Stotram sagrado para eliminar obstaculos",
-    "Bhajan devocional para sanar el alma",
-    "Mantra de Hanuman para valor y proteccion",
-]
-
-DIAS_SERIE_21 = [
-    "Dia 1: Reconoce que mereces la abundancia que pides",
-    "Dia 2: Repite el mantra Om Gan Ganapataye con fe total",
-    "Dia 3: Visualiza a Ganesha eliminando tus obstaculos",
-    "Dia 4: Agradece por lo que ya tienes en tu vida",
-    "Dia 5: Suelta el control y confia en el proceso divino",
-    "Dia 6: Escribe tres deseos que quieres manifestar",
-    "Dia 7: Medita en silencio 10 minutos con Ganesha",
-    "Dia 8: Perdona a quien te ha hecho dano",
-    "Dia 9: Actua como si ya tuvieras lo que deseas",
-    "Dia 10: Comparte tu abundancia con alguien mas",
-    "Dia 11: Elimina un pensamiento negativo hoy",
-    "Dia 12: Conecta con la naturaleza y su energia",
-    "Dia 13: Repite afirmaciones de merecimiento",
-    "Dia 14: Celebra tus pequenos logros de este mes",
-    "Dia 15: Pide ayuda a Ganesha para tu proposito",
-    "Dia 16: Libera el miedo al fracaso definitivamente",
-    "Dia 17: Confia en tu intuicion y sigue tu camino",
-    "Dia 18: Bendice tu dinero y tus finanzas",
-    "Dia 19: Rodeate de energia positiva y personas afines",
-    "Dia 20: Prepara tu mente para recibir milagros",
-    "Dia 21: Celebra tu transformacion y nueva abundancia",
+    "Om Namah Shivaya musica devocional para un momento de calma",
+    "Aarti devocional corta para la manana",
+    "Bhajan devocional corto para la gratitud",
+    "Mantra de Hanuman musica devocional corta",
+    "Musica devocional de Lakshmi para un momento de pausa",
+    "Stotram devocional corto para la tarde",
 ]
 
 EMOJIS_COMBOS = ["\u2728\U0001F531\U0001F338", "\U0001F525\u2728\U0001F549", "\U0001F64F\U0001F4AB\U0001F531",
@@ -431,20 +384,22 @@ def generar_guion(tema, lang='es'):
 Sin tildes ni caracteres especiales ni asteriscos ni markdown.
 No hagas promesas de salud, curacion o resultados garantizados.
 El titulo debe describir exactamente lo que contiene el video.
+Este video es musica devocional con imagenes y sin narracion: describe solo la musica y la tradicion devocional. Nunca afirmes efectos sobre dinero, suerte, salud, amor o manifestacion ni prometas resultados.
 
 Responde EXACTAMENTE en este formato sin simbolos extra:
 TITULO: {emoji} [titulo descriptivo, maximo 90 caracteres, con mayusculas en palabras clave, que genere curiosidad y engagement]
-DESCRIPCION: [300 palabras describiendo el contenido del video, beneficios espirituales de la practica del mantra, CTA para suscribirse a youtube.com/@SpiritualWave888. Incluir al final: "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."]
+DESCRIPCION: [300 palabras describiendo el contenido del video, el significado y la tradicion del mantra, CTA para suscribirse a youtube.com/@SpiritualWave888. Incluir al final: "La musica, las imagenes y los videos fueron creados con herramientas de inteligencia artificial."]
 TAGS: [5 hashtags separados por espacios, los mas relevantes para el video]"""
     else:
         prompt = f"""You are an expert in spiritual content for YouTube. Create honest and devotional content about: {tema}
 No asterisks, no markdown, no special symbols.
 Do not make health claims, healing promises, or guaranteed results.
 The title must describe exactly what the video contains.
+This video is devotional music with visuals and no narration: describe only the music and the devotional tradition. Never claim effects on money, luck, health, brain, sleep results, love or manifestation, and never promise results.
 
 Reply EXACTLY in this format:
 TITULO: {emoji} [descriptive title, maximum 60 characters, capitalize key words]
-DESCRIPCION: [300 words describing the video content, spiritual benefits of mantra practice, CTA to subscribe to youtube.com/@SpiritualWave888. Include at the end: "The music, images and videos were created with artificial intelligence tools."]
+DESCRIPCION: [300 words describing the video content, the tradition and meaning of the mantra, CTA to subscribe to youtube.com/@SpiritualWave888. Include at the end: "The music, images and videos were created with artificial intelligence tools."]
 TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]"""
 
     try:
@@ -471,7 +426,7 @@ TAGS: [5 relevant hashtags separated by spaces, the most relevant for the video]
     descripcion = extraer_campo(contenido, 'DESCRIPCION', 'TAGS') or f"Video sobre {tema}"
     descripcion = limpiar_texto(descripcion)
 
-    tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #528hz #Abundancia #Bhakti #Devocional #JaiGanesh #Mantra2026 #SanatanDharma #MusicaEspiritual #Meditacion"
+    tags = extraer_campo(contenido, 'TAGS') or "#Ganesha #Mantra #Espiritual #Bhakti #SpiritualWave"
     tags = limpiar_texto(tags)
 
     return titulo, descripcion, tags
@@ -802,7 +757,7 @@ def texto_visual(texto, maxlen=60):
 def lista_tags(tags):
     """Tags reales de YouTube (sin #), mezcla de los generados y los base del canal."""
     base = ['Ganesha mantra', 'Om Gan Ganapataye Namaha', 'Ganpati Bappa',
-            'meditation music', 'spiritual music', '528 frequency']
+            'meditation music', 'spiritual music']
     propios = [t.strip('#').strip() for t in (tags or '').split() if t.strip('#').strip()]
     salida, total, vistos = [], 0, set()
     for t in propios + base:
@@ -1027,17 +982,7 @@ def montar_video(titulo, duracion=None, es_short=False):
 
 def agregar_capitulos(descripcion, duracion_min, idioma='es'):
     """Capitulos reales (timestamps) para videos largos + pie de pagina."""
-    capitulos = ""
-    if duracion_min >= 9:
-        nombres = ["Opening Mantra", "Deep Focus", "Inner Calm", "Sacred Frequency",
-                   "Blessing Flow", "Gratitude", "Abundance Mindset", "Closing Blessing"]
-        n = min(len(nombres), max(3, duracion_min // 2))
-        paso = (duracion_min * 60) // n
-        lineas = []
-        for i in range(n):
-            seg = i * paso
-            lineas.append(f"{seg // 60:02d}:{seg % 60:02d} {nombres[i]}")
-        capitulos = "\n\nChapters:\n" + "\n".join(lineas)
+    capitulos = ""  # sin capitulos genericos: no reflejan el contenido real
     if idioma in ('es', 'pt'):
         footer = "\n\nSuscribete: youtube.com/@SpiritualWave888\n"
         footer += "Activa la campana para recibir mantras cada dia\n\n"
@@ -1163,12 +1108,21 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
     DETALLE_SUBIDA.clear()
     DETALLE_SUBIDA['mb'] = os.path.getsize(video_path) // 1024 // 1024
     media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
-    response = youtube.videos().insert(part='snippet,status', body=body, media_body=media).execute()
+    body['status']['containsSyntheticMedia'] = True   # divulgacion oficial de YouTube (musica/imagenes con IA)
+    try:
+        response = youtube.videos().insert(part='snippet,status', body=body, media_body=media).execute()
+    except Exception as e:
+        if 'containsSyntheticMedia' not in str(e):
+            raise
+        print(f"  containsSyntheticMedia no aceptado, reintento sin el campo: {str(e)[:120]}")
+        body['status'].pop('containsSyntheticMedia', None)
+        media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
+        response = youtube.videos().insert(part='snippet,status', body=body, media_body=media).execute()
     video_id = response['id']
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"  SUBIDO: {url}")
     DETALLE_SUBIDA.update(miniatura=False,
-                          subtitulos=None if es_short else False,
+                          subtitulos=None,
                           comentario=None if es_short else False,
                           playlist_ok=None if es_short else False)
 
@@ -1200,28 +1154,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
         if playlist_nombre:
             DETALLE_SUBIDA['playlist_ok'] = agregar_a_playlist(youtube, video_id, playlist_nombre)
 
-        # Subtitulos activados
-        try:
-            srt_path = generar_srt(titulo, duracion_min, idioma)
-            if srt_path and os.path.exists(srt_path):
-                lang_code = idioma if idioma in ['es', 'en', 'pt'] else 'en'
-                lang_name = {'es': 'Español', 'en': 'English', 'pt': 'Português'}.get(lang_code, 'English')
-                youtube.captions().insert(
-                    part='snippet',
-                    body={
-                        'snippet': {
-                            'videoId': video_id,
-                            'language': lang_code,
-                            'name': lang_name,
-                            'isDraft': False
-                        }
-                    },
-                    media_body=MediaFileUpload(srt_path, mimetype='application/octet-stream')
-                ).execute()
-                print(f"  Subtitulos {lang_name} OK")
-                DETALLE_SUBIDA['subtitulos'] = True
-        except Exception as e:
-            print(f"  Subtitulos error (no critico): {e}")
+        # Sin subtitulos automaticos: el video no tiene voz y los de plantilla no reflejan el contenido
 
         try:
             # Comentario fijo neutral para fijar en el video
@@ -1330,25 +1263,29 @@ fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 
 
 TEMAS_SHORTS_HI = [
-    "Ganpati Bappa Morya mantra that opens closed doors",
-    "Why Vighnaharta removes obstacles before you ask",
-    "Om Gan Ganapataye Namaha 21 times and feel the shift",
-    "The Ganesha mantra Indian families chant every morning",
-    "Shubh Labh Ganesha blessing for money and good luck",
-    "What Ganpati Bappa teaches about letting go of fear",
-    "Start your day with this Ganesha mantra",
-    "Why we chant Ganesha first before anything new",
-    "Vakratunda Mahakaya mantra for a fresh beginning",
-    "Ganesh mantra for peace when life feels heavy",
-    "Listen to this Ganpati chant before an important day",
-    "The meaning of Ganpati Bappa Morya most people miss",
+    "Ganpati Bappa Morya, one minute of devotional chant",
+    "Vighnaharta Ganesha mantra music for a calm morning",
+    "Om Gan Ganapataye Namaha, a short devotional chant",
+    "Ganesha mantra music for a quiet start of the day",
+    "Shubh Ganesha blessing music, short devotional clip",
+    "Ganpati Bappa devotional music for a mindful minute",
+    "Vakratunda Mahakaya mantra, short devotional music",
+    "A quiet minute with Ganpati Bappa music",
+    "Ganesha chant for gratitude, one minute",
+    "Ganpati devotional music for the evening prayer",
+    "Short Ganesh ji bhajan for the morning",
+    "Ganpati Bappa Morya chant to pause and breathe",
+    "Listen to this Ganpati chant before a busy day",
+    "Soft Ganesha devotional music for a calm pause",
+    "Gajanana devotional chant, one minute",
+    "Mangal Murti Ganesha short devotional music",
 ]
 
 
 def generar_hi():
     """Guion del video largo en hindi-ingles (con deteccion de festivales)."""
     festival = detectar_festival_hindu()
-    tema_fest = f"Special {festival} Ganesh mantra for blessings prosperity and celebration 2026" if festival else None
+    tema_fest = f"Special {festival} Ganesh devotional music and greetings 2026" if festival else None
     # el tema de festival solo si no se uso en los ultimos 3 dias (para no repetir el mismo titulo todos los dias)
     if festival and (dias_desde_uso(tema_fest) is None or dias_desde_uso(tema_fest) > 3):
         tema = tema_fest
@@ -1365,10 +1302,11 @@ Generate engaging, honest content for a video about: {tema}
 {contexto}
 Use English but include devotional Hindi terms like Ganpati Bappa, Vighnaharta, Shubh, Mangal when natural.
 Do not make health claims or guaranteed-result promises.
+This video is devotional music with visuals and no narration: describe only the music and the devotional tradition. Never claim effects on money, luck, health, brain, sleep results, love or manifestation, and never promise results.
 No asterisks, no markdown, no emojis in the title.
 Reply EXACTLY in this format:
 TITULO: [title maximum 70 characters, impactful, include Ganpati or Ganesha]
-DESCRIPCION: [300 words with devotional keywords, benefits of mantra practice, CTA to subscribe to youtube.com/@SpiritualWave888. End with: "The music, images and videos were created with artificial intelligence tools."]
+DESCRIPCION: [300 words with devotional keywords, the tradition and meaning of the mantra, CTA to subscribe to youtube.com/@SpiritualWave888. End with: "The music, images and videos were created with artificial intelligence tools."]
 TAGS: [5 hashtags separated by spaces including Ganpati and Ganesha]"""
     base_tags = "#Ganpati #Ganesha #Mantra #Vighnaharta #SpiritualWave"
     try:

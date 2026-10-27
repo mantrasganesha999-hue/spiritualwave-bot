@@ -36,6 +36,9 @@ def get_youtube():
     return build('youtube', 'v3', credentials=creds)
 
 def responder_comentarios():
+    if os.environ.get("RESPUESTAS_AUTOMATICAS") != "1":
+        print("Respuestas automaticas desactivadas (las respuestas eran plantillas repetidas). Responde a mano en YouTube Studio.")
+        return
     print("=== RESPONDIENDO COMENTARIOS ===")
     youtube = get_youtube()
     respondidos = 0

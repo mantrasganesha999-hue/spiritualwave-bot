@@ -27,17 +27,17 @@ ENC_LIVE = ['-c:v', 'libx264', '-preset', 'veryfast',
 
 TEMAS_LIVE = [
     "Om Gan Ganapataye Namaha Live Chanting",
-    "Ganesha Mantra for Peace and Abundance",
-    "Live Ganesha Meditation Music for Deep Calm",
+    "Ganesha Devotional Music Live for Peace",
+    "Live Ganesha Meditation Music",
     "Ganpati Bappa Morya Devotional Live",
-    "Ganesha Sleep Music Live to Remove Obstacles",
-    "Powerful Ganesha Mantra for a Fresh Start",
-    "528 Frequency Ganesha Music Live",
-    "Vighnaharta Ganesha Mantras Live Stream",
-    "Ganesha Morning Mantra for Positive Energy",
     "Ganesha Evening Prayer Music Live",
-    "Shubh Labh Ganesha Mantra for Good Luck",
-    "Ganesha Mantra for Focus and Clarity Live",
+    "Ganesha Morning Devotional Music Live",
+    "Vighnaharta Ganesha Mantras Live Stream",
+    "Ganesha Mantra Music for Focus Live",
+    "Shubh Ganesha Devotional Music Live",
+    "Ganesha Bhajans Live for Daily Devotion",
+    "Soft Ganesha Chanting Live for a Quiet Evening",
+    "Ganesha Mantra Music Live for Calm and Gratitude",
 ]
 
 
