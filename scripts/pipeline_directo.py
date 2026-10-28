@@ -147,13 +147,25 @@ def _hora(b):
     return pc._fecha_yt(t) if t else None
 
 
+def _listar_pendientes(youtube, part):
+    """Directos que aun no han empezado (created/ready/testing), TODAS las paginas.
+    Antes se leia solo 'all' con maxResults=50 y los viejos quedaban fuera de esa primera pagina."""
+    items, token = [], None
+    while True:
+        r = youtube.liveBroadcasts().list(part=part, broadcastStatus='upcoming',
+                                          maxResults=50, pageToken=token).execute()
+        items += r.get('items', [])
+        token = r.get('nextPageToken')
+        if not token:
+            return items
+
+
 def buscar_programado(youtube):
     """Directo de hoy ya programado de antemano (sin conectar, 'created', dentro de las proximas 14 h)."""
     try:
-        r = youtube.liveBroadcasts().list(part='snippet,status,contentDetails',
-                                          broadcastStatus='all', maxResults=50).execute()
+        items = _listar_pendientes(youtube, 'snippet,status,contentDetails')
         ahora = datetime.utcnow()
-        cands = [b for b in r.get('items', [])
+        cands = [b for b in items
                  if b['status']['lifeCycleStatus'] == 'created' and not b.get('contentDetails', {}).get('boundStreamId')
                  and _hora(b) and ahora - timedelta(hours=3) <= _hora(b) <= ahora + timedelta(hours=14)]
         return min(cands, key=_hora) if cands else None
@@ -168,9 +180,9 @@ def limpiar_pendientes(youtube, conservar=None):
     transmision. Nunca toca uno en vivo, el que se va a reutilizar (conservar) ni uno programado para despues."""
     borrados = 0
     try:
-        r = youtube.liveBroadcasts().list(part='id,snippet,status', broadcastStatus='all', maxResults=50).execute()
+        items = _listar_pendientes(youtube, 'id,snippet,status')
         ahora = datetime.utcnow()
-        for b in r.get('items', []):
+        for b in items:
             if b['status']['lifeCycleStatus'] not in ('created', 'ready', 'testing') or b['id'] == conservar:
                 continue
             if _hora(b) and _hora(b) > ahora + timedelta(hours=14):

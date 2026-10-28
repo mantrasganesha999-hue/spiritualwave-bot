@@ -12,9 +12,16 @@ def main():
     from googleapiclient.discovery import build
     with open(os.path.join(BASE, 'token.pickle'), 'rb') as f:
         yt = build('youtube', 'v3', credentials=pickle.load(f))
-    r = yt.liveBroadcasts().list(part='id,snippet,status', broadcastStatus='all', maxResults=50).execute()
+    items, token = [], None
+    while True:   # solo los que NO han empezado, todas las paginas
+        r = yt.liveBroadcasts().list(part='id,snippet,status', broadcastStatus='upcoming',
+                                     maxResults=50, pageToken=token).execute()
+        items += r.get('items', [])
+        token = r.get('nextPageToken')
+        if not token:
+            break
     n = 0
-    for b in r.get('items', []):
+    for b in items:
         est = b['status']['lifeCycleStatus']
         if est in ('created', 'ready', 'testing'):
             yt.liveBroadcasts().delete(id=b['id']).execute()
