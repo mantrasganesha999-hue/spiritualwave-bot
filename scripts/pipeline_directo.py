@@ -237,6 +237,8 @@ def crear_directo(youtube, tema, titulo, descripcion):
         try:
             youtube.liveBroadcasts().bind(part="id,contentDetails", id=previo['id'], streamId=stream['id']).execute()
             print(f"  Usando el directo programado de antemano: {previo['id']}")
+            tema_prev = previo['snippet']['title'].replace('\U0001F534 LIVE: ', '').replace(' | SpiritualWave', '')
+            _poner_miniatura(youtube, previo['id'], tema_prev)   # no critico: garantiza miniatura propia
             return previo['id'], destino, previo['snippet']['title']
         except Exception as e:
             print(f"  No se pudo usar el programado ({e}); se crea uno nuevo")
@@ -254,21 +256,42 @@ def crear_directo(youtube, tema, titulo, descripcion):
 
 def programar_siguiente(youtube):
     """Crea (sin conectar a la transmision) el directo de la proxima salida para que aparezca como
-    'Proximo directo' con recordatorio ~24 h antes. Si falla, no pasa nada: manana se crea uno normal."""
+    'Proximo directo' con recordatorio ~24 h antes. Es idempotente (si ya existe uno para esa salida no
+    crea otro), reintenta 3 veces y avisa por Telegram si no lo logra. Devuelve el id o None."""
+    ultimo_error = None
+    for intento in range(1, 4):
+        try:
+            ahora = datetime.utcnow()
+            t = ahora.replace(hour=HORA_LIVE_UTC[0], minute=HORA_LIVE_UTC[1], second=0, microsecond=0)
+            while t < ahora + timedelta(hours=6):
+                t += timedelta(days=1)
+            for b in _listar_pendientes(youtube, 'id,snippet,status'):
+                h = _hora(b)
+                if h and abs((h - t).total_seconds()) < 3 * 3600:
+                    print(f"  Directo de manana ya programado: {b['id']}")
+                    return b['id']
+            dias = (t.date() - (ahora - timedelta(hours=5)).date()).days
+            tema, titulo, desc = datos_live(max(1, dias))
+            b = _insertar_broadcast(youtube, pc.sin_hz(titulo), pc.sin_hz(desc), t)
+            _poner_miniatura(youtube, b['id'], tema)
+            print(f"  Directo de manana programado: https://www.youtube.com/watch?v={b['id']} ({t:%d %H:%M} UTC)")
+            try:
+                notificar.mensaje('\U0001F4C5', 'DIRECTO DE MAÑANA PROGRAMADO',
+                                  [f"\U0001F4CC <b>{notificar.esc(titulo)}</b>", f"\U0001F550 {t:%d/%m %H:%M} UTC"],
+                                  silencioso=True)
+            except Exception:
+                pass
+            return b['id']
+        except Exception as e:
+            ultimo_error = e
+            print(f"  No se pudo programar el directo de manana (intento {intento}/3): {e}")
+            time.sleep(20)
     try:
-        ahora = datetime.utcnow()
-        t = ahora.replace(hour=HORA_LIVE_UTC[0], minute=HORA_LIVE_UTC[1], second=0, microsecond=0)
-        while t < ahora + timedelta(hours=6):
-            t += timedelta(days=1)
-        dias = (t.date() - (ahora - timedelta(hours=5)).date()).days
-        tema, titulo, desc = datos_live(max(1, dias))
-        b = _insertar_broadcast(youtube, pc.sin_hz(titulo), pc.sin_hz(desc), t)
-        _poner_miniatura(youtube, b['id'], tema)
-        print(f"  Directo de manana programado: https://www.youtube.com/watch?v={b['id']} ({t:%d %H:%M} UTC)")
-        return b['id']
-    except Exception as e:
-        print(f"  No se pudo programar el directo de manana (no critico): {e}")
-        return None
+        notificar.mensaje('⚠️', 'NO SE PUDO PROGRAMAR EL DIRECTO DE MAÑANA',
+                          [f"{notificar.esc(str(ultimo_error)[:300])}", "Mañana se crea uno normal a las 10:00."])
+    except Exception:
+        pass
+    return None
 
 
 def transmitir(base, audio, destino, duracion):
@@ -387,6 +410,7 @@ def main():
         chequeo = threading.Timer(120, verificar_en_vivo, args=(youtube, broadcast_id, titulo))
         chequeo.daemon = True
         chequeo.start()
+        programar_siguiente(youtube)   # ya al arrancar: no depende de que el job llegue vivo hasta el final
         progreso = threading.Thread(target=progreso_horario, args=(youtube, broadcast_id, inicio, duracion, parar),
                                     daemon=True)
         progreso.start()
