@@ -52,7 +52,7 @@ def datos_live(dias=0):
         tema = f"{festival} Special Ganesha Mantra Live"
     else:
         tema = TEMAS_LIVE[ref.timetuple().tm_yday % len(TEMAS_LIVE)]
-    titulo = f"\U0001F534 LIVE: {tema} | SpiritualWave"
+    titulo = f"\U0001F534 LIVE: {tema} | गणेश मंत्र लाइव"
     descripcion = (
         f"{tema}\n\n"
         "Join this live stream of Ganesha mantras and devotional music. "
@@ -107,6 +107,12 @@ def conectar_youtube():
 
 
 def miniatura_live(tema):
+    try:   # portada nueva (devanagari + insignia LIVE); si no esta disponible, la anterior
+        if pc.dv2 and pc.dv2.disponible():
+            return pc.dv2.portada_larga(random.choice(pc.get_imagenes()), ['गणेश मंत्र', 'लाइव'],
+                                        'DEVOTIONAL MUSIC \u2022 4 HOURS', '\u25cf LIVE', '/tmp/thumb_live_v2.jpg')
+    except Exception as e:
+        print(f"  Portada live v2 no disponible, uso la anterior: {e}")
     path = pc.generar_thumbnail(tema, variante=random.randint(0, 9),
                                 texto_marca='SpiritualWave',
                                 subtexto='LIVE Ganesha Mantras')
@@ -237,7 +243,7 @@ def crear_directo(youtube, tema, titulo, descripcion):
         try:
             youtube.liveBroadcasts().bind(part="id,contentDetails", id=previo['id'], streamId=stream['id']).execute()
             print(f"  Usando el directo programado de antemano: {previo['id']}")
-            tema_prev = previo['snippet']['title'].replace('\U0001F534 LIVE: ', '').replace(' | SpiritualWave', '')
+            tema_prev = previo['snippet']['title'].replace('\U0001F534 LIVE: ', '').replace(' | SpiritualWave', '').replace(' | गणेश मंत्र लाइव', '')
             _poner_miniatura(youtube, previo['id'], tema_prev)   # no critico: garantiza miniatura propia
             return previo['id'], destino, previo['snippet']['title']
         except Exception as e:

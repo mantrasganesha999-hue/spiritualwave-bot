@@ -31,7 +31,7 @@ jobs:
     - name: Instalar dependencias
       run: |
         sudo apt-get update
-        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu
+        sudo apt-get install -y --fix-missing ffmpeg fonts-dejavu libraqm0 libfribidi0
         pip install requests google-api-python-client google-auth-oauthlib Pillow
 
     - name: Transmitir en vivo

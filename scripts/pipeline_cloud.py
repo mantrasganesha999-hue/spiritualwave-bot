@@ -11,6 +11,13 @@ TELEGRAM_CHAT = os.environ.get('TELEGRAM_CHAT_ID')
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import notificar
+try:   # diseno nuevo (portadas, letra en pantalla, catalogo de mantras); si falla se usa el flujo anterior
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import diseno_v2 as dv2
+    import catalogo_mantras as cat2
+except Exception as _e:
+    print(f"Diseno v2 no disponible: {_e}")
+    dv2 = cat2 = None
 
 TEMAS_ES = [
     "musica devocional de Ganesha para empezar el dia con calma",
@@ -279,6 +286,9 @@ def ya_hecho_hoy():
 
 TEMAS_RECIENTES = {}   # hash del tema -> fecha (UTC) de su ultima publicacion, ultimos 7 dias
 TEMA_ACTUAL = {'tema': None}
+PORTADA_ACTUAL = {'path': None}      # portada ya generada por el diseno v2 (si hay)
+TAGS_EXTRA = []                      # tags especificos del mantra (SEO)
+DESC_COMPLETA = {'v': False}         # la descripcion ya viene completa (no agregar pie ni capitulos)
 
 
 def hash_tema(tema):
@@ -309,6 +319,8 @@ def verificar_salud():
     musicas = get_musicas()
     if len(musicas) < 5:
         problemas.append(f"Solo {len(musicas)} musicas disponibles")
+    if cat2 is not None and not dv2.disponible():
+        problemas.append("Diseno nuevo desactivado (falta libraqm o las fuentes de assets/fonts); se usa el diseno anterior")
     if not GROQ_KEY:
         problemas.append("GROQ_API_KEY no configurada")
     if not YOUTUBE_TOKEN_B64:
@@ -678,10 +690,10 @@ def generar_thumbnail_short(titulo, variante=1):
         print(f"  Thumbnail Short error: {e}")
         return None
 
-def crear_mezcla_audio(duracion, salida='/tmp/mezcla_audio.m4a'):
+def crear_mezcla_audio(duracion, salida='/tmp/mezcla_audio.m4a', musicas=None):
     """Playlist de varias canciones (sin repetir seguidas) con volumen
     normalizado y fade in/out, en vez de una sola cancion en loop."""
-    musicas = get_musicas()
+    musicas = list(musicas) if musicas else get_musicas()
     if not musicas:
         return None
     try:
@@ -758,7 +770,7 @@ def lista_tags(tags):
     """Tags reales de YouTube (sin #), mezcla de los generados y los base del canal."""
     base = ['Ganesha mantra', 'Om Gan Ganapataye Namaha', 'Ganpati Bappa',
             'meditation music', 'spiritual music']
-    propios = [t.strip('#').strip() for t in (tags or '').split() if t.strip('#').strip()]
+    propios = list(TAGS_EXTRA) + [t.strip('#').strip() for t in (tags or '').split() if t.strip('#').strip()]
     salida, total, vistos = [], 0, set()
     for t in propios + base:
         if t.lower() in vistos:
@@ -881,7 +893,7 @@ def construir_segmentos(es_short, w, h, fps, trabajo, n_clips, por_segmento,
     return segmentos
 
 
-def filtros_texto(titulo_txt, es_short, t_total):
+def filtros_texto(titulo_txt, es_short, t_total, con_titulo=True):
     """Titulo (en varias lineas) que aparece/desaparece, marca fija y CTA final."""
     font = f"fontfile={FUENTE_BOLD}:" if os.path.exists(FUENTE_BOLD) else ""
     borde = "borderw=3:bordercolor=black:shadowcolor=black:shadowx=3:shadowy=3"
@@ -896,7 +908,7 @@ def filtros_texto(titulo_txt, es_short, t_total):
     lineas = textwrap.wrap(titulo_txt, width=por_linea, break_long_words=False)[:3] or [titulo_txt]
     alto = int(tam * 1.25)
     filtros = []
-    for i, linea in enumerate(lineas):
+    for i, linea in enumerate(lineas if con_titulo else []):
         y = f"h-{base + (len(lineas) - 1 - i) * alto}"
         filtros.append(
             f"drawtext={font}text='{linea}':fontcolor=0xFFD700:fontsize={tam}:"
@@ -914,7 +926,7 @@ def filtros_texto(titulo_txt, es_short, t_total):
     return ','.join(filtros)
 
 
-def montar_video(titulo, duracion=None, es_short=False):
+def montar_video(titulo, duracion=None, es_short=False, entrada=None, musicas=None):
     duracion = duracion or DURACION_LARGO
     t_total = 58 if es_short else int(duracion)
     print(f"Montando {'SHORT' if es_short else 'VIDEO ' + str(t_total//60) + 'min'} HD con transiciones...")
@@ -953,20 +965,44 @@ def montar_video(titulo, duracion=None, es_short=False):
                 if acumulado >= t_total + 5:
                     break
 
-    mezcla = crear_mezcla_audio(t_total, salida=f'{trabajo}/audio.m4a')
+    mezcla = crear_mezcla_audio(t_total, salida=f'{trabajo}/audio.m4a', musicas=musicas)
     if mezcla:
         entrada_audio, codec_audio = ['-i', mezcla], ['-c:a', 'copy']
     else:
-        musica = random.choice(get_musicas())
+        musica = random.choice(list(musicas) if musicas else get_musicas())
         entrada_audio = ['-stream_loop', '-1', '-i', musica]
         codec_audio = ['-c:a', 'aac', '-b:a', '192k']
 
     titulo_txt = texto_visual(titulo, 60 if es_short else 80)
-    vf = filtros_texto(titulo_txt, es_short, t_total)
+    tarjetas = []
+    if entrada and dv2 and dv2.disponible():
+        try:
+            for i, card in enumerate(entrada['cards']):
+                tarjetas.append(dv2.tarjeta_letra(card, es_short, f'{trabajo}/letra_{i}.png'))
+        except Exception as e:
+            print(f"  Tarjetas de letra no disponibles: {e}")
+            tarjetas = []
+    vf = filtros_texto(titulo_txt, es_short, t_total, con_titulo=not tarjetas)
+    if tarjetas:
+        extra, fc, previo = [], f"[0:v]{vf}[v0]", 'v0'
+        n = len(tarjetas)
+        ciclo, visible = 20 * n, 17
+        for i, (png, x, y) in enumerate(tarjetas):
+            extra += ['-loop', '1', '-framerate', str(fps), '-i', png]
+            ini = i * 20
+            if es_short and n == 1:
+                en = f"between(t,0.5,{t_total - 3})"
+            else:
+                en = f"between(mod(t,{ciclo}),{ini},{ini + visible})*lt(t,{t_total - 3})"
+            fc += f";[{previo}][{i + 2}:v]overlay={x}:{y}:enable='{en}'[v{i + 1}]"
+            previo = f"v{i + 1}"
+        salida_video = ['-filter_complex', fc, '-map', f'[{previo}]', '-map', '1:a']
+    else:
+        extra, salida_video = [], ['-vf', vf, '-map', '0:v', '-map', '1:a']
 
     cmd = ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista_path,
-           *entrada_audio, '-map', '0:v', '-map', '1:a',
-           '-vf', vf, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22',
+           *entrada_audio, *extra, *salida_video,
+           '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22',
            '-maxrate', '7M', '-bufsize', '14M',
            '-r', str(fps), '-pix_fmt', 'yuv420p', *codec_audio,
            '-t', str(t_total), '-movflags', '+faststart', salida]
@@ -1087,9 +1123,9 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
     youtube = build('youtube', 'v3', credentials=creds)
 
     titulo_final = f"{titulo} #Shorts" if es_short else titulo
-    desc_final = descripcion if es_short else agregar_capitulos(descripcion, duracion_min, idioma)
+    desc_final = descripcion if (es_short or DESC_COMPLETA['v']) else agregar_capitulos(descripcion, duracion_min, idioma)
 
-    if tags and tags.split()[0] not in desc_final:
+    if tags and not DESC_COMPLETA['v'] and tags.split()[0] not in desc_final:
         desc_final = desc_final + "\n\n" + tags
 
     body = {
@@ -1127,7 +1163,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
                           playlist_ok=None if es_short else False)
 
     if es_short:
-        thumb = generar_thumbnail_short(titulo, variante)
+        thumb = PORTADA_ACTUAL['path'] or generar_thumbnail_short(titulo, variante)
         if thumb:
             try:
                 youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb, mimetype='image/jpeg')).execute()
@@ -1138,7 +1174,7 @@ def subir_youtube(video_path, titulo, descripcion, tags, es_short=False, duracio
     else:
         texto_marca = 'Ganpati Bappa' if idioma == 'hi' else 'SpiritualWave'
         subtexto = {'hi': 'Vighnaharta Ganesha Mantras', 'en': 'Sacred Ganesha Mantras'}.get(idioma, 'Mantras & Frecuencias Divinas')
-        thumb = generar_thumbnail(titulo, variante, texto_marca, subtexto)
+        thumb = PORTADA_ACTUAL['path'] or generar_thumbnail(titulo, variante, texto_marca, subtexto)
         if thumb:
             try:
                 youtube.thumbnails().set(videoId=video_id, media_body=MediaFileUpload(thumb, mimetype='image/jpeg')).execute()
@@ -1328,7 +1364,7 @@ TAGS: [5 hashtags separated by spaces including Ganpati and Ganesha]"""
     return titulo[:95].strip(), desc, tags
 
 
-def producir_largo(idioma):
+def producir_largo_clasico(idioma):
     """Video horizontal largo. Devuelve dict con titulo, url y detalles de la subida."""
     if idioma == 'hi':
         titulo, desc, tags = generar_hi()
@@ -1349,7 +1385,7 @@ def producir_largo(idioma):
             'playlist': playlist}
 
 
-def producir_short(idioma):
+def producir_short_clasico(idioma):
     """Short vertical. Devuelve dict con titulo, url y detalles de la subida."""
     temas = TEMAS_SHORTS_HI if idioma == 'hi' else TEMAS_SHORTS_EN
     tema = sin_hz(elegir_tema(temas))
@@ -1365,6 +1401,91 @@ def producir_short(idioma):
     _, url = subir_youtube(short, tema, desc, hashtags, es_short=True,
                            variante=random.randint(0, 9), idioma=idioma)
     return {**DETALLE_SUBIDA, 'titulo': tema, 'url': url, 'duracion': '58 s'}
+
+
+def _v2_activo():
+    return bool(dv2 and cat2 and dv2.disponible()) and (os.environ.get('DISENO_V2') or '1') != '0'
+
+
+def elegir_entrada(formato, idioma):
+    """Elige un mantra del catalogo sin repetir el mismo (formato+idioma) en 7 dias."""
+    mapa = {f"{e['id']}|{formato}|{idioma}": e for e in cat2.ENTRADAS}
+    clave = elegir_tema(list(mapa))
+    return mapa[clave], clave
+
+
+def _limpiar_v2():
+    PORTADA_ACTUAL['path'] = None
+    TAGS_EXTRA.clear()
+    DESC_COMPLETA['v'] = False
+
+
+def producir_largo(idioma):
+    """Video largo con letra y significado en pantalla, portada nueva y SEO (si algo falla, flujo anterior)."""
+    if not _v2_activo():
+        return producir_largo_clasico(idioma)
+    try:
+        entrada, clave = elegir_entrada('largo', idioma)
+        pistas = cat2.pistas_shloka(BASE, entrada)
+        cantado = bool(pistas)
+        meta = cat2.meta_largo(entrada, idioma, cantado)
+        TEMA_ACTUAL['tema'] = clave
+        print(f"\n[VIDEO V2 {idioma.upper()}] {entrada['id']} | cantado={cantado} | {meta['titulo']}")
+        portada = dv2.portada_larga(random.choice(get_imagenes()), entrada['deva'], meta['sub'], meta['badge'],
+                                    '/tmp/portada_larga.jpg')
+        video = (montar_video(meta['titulo'], duracion=DURACION_LARGO, entrada=entrada, musicas=pistas or None)
+                 or montar_video(meta['titulo'], duracion=DURACION_LARGO, entrada=entrada, musicas=pistas or None))
+        if not video:
+            raise RuntimeError("no se pudo montar el video v2")
+    except Exception as e:
+        print(f"Flujo v2 (largo) fallo antes de subir, uso el flujo anterior: {e}")
+        _limpiar_v2()
+        return producir_largo_clasico(idioma)
+    try:
+        PORTADA_ACTUAL['path'] = portada
+        TAGS_EXTRA[:] = meta['tags_extra']
+        DESC_COMPLETA['v'] = True
+        playlist = "Ganesh Mantra Lyrics & Meaning"
+        _, url = subir_youtube(video, meta['titulo'], meta['descripcion'], meta['hashtags'],
+                               duracion_min=DURACION_LARGO // 60, variante=random.randint(0, 9),
+                               playlist_nombre=playlist, idioma=idioma)
+    finally:
+        _limpiar_v2()
+    return {**DETALLE_SUBIDA, 'titulo': meta['titulo'], 'url': url, 'duracion': duracion_txt_largo(),
+            'playlist': playlist}
+
+
+def producir_short(idioma):
+    """Short vertical con letra y significado, portada nueva y SEO (si algo falla, flujo anterior)."""
+    if not _v2_activo():
+        return producir_short_clasico(idioma)
+    try:
+        entrada, clave = elegir_entrada('short', idioma)
+        pistas = cat2.pistas_shloka(BASE, entrada)
+        cantado = bool(pistas)
+        meta = cat2.meta_short(entrada, idioma, cantado)
+        TEMA_ACTUAL['tema'] = clave
+        print(f"\n[SHORT V2 {idioma.upper()}] {entrada['id']} | cantado={cantado} | {meta['titulo']}")
+        portada = dv2.portada_short(random.choice(get_imagenes_shorts()), entrada['deva'], meta['sub'], meta['badge'],
+                                    '/tmp/portada_short.jpg')
+        short = (montar_video(meta['titulo'], es_short=True, entrada=entrada, musicas=pistas or None)
+                 or montar_video(meta['titulo'], es_short=True, entrada=entrada, musicas=pistas or None))
+        if not short:
+            raise RuntimeError("no se pudo montar el short v2")
+    except Exception as e:
+        print(f"Flujo v2 (short) fallo antes de subir, uso el flujo anterior: {e}")
+        _limpiar_v2()
+        return producir_short_clasico(idioma)
+    try:
+        PORTADA_ACTUAL['path'] = portada
+        TAGS_EXTRA[:] = meta['tags_extra']
+        DESC_COMPLETA['v'] = True
+        _, url = subir_youtube(short, meta['titulo'], meta['descripcion'], meta['hashtags'], es_short=True,
+                               variante=random.randint(0, 9), idioma=idioma)
+    finally:
+        _limpiar_v2()
+    return {**DETALLE_SUBIDA, 'titulo': meta['titulo'], 'url': url, 'duracion': '58 s'}
+
 
 
 def main():
