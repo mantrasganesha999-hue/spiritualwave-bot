@@ -1,0 +1,103 @@
+{
+ "id": "01_janm",
+ "formato": "katha",
+ "idioma": "hi",
+ "publicar": "2026-11-19T13:30:00Z",
+ "publicar_texto": "jueves 19 nov 2026, 7:00 pm hora de India",
+ "titulo": "गणेश जी का जन्म कैसे हुआ? | शिव पुराण की कथा | Ganesh Ji Ki Katha",
+ "descripcion": "भगवान गणेश के जन्म की कथा, शिव पुराण (रुद्र संहिता, कुमार खंड) के अनुसार। माता पार्वती ने उबटन से बालक कैसे बनाया, द्वार पर शिव जी से युद्ध क्यों हुआ, गणेश जी को हाथी का सिर कैसे मिला, और वे प्रथम पूज्य क्यों कहलाते हैं।\n\nध्यान दें: यह कथा अलग-अलग ग्रंथों में थोड़े अलग रूप में मिलती है। इस वीडियो में शिव पुराण का वर्णन है।\n\n{CAPITULOS}\n\nThe story of Lord Ganesha's birth as told in the Shiva Purana, narrated in Hindi.\n\nइस वीडियो की आवाज़ और चित्र AI टूल से बनाए गए हैं। Voice and images were created with AI tools.\n\n#GaneshKatha #Ganesha #ShivPuran",
+ "tags": [
+  "गणेश जी की कथा",
+  "गणेश जन्म कथा",
+  "ganesh ji ki katha",
+  "ganesh janm katha",
+  "ganesha story in hindi",
+  "shiv puran katha",
+  "ganpati",
+  "ganesha",
+  "hindu mythology",
+  "गणेश",
+  "शिव पुराण"
+ ],
+ "categoria": "27",
+ "miniatura": {
+  "formato": "katha",
+  "lineas": [
+   "गणेश जी का",
+   "जन्म कैसे हुआ?"
+  ],
+  "gancho": "सिर हाथी का क्यों?",
+  "insignia": "कथा",
+  "paleta": "fuego",
+  "imagen": "10"
+ },
+ "fuente": "शिव पुराण, रुद्र संहिता, कुमार खंड",
+ "escenas": [
+  {
+   "n": 1,
+   "capitulo": "शुरुआत",
+   "texto": "क्या आप जानते हैं कि भगवान गणेश का सिर हाथी का क्यों है? और क्यों हर पूजा, हर शुभ काम, हर नई शुरुआत, सबसे पहले गणेश जी के नाम से होती है? घर में गृह प्रवेश हो, विवाह हो, या कोई नया काम, हम सबसे पहले कहते हैं, श्री गणेशाय नमः। इसके पीछे एक बहुत सुंदर और अद्भुत कथा है। आज हम शिव पुराण की रुद्र संहिता में बताई गई, भगवान गणेश के जन्म की कथा सुनेंगे। तो आइए, मन को शांत करें, और इस पावन कथा को शुरू करें।",
+   "prompt_imagen": "Lord Ganesha seated on a lotus throne in a glowing Himalayan temple, gentle smile, four arms, holding a modak, golden halo, mist and soft light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 2,
+   "capitulo": "कैलाश पर्वत",
+   "texto": "बहुत समय पहले की बात है। हिमालय की ऊँची, बर्फ से ढकी चोटियों के बीच, कैलाश पर्वत पर, भगवान शिव और माता पार्वती निवास करते थे। शिव जी के अनेक गण थे, जैसे नंदी और भृंगी, जो हर समय उनकी सेवा में रहते थे, और केवल उन्हीं की आज्ञा मानते थे। माता पार्वती की सखियों ने एक दिन उनसे कहा, माता, शिव जी के तो इतने गण हैं, पर आपका अपना कोई नहीं, जो केवल आपकी आज्ञा का पालन करे। यह बात माता पार्वती के मन में बस गई।",
+   "prompt_imagen": "Snowy Mount Kailash at sunrise, Lord Shiva in meditation and Goddess Parvati seated beside him, attendants (ganas) in the distance, serene atmosphere. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 3,
+   "capitulo": "उबटन से बालक",
+   "texto": "एक दिन माता पार्वती स्नान की तैयारी कर रही थीं। उस समय उन्होंने अपने शरीर पर लगे उबटन को उतारा, और उससे एक सुंदर बालक की आकृति बनाई। उस बालक का रूप बहुत तेजस्वी था, उसके अंग सुंदर और बलशाली थे। फिर माता ने उसमें प्राण डाल दिए। बालक की आँखें खुलीं, वह जीवित हो उठा, और उसने हाथ जोड़कर माता को प्रणाम किया। माता पार्वती का हृदय प्रेम से भर गया। उन्होंने कहा, तुम मेरे पुत्र हो। तुम केवल मेरे हो।",
+   "prompt_imagen": "Goddess Parvati gently shaping a small radiant boy from golden turmeric paste, the boy coming to life with a soft glow, palace interior with oil lamps. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 4,
+   "capitulo": "द्वार की रक्षा",
+   "texto": "माता पार्वती ने अपने पुत्र को एक दंड दिया, और कहा, पुत्र, मैं भीतर स्नान करने जा रही हूँ। तुम द्वार पर पहरा दो। मेरी आज्ञा के बिना, कोई भी भीतर नहीं आना चाहिए, चाहे वह कोई भी हो। बालक ने विनम्रता से कहा, जैसी आपकी आज्ञा, माता। और वह हाथ में दंड लेकर, पूरी निष्ठा के साथ, द्वार पर खड़ा हो गया। उसके मन में केवल एक ही बात थी, माता की आज्ञा का पालन करना।",
+   "prompt_imagen": "A brave young boy with a wooden staff standing guard at a grand carved palace doorway on Mount Kailash, determined expression, warm evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 5,
+   "capitulo": "शिव जी का आगमन",
+   "texto": "कुछ समय बाद, भगवान शिव अपने गणों के साथ वहाँ पहुँचे, और भीतर जाने लगे। बालक ने आगे बढ़कर उनका रास्ता रोक दिया। बालक शिव जी को नहीं जानता था। शिव जी ने कहा, बालक, यह मेरा ही घर है, मुझे भीतर जाने दो। बालक ने उत्तर दिया, मेरी माता भीतर हैं, और उनकी आज्ञा है, कि कोई भीतर नहीं जाएगा। मैं आपको भीतर नहीं जाने दूँगा। शिव जी ने उसे कई बार समझाया, पर बालक अपनी माता के वचन पर अडिग रहा।",
+   "prompt_imagen": "Lord Shiva with trident and crescent moon arriving at the palace door, the young boy blocking the way with his staff, tense but respectful moment. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 6,
+   "capitulo": "युद्ध",
+   "texto": "तब शिव जी ने अपने गणों को आदेश दिया, कि इस बालक को द्वार से हटाओ। गणों ने बालक को समझाने की कोशिश की, फिर उससे युद्ध किया। पर वह छोटा सा बालक अकेले ही सब पर भारी पड़ा, और उसने सारे गणों को पीछे हटा दिया। यह समाचार देवताओं तक पहुँचा। ब्रह्मा जी और भगवान विष्णु सहित, अनेक देवता वहाँ आए। सबने प्रयास किया, पर कोई भी उस बालक को उसके स्थान से हिला नहीं सका। माता की शक्ति उसके साथ थी।",
+   "prompt_imagen": "Dramatic sky over Mount Kailash, Shiva's ganas falling back before the small boy guarding the door, Lord Shiva raising his trident, swirling clouds, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 7,
+   "capitulo": "माता का दुख",
+   "texto": "अंत में भगवान शिव ने स्वयं अपना त्रिशूल उठाया। एक भयंकर क्षण आया, और त्रिशूल के प्रहार से बालक का सिर धड़ से अलग हो गया। पूरा कैलाश सन्नाटे में डूब गया। जब माता पार्वती बाहर आईं, और उन्होंने अपने पुत्र को इस अवस्था में देखा, तो उनका हृदय टूट गया। उनका दुख क्रोध में बदल गया। उन्होंने अनेक शक्तियों को प्रकट किया, और कहा, यदि मेरा पुत्र फिर से जीवित नहीं हुआ, तो मैं पूरी सृष्टि का संहार कर दूँगी।",
+   "prompt_imagen": "Goddess Parvati in grief turning into fierce power, glowing eyes, the gods bowing before her asking forgiveness, stormy divine light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 8,
+   "capitulo": "देवताओं की प्रार्थना",
+   "texto": "तीनों लोकों में भय फैल गया। देवताओं और ऋषियों ने, नारद मुनि के साथ, माता पार्वती की स्तुति की, और उनसे शांत होने की प्रार्थना की। माता ने कहा, मेरा क्रोध तभी शांत होगा, जब मेरा पुत्र फिर से जीवित होगा, और उसे सभी देवताओं में सम्मान का स्थान मिलेगा। देवता भगवान शिव के पास गए। शिव जी ने माता की बात स्वीकार की, और इस समस्या का समाधान करने का वचन दिया।",
+   "prompt_imagen": "Narada and the gods with folded hands praying before a fierce glowing Goddess Parvati, sages around, divine light breaking through clouds. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 9,
+   "capitulo": "हाथी का सिर",
+   "texto": "भगवान शिव ने अपने गणों को आदेश दिया, उत्तर दिशा की ओर जाओ, और जो भी पहला प्राणी मिले, उसका सिर लेकर आओ। गण उत्तर दिशा में गए, और उन्हें सबसे पहले एक हाथी मिला, जिसका एक ही दाँत था। वे उस हाथी का सिर लेकर लौट आए। शिव जी ने वह सिर बालक के धड़ पर जोड़ा, और उस पर पवित्र जल छिड़का। देखते ही देखते बालक फिर से जीवित हो उठा, जैसे गहरी नींद से जागा हो।",
+   "prompt_imagen": "Shiva's ganas returning through misty northern forests carrying the head of a one-tusked elephant, Lord Shiva waiting, sacred atmosphere, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 10,
+   "capitulo": "प्रथम पूज्य",
+   "texto": "माता पार्वती ने अपने पुत्र को गले लगा लिया, और उनका मन शांत हो गया। भगवान शिव ने बालक को अपना पुत्र स्वीकार किया, और उसे अपने सभी गणों का अध्यक्ष बना दिया। इसीलिए उनका नाम पड़ा, गणपति, यानी गणों के स्वामी, और गणेश। ब्रह्मा जी, विष्णु जी और सभी देवताओं ने उन्हें आशीर्वाद दिया, और वरदान दिया, कि हर पूजा और हर शुभ कार्य में, सबसे पहले गणेश जी की पूजा होगी। इसलिए गणेश जी प्रथम पूज्य कहलाते हैं।",
+   "prompt_imagen": "Young Lord Ganesha with elephant head embraced by Parvati, Shiva blessing him, Brahma and Vishnu showering flowers from the sky, festive divine glow. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 11,
+   "capitulo": "कथा की सीख",
+   "texto": "यह कथा हमें कई बातें सिखाती है। बालक गणेश ने अपने कर्तव्य को सबसे ऊपर रखा, और माता के वचन से कभी पीछे नहीं हटे। माता पार्वती का प्रेम हमें बताता है, कि माँ की ममता कितनी गहरी होती है। और भगवान शिव ने अपनी भूल सुधारकर, सबको सम्मान दिया। अलग अलग ग्रंथों में यह कथा थोड़े अलग रूप में भी मिलती है, आज हमने शिव पुराण का वर्णन सुना। अगली कथा में हम जानेंगे, कि गणेश चतुर्थी पर चंद्रमा क्यों नहीं देखा जाता। बोलिए, गणपति बाप्पा मोरया!",
+   "prompt_imagen": "Families in India celebrating Ganesha with diyas, flowers and modaks before a Ganesha idol at home, warm festive evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  }
+ ]
+}

@@ -1,0 +1,60 @@
+name: SpiritualWave Videos Nuevos (v3)
+
+on:
+  push:
+    branches: [master]
+    paths: ['contenido/**']
+  workflow_dispatch:
+    inputs:
+      carpeta:
+        description: 'Carpeta a producir (ej. 01_janm). Vacio = el siguiente listo'
+        required: false
+        default: ''
+      permitir_banco:
+        description: 'Escribe 1 para usar imagenes del banco si faltan (solo pruebas)'
+        required: false
+        default: ''
+
+concurrency:
+  group: v3-producir
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  producir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg libraqm0 libfribidi0
+          pip install requests pillow edge-tts google-api-python-client google-auth-oauthlib google-auth-httplib2
+      - name: Producir
+        env:
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          VOZ_MOTOR: ${{ vars.VOZ_MOTOR }}
+          VOZ_EDGE: ${{ vars.VOZ_EDGE }}
+          CARPETA: ${{ github.event.inputs.carpeta }}
+          PERMITIR_BANCO: ${{ github.event.inputs.permitir_banco }}
+        run: python scripts/v3/producir_v3.py
+      - name: Guardar estado (voz generada, portada, subido.json)
+        if: always()
+        run: |
+          git config user.name "spiritualwave-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add contenido
+          git diff --cached --quiet || git commit -m "v3: estado de produccion"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break || sleep 5; done

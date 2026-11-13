@@ -1,0 +1,37 @@
+DESCRIPCIONES DE IMAGEN - 01 Janm
+Genera UNA imagen por escena, horizontal 16:9 (minimo 1920x1080) y guardala como imagenes\01.png ... imagenes\11.png
+Usa el mismo estilo en todas. La imagen 10 se usa tambien de fondo para la miniatura.
+
+===== IMAGEN 01  ->  imagenes\01.png =====
+Lord Ganesha seated on a lotus throne in a glowing Himalayan temple, gentle smile, four arms, holding a modak, golden halo, mist and soft light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 02  ->  imagenes\02.png =====
+Snowy Mount Kailash at sunrise, Lord Shiva in meditation and Goddess Parvati seated beside him, attendants (ganas) in the distance, serene atmosphere. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 03  ->  imagenes\03.png =====
+Goddess Parvati gently shaping a small radiant boy from golden turmeric paste, the boy coming to life with a soft glow, palace interior with oil lamps. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 04  ->  imagenes\04.png =====
+A brave young boy with a wooden staff standing guard at a grand carved palace doorway on Mount Kailash, determined expression, warm evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 05  ->  imagenes\05.png =====
+Lord Shiva with trident and crescent moon arriving at the palace door, the young boy blocking the way with his staff, tense but respectful moment. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 06  ->  imagenes\06.png =====
+Dramatic sky over Mount Kailash, Shiva's ganas falling back before the small boy guarding the door, Lord Shiva raising his trident, swirling clouds, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 07  ->  imagenes\07.png =====
+Goddess Parvati in grief turning into fierce power, glowing eyes, the gods bowing before her asking forgiveness, stormy divine light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 08  ->  imagenes\08.png =====
+Narada and the gods with folded hands praying before a fierce glowing Goddess Parvati, sages around, divine light breaking through clouds. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 09  ->  imagenes\09.png =====
+Shiva's ganas returning through misty northern forests carrying the head of a one-tusked elephant, Lord Shiva waiting, sacred atmosphere, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 10  ->  imagenes\10.png =====
+Young Lord Ganesha with elephant head embraced by Parvati, Shiva blessing him, Brahma and Vishnu showering flowers from the sky, festive divine glow. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
+===== IMAGEN 11  ->  imagenes\11.png =====
+Families in India celebrating Ganesha with diyas, flowers and modaks before a Ganesha idol at home, warm festive evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
+
