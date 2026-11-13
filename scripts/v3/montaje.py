@@ -27,7 +27,21 @@ def banco_ganesha():
     return sorted(glob.glob(os.path.join(BASE, 'assets', 'backgrounds', 'ganesha*.jpg')))
 
 def banco_clips():
-    return sorted(glob.glob(os.path.join(BASE, 'assets', 'videos_ganesha_horizontal', '*.mp4')))
+    c = []
+    for ext in ('mp4', 'mov', 'webm', 'm4v'):
+        c += glob.glob(os.path.join(BASE, 'assets', 'videos_ganesha_horizontal', f'*.{ext}'))
+    return sorted(c)
+
+_ORDEN = {}
+def clip_del_banco(semilla, n):
+    """Un clip distinto por escena dentro del mismo video (orden barajado fijo por video)."""
+    clips = banco_clips()
+    if not clips:
+        return None
+    if semilla not in _ORDEN:
+        o = list(clips); random.Random(semilla).shuffle(o); _ORDEN[semilla] = o
+    o = _ORDEN[semilla]
+    return o[(n - 1) % len(o)]
 
 def media_escena(carpeta, n, semilla):
     """Devuelve (ruta, es_video, de_banco). Prioridad: video propio > imagen propia > clip del banco > imagen del banco."""
@@ -39,10 +53,10 @@ def media_escena(carpeta, n, semilla):
         p = os.path.join(carpeta, 'imagenes', f'{n:02d}.{ext}')
         if os.path.exists(p):
             return p, False, False
+    clip = clip_del_banco(semilla, n)
+    if clip:
+        return clip, True, True
     random.seed(f"{semilla}-{n}")
-    clips = banco_clips()
-    if clips:
-        return random.choice(clips), True, True
     banco = banco_ganesha()
     if not banco:
         raise RuntimeError(f"Falta imagenes/{n:02d} y no hay banco de imagenes ni clips")
@@ -252,6 +266,97 @@ def render_japa(fondo, capa_png, rep_audio, n, tmp, salida):
         '-t', f'{d:.2f}', *ENC, salida])
     return d
 
+# ---------- formato "mantra cantado": cancion (Suno) + clips + letra en pantalla ----------
+EXT_AUD = ('mp3', 'wav', 'm4a', 'flac', 'ogg')
+
+def canciones(carpeta):
+    c = []
+    for ext in EXT_AUD:
+        c += glob.glob(os.path.join(carpeta, 'musica', f'*.{ext}'))
+    return sorted(c)
+
+def png_estrofa(deva, translit, significado, salida):
+    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    lineas = [l for l in deva.split('\n') if l.strip()]
+    alto = 70 + 92 * len(lineas) + (58 if translit else 0) * max(1, len(textwrap.wrap(translit, 64))) + 56 * len(textwrap.wrap(significado, 62)[:2]) + 40
+    y0 = H - 40 - alto
+    d.rounded_rectangle([110, y0, W - 110, H - 40], radius=34, fill=(15, 5, 0, 190), outline=(255, 190, 60, 230), width=3)
+    y = y0 + 70
+    for ln in lineas:
+        f = pv.ajustar(ln, 'baloo8.ttf', W - 340, 76, 44)
+        d.text((W // 2, y), ln, font=f, fill=(255, 215, 90), anchor='mm', stroke_width=3, stroke_fill=(60, 20, 0))
+        y += 92
+    for ln in textwrap.wrap(translit, 64):
+        d.text((W // 2, y), ln, font=pv.fuente('baloo8.ttf', 42), fill=(255, 255, 255), anchor='mm')
+        y += 58
+    for ln in textwrap.wrap(significado, 62)[:2]:
+        d.text((W // 2, y), ln, font=pv.fuente('hind7.ttf', 40), fill=(255, 225, 190), anchor='mm')
+        y += 56
+    im.save(salida)
+
+_CLIPS_LISTOS = {}
+def clip_10s(video, tmp):
+    if video in _CLIPS_LISTOS:
+        return _CLIPS_LISTOS[video]
+    out = os.path.join(tmp, f'c10_{len(_CLIPS_LISTOS):03d}.mp4')
+    sh(['ffmpeg', '-y', '-v', 'error', '-stream_loop', '-1', '-i', video, '-t', '10', '-an', '-vf',
+        f'scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},eq=saturation=1.12,'
+        f'fade=t=in:st=0:d=0.5,fade=t=out:st=9.5:d=0.5',
+        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', out])
+    _CLIPS_LISTOS[video] = out
+    return out
+
+def render_cancion(carpeta, e, semilla, tmp, salida):
+    songs = canciones(carpeta)
+    if not songs:
+        raise RuntimeError("falta la cancion en la carpeta musica/")
+    T = float(e.get('minutos', 12)) * 60
+    # audio: las versiones de la cancion alternadas hasta cubrir T, con 1.5 s de respiro entre vueltas
+    wavs = []
+    for k, sg in enumerate(songs):
+        wv = os.path.join(tmp, f'song{k}.wav')
+        sh(['ffmpeg', '-y', '-v', 'error', '-i', sg, '-af', 'apad=pad_dur=1.5', '-ar', '48000', '-ac', '2', wv])
+        wavs.append(wv)
+    lst, acum, k = [], 0.0, 0
+    while acum < T:
+        lst.append(wavs[k % len(wavs)]); acum += dur(wavs[k % len(wavs)]); k += 1
+    la = os.path.join(tmp, 'songs.txt'); open(la, 'w').write(''.join(f"file '{w}'\n" for w in lst))
+    audio = os.path.join(tmp, 'cancion_larga.wav')
+    sh(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', la, '-t', f'{T:.2f}',
+        '-af', f'afade=t=out:st={T - 6:.2f}:d=6', '-ar', '48000', '-ac', '2', audio])
+    # video: clips del canal, uno distinto cada 10 s, en orden barajado fijo por video
+    clips = banco_clips()
+    if not clips:
+        raise RuntimeError("no hay clips en assets/videos_ganesha_horizontal")
+    orden = list(clips); random.Random(semilla + '-cancion').shuffle(orden)
+    n = int(T // 10) + 1
+    lv = os.path.join(tmp, 'clips.txt')
+    open(lv, 'w').write(''.join(f"file '{clip_10s(orden[j % len(orden)], tmp)}'\n" for j in range(n)))
+    fondo = os.path.join(tmp, 'fondo_cancion.mp4')
+    sh(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', lv, '-t', f'{T:.2f}', '-c', 'copy', fondo])
+    # estrofas rotando cada N segundos
+    letras = e.get('letras', [])
+    seg = float(e.get('seg_estrofa', 18))
+    entradas = ['-i', fondo, '-i', audio]
+    if not os.path.exists(os.path.join(tmp, 'marca.png')):
+        png_marca(os.path.join(tmp, 'marca.png'))
+    entradas += ['-i', os.path.join(tmp, 'marca.png')]
+    fil = ["[0:v]format=rgba[v0]", "[v0][2:v]overlay=0:20[v1]"]
+    ult = 'v1'
+    ciclo = seg * max(1, len(letras))
+    for k, L in enumerate(letras):
+        p = os.path.join(tmp, f'estrofa{k}.png')
+        png_estrofa(L['deva'], L.get('translit', ''), L.get('sig', ''), p)
+        entradas += ['-i', p]
+        a, b = k * seg, (k + 1) * seg
+        fil.append(f"[{ult}][{3 + k}:v]overlay=0:0:enable='between(mod(t,{ciclo:.2f}),{a + 0.3:.2f},{b - 0.3:.2f})'[l{k}]")
+        ult = f'l{k}'
+    fil.append(f"[{ult}]fade=t=in:st=0:d=0.6,fade=t=out:st={T - 1.5:.2f}:d=1.5,format=yuv420p[vout]")
+    sh(['ffmpeg', '-y', '-v', 'error', *entradas, '-filter_complex', ';'.join(fil), '-map', '[vout]', '-map', '1:a',
+        '-t', f'{T:.2f}', *ENC, salida])
+    return T
+
 def tanpura(d, salida):
     """Fondo musical original: drone tipo tanpura (Sa-Pa-Sa), suave y sin voz."""
     propia = sorted(glob.glob(os.path.join(BASE, 'assets', 'music_fondo', '*.mp3')))
@@ -279,6 +384,7 @@ def montar(carpeta, generar_voz, tmp):
     g = json.load(open(os.path.join(carpeta, 'guion.json'), encoding='utf-8'))
     os.makedirs(tmp, exist_ok=True)
     partes, caps, t, avisos = [], [], 0.0, []
+    sin_fondo = []   # tramos con cancion: ahi no va la tanpura
     for i, e in enumerate(g['escenas']):
         n = e['n']; tipo = e.get('tipo', 'escena')
         img, es_video, de_banco = media_escena(carpeta, n, g['id'])
@@ -286,7 +392,7 @@ def montar(carpeta, generar_voz, tmp):
             avisos.append(f"escena {n:02d}: sin imagen/video propio, use {'un clip' if es_video else 'una imagen'} del banco")
         out = os.path.join(tmp, f'esc{n:02d}.mp4')
         audio = None
-        if tipo != 'silencio' and e.get('texto'):
+        if tipo not in ('silencio', 'cancion') and e.get('texto'):
             audio = os.path.join(carpeta, 'voz', f'{n:02d}.mp3')
             generar_voz(e['texto'], audio)
         if tipo == 'escena':
@@ -314,6 +420,9 @@ def montar(carpeta, generar_voz, tmp):
                 caps.append((t, e.get('capitulo_japa', 'मंत्र जाप 108')))
                 t += d
                 continue
+            elif tipo == 'cancion':
+                d = render_cancion(carpeta, e, g['id'], tmp, out)
+                sin_fondo.append((t, t + d))
             elif tipo == 'silencio':
                 png_tarjeta(e['capitulo'], e.get('filas', []), capa, e.get('pie'))
                 d = render_estatica(fondo, capa, None, float(e.get('segundos', 60)), out)
@@ -333,7 +442,8 @@ def montar(carpeta, generar_voz, tmp):
     bed = os.path.join(tmp, 'fondo.wav'); tanpura(total, bed)
     final = os.path.join(tmp, f"{g['id']}.mp4")
     sh(['ffmpeg', '-y', '-v', 'error', '-i', unido, '-i', bed, '-filter_complex',
-        "[1:a]volume=0.16[b];[0:a][b]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]",
+        "[1:a]volume=0.16" + ''.join(f",volume=0:enable='between(t,{a:.2f},{b:.2f})'" for a, b in sin_fondo)
+        + "[b];[0:a][b]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]",
         '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', final])
     # capitulos: YouTube pide el primero en 0:00, al menos 3 y de 10 s o mas
     limpio = []

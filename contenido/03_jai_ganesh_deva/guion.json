@@ -1,0 +1,88 @@
+{
+ "id": "03_jai_ganesh_deva",
+ "formato": "aarti",
+ "publicar": "2026-11-22T13:30:00Z",
+ "publicar_texto": "domingo 22 nov 2026, 7:00 pm hora de India",
+ "titulo": "जय गणेश देवा आरती | अर्थ सहित | Jai Ganesh Deva Aarti Lyrics & Meaning",
+ "categoria": "10",
+ "miniatura": {
+  "formato": "aarti",
+  "lineas": [
+   "जय गणेश देवा"
+  ],
+  "gancho": "आरती अर्थ सहित",
+  "insignia": "आरती",
+  "paleta": "azafran",
+  "imagen": "01"
+ },
+ "tags": [
+  "जय गणेश देवा",
+  "jai ganesh deva aarti",
+  "ganesh aarti",
+  "ganesh aarti lyrics",
+  "गणेश आरती",
+  "ganpati aarti",
+  "jai ganesh jai ganesh deva",
+  "aarti with lyrics",
+  "ganesha",
+  "गणेश जी की आरती"
+ ],
+ "escenas": [
+  {
+   "n": 1,
+   "capitulo": "आरती का परिचय",
+   "texto": "जय गणेश जय गणेश जय गणेश देवा। यह भगवान गणेश की सबसे लोकप्रिय आरतियों में से एक है, जो उत्तर भारत के बहुत से घरों में गाई जाती है। आज हम इस आरती की पंक्तियों का अर्थ समझेंगे, और फिर सब साथ मिलकर इसे गाएँगे।"
+  },
+  {
+   "n": 2,
+   "capitulo": "आरती का अर्थ",
+   "texto": "पहली पंक्ति में हम गणेश जी की जय बोलते हैं, जिनकी माता पार्वती और पिता महादेव हैं। फिर उनके रूप का वर्णन है, एक दाँत वाले, दया करने वाले, चार भुजाओं वाले, जिनके माथे पर सिंदूर सजता है, और जिनकी सवारी मूषक है। आगे भक्त पान, फल, मेवा और लड्डू का भोग लगाने की बात करते हैं, और बताते हैं कि संत उनकी सेवा करते हैं।"
+  },
+  {
+   "n": 3,
+   "capitulo": "आरती कैसे करें",
+   "texto": "आरती के लिए एक थाली में दीपक, फूल, थोड़ा सिंदूर और प्रसाद रखें। दीपक को गणेश जी के सामने, घड़ी की दिशा में, धीरे धीरे घुमाएँ, और साथ में आरती गाएँ। आरती के बाद प्रसाद सबमें बाँटें। अब आइए, साथ में गाते हैं।"
+  },
+  {
+   "n": 4,
+   "tipo": "cancion",
+   "capitulo": "आरती गायन",
+   "minutos": 8,
+   "seg_estrofa": 16,
+   "letras": [
+    {
+     "deva": "जय गणेश जय गणेश जय गणेश देवा\nमाता जाकी पार्वती पिता महादेवा",
+     "translit": "Jai Ganesh Jai Ganesh Jai Ganesh Deva, Mata Jaki Parvati Pita Mahadeva",
+     "sig": "हे गणेश देव, आपकी जय हो; आपकी माता पार्वती और पिता महादेव हैं"
+    },
+    {
+     "deva": "एक दन्त दयावन्त चार भुजा धारी\nमाथे सिन्दूर सोहे मूसे की सवारी",
+     "translit": "Ek Dant Dayavant Char Bhuja Dhari, Mathe Sindoor Sohe Moose Ki Sawari",
+     "sig": "एक दाँत वाले, दयालु, चार भुजाओं वाले; माथे पर सिंदूर और मूषक की सवारी"
+    },
+    {
+     "deva": "पान चढ़े फल चढ़े और चढ़े मेवा\nलड्डुअन का भोग लगे सन्त करें सेवा",
+     "translit": "Paan Chadhe Phal Chadhe Aur Chadhe Meva, Ladduan Ka Bhog Lage Sant Karen Seva",
+     "sig": "पान, फल और मेवा चढ़ते हैं; लड्डुओं का भोग लगता है और संत सेवा करते हैं"
+    },
+    {
+     "deva": "अन्धन को आँख देत कोढ़िन को काया\nबाँझन को पुत्र देत निर्धन को माया",
+     "translit": "Andhan Ko Aankh Det Kodhin Ko Kaya, Banjhan Ko Putra Det Nirdhan Ko Maya",
+     "sig": "भक्तों की आस्था: आप अंधों को दृष्टि, रोगी को स्वस्थ शरीर, निःसंतान को संतान और निर्धन को धन देते हैं"
+    },
+    {
+     "deva": "सूर श्याम शरण आए सफल कीजे सेवा\nमाता जाकी पार्वती पिता महादेवा",
+     "translit": "Soor Shyam Sharan Aaye Safal Keeje Seva, Mata Jaki Parvati Pita Mahadeva",
+     "sig": "सूर-श्याम आपकी शरण में आए हैं, उनकी सेवा सफल करें"
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "capitulo": "समापन",
+   "texto": "आरती के बाद, गणेश जी को प्रणाम करें, और प्रसाद सबमें बाँटें। बोलिए, गणपति बाप्पा मोरया!"
+  }
+ ],
+ "idioma": "hi",
+ "descripcion": "जय गणेश देवा आरती, हर पंक्ति के अर्थ के साथ, और फिर साथ में गाने के लिए पूरी आरती।\n\nजय गणेश जय गणेश जय गणेश देवा। माता जाकी पार्वती पिता महादेवा॥\nएक दन्त दयावन्त चार भुजा धारी। माथे सिन्दूर सोहे मूसे की सवारी॥\nपान चढ़े फल चढ़े और चढ़े मेवा। लड्डुअन का भोग लगे सन्त करें सेवा॥\nअन्धन को आँख देत कोढ़िन को काया। बाँझन को पुत्र देत निर्धन को माया॥\nसूर श्याम शरण आए सफल कीजे सेवा। माता जाकी पार्वती पिता महादेवा॥\n\nA traditional aarti to Lord Ganesha, with the meaning of each line in Hindi and the full aarti to sing along.\n\nआरती कैसे करें: थाली में दीपक, फूल, सिंदूर और प्रसाद; दीपक को घड़ी की दिशा में घुमाएँ।\n\n{CAPITULOS}\n\nकथन की आवाज़ और गायन AI टूल से बनाए गए हैं (गायन: Suno)। Narration voice and singing were created with AI tools (singing: Suno).\n\n#GaneshAarti #JaiGaneshDeva #Ganesha"
+}

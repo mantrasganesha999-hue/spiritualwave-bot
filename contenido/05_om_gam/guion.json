@@ -1,0 +1,74 @@
+{
+ "id": "05_om_gam",
+ "formato": "mantra",
+ "publicar": "2026-11-25T13:30:00Z",
+ "publicar_texto": "miercoles 25 nov 2026, 7:00 pm hora de India",
+ "titulo": "ॐ गं गणपतये नमः मंत्र जाप | अर्थ सहित | Om Gam Ganapataye Namah",
+ "categoria": "10",
+ "miniatura": {
+  "formato": "mantra",
+  "lineas": [
+   "ॐ गं गणपतये",
+   "नमः"
+  ],
+  "gancho": "अर्थ + मंत्र जाप",
+  "insignia": "मंत्र",
+  "paleta": "real",
+  "imagen": "01"
+ },
+ "tags": [
+  "ॐ गं गणपतये नमः",
+  "om gam ganapataye namah",
+  "om gan ganapataye namaha",
+  "ganesh mantra",
+  "ganesh mantra jaap",
+  "गणेश मंत्र",
+  "ganpati mantra",
+  "ganesha mantra meaning",
+  "मंत्र जाप",
+  "ganesha"
+ ],
+ "escenas": [
+  {
+   "n": 1,
+   "capitulo": "मंत्र का परिचय",
+   "texto": "ॐ गं गणपतये नमः। यह भगवान गणेश का एक छोटा, पर बहुत प्रिय मंत्र है। इसमें केवल चार शब्द हैं, इसलिए इसे कोई भी आसानी से याद कर सकता है। आज हम इसका अर्थ समझेंगे, और फिर शांति से इसका जाप सुनेंगे।"
+  },
+  {
+   "n": 2,
+   "capitulo": "मंत्र का अर्थ",
+   "texto": "ॐ, वह पवित्र ध्वनि है, जिससे लगभग हर मंत्र शुरू होता है। गं, गणेश जी का बीज मंत्र माना जाता है, यानी उनका मूल अक्षर। गणपतये का अर्थ है, गणों के स्वामी, यानी गणपति के लिए। और नमः का अर्थ है, नमन, प्रणाम। पूरे मंत्र का अर्थ है, ॐ, गणों के स्वामी गणपति को मेरा नमन।"
+  },
+  {
+   "n": 3,
+   "capitulo": "जाप कैसे करें",
+   "texto": "जाप के लिए एक शांत जगह चुनें। सीधे बैठें, और कुछ गहरी साँसें लें। अगर आपके पास माला है, तो हर मनके पर एक बार मंत्र बोलें। एक माला में एक सौ आठ मनके होते हैं। अगर माला नहीं है, तो बस इस वीडियो के साथ, मन ही मन जाप करें।"
+  },
+  {
+   "n": 4,
+   "tipo": "cancion",
+   "capitulo": "मंत्र जाप",
+   "minutos": 12,
+   "seg_estrofa": 20,
+   "letras": [
+    {
+     "deva": "ॐ गं गणपतये नमः",
+     "translit": "Om Gam Ganapataye Namah",
+     "sig": "ॐ, गणों के स्वामी गणपति को मेरा नमन"
+    },
+    {
+     "deva": "ॐ · गं · गणपतये · नमः",
+     "translit": "Om · Gam · Ganapataye · Namah",
+     "sig": "पवित्र ध्वनि · बीज मंत्र · गणपति के लिए · नमन"
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "capitulo": "समापन",
+   "texto": "जाप के बाद कुछ क्षण चुप बैठें, और मन की शांति को महसूस करें। जय श्री गणेश।"
+  }
+ ],
+ "idioma": "hi",
+ "descripcion": "भगवान गणेश का मंत्र ॐ गं गणपतये नमः, हर शब्द के अर्थ के साथ, और फिर शांत जाप।\n\nॐ गं गणपतये नमः\nOm Gam Ganapataye Namah\n\nअर्थ: ॐ, गणों के स्वामी गणपति को मेरा नमन। गं को गणेश जी का बीज मंत्र माना जाता है।\nMeaning: Om, salutations to Ganapati, the lord of the ganas. Gam is regarded as Ganesha's seed syllable.\n\nजाप कैसे करें: शांत जगह, सीधे बैठें; माला हो तो हर मनके पर एक बार (एक माला = 108)।\n\n{CAPITULOS}\n\nकथन की आवाज़ और गायन AI टूल से बनाए गए हैं (गायन: Suno)। Narration voice and singing were created with AI tools (singing: Suno).\n\n#OmGamGanapatayeNamah #GaneshMantra #Ganesha"
+}

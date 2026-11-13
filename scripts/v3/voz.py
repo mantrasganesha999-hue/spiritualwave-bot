@@ -27,9 +27,9 @@ def _elevenlabs(texto, salida):
         raise RuntimeError(f"ElevenLabs {r.status_code}: {r.text[:200]}")
     open(salida, 'wb').write(r.content)
 
-def _azure(texto, salida, rate='-6%'):
+def _azure(texto, salida, rate='-6%', voz=None):
     region = os.environ.get('AZURE_SPEECH_REGION') or 'centralindia'
-    ssml = (f"<speak version='1.0' xml:lang='hi-IN'><voice name='{VOZ_AZURE}'><prosody rate='{rate}'>"
+    ssml = (f"<speak version='1.0' xml:lang='hi-IN'><voice name='{voz or VOZ_AZURE}'><prosody rate='{rate}'>"
             f"{html.escape(texto)}</prosody></voice></speak>")
     r = requests.post(f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1",
                       headers={'Ocp-Apim-Subscription-Key': os.environ['AZURE_SPEECH_KEY'],
@@ -40,13 +40,13 @@ def _azure(texto, salida, rate='-6%'):
         raise RuntimeError(f"Azure {r.status_code}: {r.text[:200]}")
     open(salida, 'wb').write(r.content)
 
-def _edge(texto, salida, rate='-6%'):
+def _edge(texto, salida, rate='-6%', voz=None):
     import edge_tts
     async def go():
-        await edge_tts.Communicate(texto, VOZ_EDGE, rate=rate).save(salida)
+        await edge_tts.Communicate(texto, voz or VOZ_EDGE, rate=rate).save(salida)
     asyncio.run(go())
 
-def generar(texto, salida, rate='-6%'):
+def generar(texto, salida, rate='-6%', voz=None):
     """Genera salida (mp3) si no existe. Devuelve el motor usado ('propia' si ya existia)."""
     if os.path.exists(salida) and os.path.getsize(salida) > 1000:
         return 'propia'
@@ -61,7 +61,7 @@ def generar(texto, salida, rate='-6%'):
             continue
         for intento in range(3):
             try:
-                {'elevenlabs': _elevenlabs, 'azure': lambda t, s: _azure(t, s, rate), 'edge': lambda t, s: _edge(t, s, rate)}[mm](texto, salida)
+                {'elevenlabs': _elevenlabs, 'azure': lambda t, s: _azure(t, s, rate, voz), 'edge': lambda t, s: _edge(t, s, rate, voz)}[mm](texto, salida)
                 if os.path.getsize(salida) > 1000:
                     return mm
             except Exception as e:

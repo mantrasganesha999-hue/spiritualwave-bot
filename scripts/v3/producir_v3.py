@@ -15,6 +15,9 @@ except Exception:
 BASE = montaje.BASE
 SOLO = (os.environ.get('CARPETA') or '').strip()
 PERMITIR_BANCO = (os.environ.get('PERMITIR_BANCO') or '') == '1'
+# Voces elegidas en el casting: hombre (Madhur) lento para historias y mantras, mujer (Swara) normal para aarti y chaturthi.
+VOCES = {'katha': ('hi-IN-MadhurNeural', '-14%'), 'mantra': ('hi-IN-MadhurNeural', '-14%'),
+         'aarti': ('hi-IN-SwaraNeural', '-6%'), 'chaturthi': ('hi-IN-SwaraNeural', '-6%')}
 PLAYLISTS = {'katha': 'गणेश जी की कथाएँ | Ganesh Katha', 'mantra': 'गणेश मंत्र 108 जाप | Mantra Jaap',
              'chaturthi': 'चतुर्थी व्रत और पूजा विधि', 'aarti': 'गणेश आरती अर्थ सहित'}
 
@@ -37,7 +40,7 @@ def youtube():
 def faltantes(carpeta, g):
     falta = []
     for e in g['escenas']:
-        if e.get('tipo', 'escena') == 'silencio' and not e.get('usa_imagen', True):
+        if e.get('tipo', 'escena') in ('cancion',) or (e.get('tipo') == 'silencio' and not e.get('usa_imagen', True)):
             continue
         if not any(os.path.exists(os.path.join(carpeta, 'imagenes', f"{e['n']:02d}.{x}")) for x in ('png', 'jpg', 'jpeg', 'webp', 'mp4', 'mov', 'webm', 'm4v')):
             falta.append(f"{e['n']:02d}")
@@ -101,15 +104,26 @@ def subir(yt, archivo, portada, g, descripcion):
 
 def producir(carpeta):
     g = json.load(open(os.path.join(carpeta, 'guion.json'), encoding='utf-8'))
+    if any(e.get('tipo') == 'cancion' for e in g['escenas']) and not montaje.canciones(carpeta):
+        marca = os.path.join(carpeta, 'musica', 'aviso_enviado.txt')
+        if not os.path.exists(marca):   # se avisa una sola vez
+            avisar(f"⏸ <b>{g['id']}</b>: falta la cancion de Suno. Guarda el MP3 en contenido\\{g['id']}\\musica\\ (ver PROMPT_SUNO.txt).")
+            os.makedirs(os.path.dirname(marca), exist_ok=True); open(marca, 'w').write('aviso enviado\n')
+        return False
     falta = faltantes(carpeta, g)
-    if falta and not PERMITIR_BANCO:
+    # Sin ningun clip/imagen propio -> se hace con los clips de Ganesha del canal (no se espera).
+    # Con algunos propios pero incompletos -> se espera a que esten todos.
+    visuales = [e for e in g['escenas'] if e.get('tipo') != 'cancion']
+    if falta and len(falta) < len(visuales) and not PERMITIR_BANCO:
         avisar(f"⏸ <b>{g['id']}</b>: faltan imagenes {', '.join(falta)}. Ponlas en contenido/{g['id']}/imagenes/ y vuelve a subir.")
         return False
     tmp = os.path.join('/tmp', 'v3_' + g['id'])
     shutil.rmtree(tmp, ignore_errors=True)
     motores = set()
+    v_nombre, v_rate = VOCES.get(g.get('formato'), VOCES['katha'])
+    v_nombre, v_rate = g.get('voz_edge', v_nombre), g.get('voz_rate', v_rate)
     def gen(texto, salida):
-        motores.add(voz.generar(texto, salida))
+        motores.add(voz.generar(texto, salida, v_rate, v_nombre))
     final, capitulos, total, img_portada, avisos = montaje.montar(carpeta, gen, tmp)
     m = g.get('miniatura', {})
     portada = os.path.join(tmp, 'portada.jpg')
