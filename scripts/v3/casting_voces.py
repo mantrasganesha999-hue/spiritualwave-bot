@@ -36,6 +36,15 @@ if key:
 else:
     print("(Sin ELEVENLABS_API_KEY: solo se generan las voces de Microsoft)")
 print("\nVoces generadas:"); [print("  ", h) for h in hechos]
+tok, chat = os.environ.get('TELEGRAM_BOT_TOKEN'), os.environ.get('TELEGRAM_CHAT_ID')
+if tok and chat and hechos:
+    requests.post(f"https://api.telegram.org/bot{tok}/sendMessage", data={'chat_id': chat,
+                  'text': "🎙 CASTING DE VOCES (hindi). Escucha y dime en el chat cual quieres:"}, timeout=60)
+    for n in hechos:
+        with open(os.path.join(OUT, n), 'rb') as f:
+            r = requests.post(f"https://api.telegram.org/bot{tok}/sendAudio", data={'chat_id': chat, 'caption': n[:-4],
+                              'title': n[:-4]}, files={'audio': (n, f, 'audio/mpeg')}, timeout=120)
+        print("Telegram", n, r.status_code)
 print(f"\nCarpeta: {OUT}")
-if os.name == 'nt':
+if os.name == 'nt' and hechos:
     subprocess.Popen(['explorer', OUT])
