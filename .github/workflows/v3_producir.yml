@@ -1,9 +1,9 @@
 name: SpiritualWave Videos Nuevos (v3)
 
 on:
-  push:
-    branches: [master]
-    paths: ['contenido/**']
+  schedule:
+    # 08:05 UTC = 3:05 am Colombia: justo despues de que se renueva la cuota de YouTube (antes de la tarea nocturna)
+    - cron: '5 8 * * *'
   workflow_dispatch:
     inputs:
       carpeta:
