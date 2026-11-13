@@ -39,7 +39,7 @@ def faltantes(carpeta, g):
     for e in g['escenas']:
         if e.get('tipo', 'escena') == 'silencio' and not e.get('usa_imagen', True):
             continue
-        if not any(os.path.exists(os.path.join(carpeta, 'imagenes', f"{e['n']:02d}.{x}")) for x in ('png', 'jpg', 'jpeg', 'webp')):
+        if not any(os.path.exists(os.path.join(carpeta, 'imagenes', f"{e['n']:02d}.{x}")) for x in ('png', 'jpg', 'jpeg', 'webp', 'mp4', 'mov', 'webm', 'm4v')):
             falta.append(f"{e['n']:02d}")
     return falta
 

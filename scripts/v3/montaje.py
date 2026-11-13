@@ -20,20 +20,59 @@ def dur(p):
                        capture_output=True, text=True)
     return float(r.stdout.strip())
 
-def banco_ganesha():
-    imgs = sorted(glob.glob(os.path.join(BASE, 'assets', 'backgrounds', 'ganesha*.jpg')))
-    return imgs
+EXT_IMG = ('png', 'jpg', 'jpeg', 'webp')
+EXT_VID = ('mp4', 'mov', 'webm', 'm4v')
 
-def imagen_escena(carpeta, n, semilla):
-    for ext in ('png', 'jpg', 'jpeg', 'webp'):
+def banco_ganesha():
+    return sorted(glob.glob(os.path.join(BASE, 'assets', 'backgrounds', 'ganesha*.jpg')))
+
+def banco_clips():
+    return sorted(glob.glob(os.path.join(BASE, 'assets', 'videos_ganesha_horizontal', '*.mp4')))
+
+def media_escena(carpeta, n, semilla):
+    """Devuelve (ruta, es_video, de_banco). Prioridad: video propio > imagen propia > clip del banco > imagen del banco."""
+    for ext in EXT_VID:
         p = os.path.join(carpeta, 'imagenes', f'{n:02d}.{ext}')
         if os.path.exists(p):
-            return p, False
+            return p, True, False
+    for ext in EXT_IMG:
+        p = os.path.join(carpeta, 'imagenes', f'{n:02d}.{ext}')
+        if os.path.exists(p):
+            return p, False, False
+    random.seed(f"{semilla}-{n}")
+    clips = banco_clips()
+    if clips:
+        return random.choice(clips), True, True
     banco = banco_ganesha()
     if not banco:
-        raise RuntimeError(f"Falta imagenes/{n:02d}.png y no hay banco de imagenes")
-    random.seed(f"{semilla}-{n}")
-    return random.choice(banco), True
+        raise RuntimeError(f"Falta imagenes/{n:02d} y no hay banco de imagenes ni clips")
+    return random.choice(banco), False, True
+
+def imagen_escena(carpeta, n, semilla):
+    """Compatibilidad: siempre una imagen fija (para fondos y portadas)."""
+    p, es_video, banco = media_escena(carpeta, n, semilla)
+    return p, banco
+
+def fotograma(video, salida, t=1.0):
+    sh(['ffmpeg', '-y', '-v', 'error', '-ss', str(t), '-i', video, '-frames:v', '1', '-q:v', '2', salida])
+    return salida
+
+def fija(media, es_video, tmp, nombre):
+    return fotograma(media, os.path.join(tmp, nombre)) if es_video else media
+
+def preparar_clip(video, tmp, i):
+    """Clip corto -> bucle suave ida y vuelta (sin saltos), 1920x1080, 25 fps, sin audio, un poco mas lento."""
+    ida = os.path.join(tmp, f'clip{i}_ida.mp4'); vuelta = os.path.join(tmp, f'clip{i}_vuelta.mp4')
+    bucle = os.path.join(tmp, f'clip{i}_bucle.mp4')
+    sh(['ffmpeg', '-y', '-v', 'error', '-i', video, '-t', '8', '-an', '-vf',
+        f'scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setpts=1.25*PTS,eq=saturation=1.12',
+        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '19', '-pix_fmt', 'yuv420p', ida])
+    sh(['ffmpeg', '-y', '-v', 'error', '-i', ida, '-vf', 'reverse', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '19',
+        '-pix_fmt', 'yuv420p', vuelta])
+    lst = os.path.join(tmp, f'clip{i}.txt')
+    open(lst, 'w').write(f"file '{ida}'\nfile '{vuelta}'\n")
+    sh(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', lst, '-c', 'copy', bucle])
+    return bucle
 
 # ---------- piezas graficas (PNG transparentes) ----------
 def png_subtitulo(texto, salida):
@@ -134,11 +173,14 @@ def kenburns(i):
         return "zoompan=z='min(1+0.00045*on,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1920x1080:fps=25"
     return "zoompan=z='max(1.12-0.00045*on,1.0)':x='iw/2-(iw/zoom/2)':y='ih/3-(ih/zoom/3)':d=1:s=1920x1080:fps=25"
 
-def render_escena(i, img, audio, texto, capitulo, tmp, salida):
+def render_escena(i, img, audio, texto, capitulo, tmp, salida, es_video=False):
     d = dur(audio) + 0.8
     subs = trozos(texto)
     total_c = sum(len(s) for s in subs) or 1
-    entradas = ['-loop', '1', '-framerate', str(FPS), '-t', f'{d:.2f}', '-i', img, '-i', audio]
+    if es_video:
+        entradas = ['-stream_loop', '-1', '-i', preparar_clip(img, tmp, i), '-i', audio]
+    else:
+        entradas = ['-loop', '1', '-framerate', str(FPS), '-t', f'{d:.2f}', '-i', img, '-i', audio]
     capas = []
     png_chip(capitulo, os.path.join(tmp, f'chip{i}.png'))
     capas.append((os.path.join(tmp, f'chip{i}.png'), 0, 0.4, 4.5))
@@ -149,8 +191,11 @@ def render_escena(i, img, audio, texto, capitulo, tmp, salida):
         dt = util * len(s) / total_c
         capas.append((p, H - 300, t, t + dt))
         t += dt
-    fil = [f"[0:v]scale=2304:1296:force_original_aspect_ratio=increase,crop=2304:1296,{kenburns(i)},"
-           f"eq=saturation=1.15,format=rgba[v0]"]
+    if es_video:
+        fil = [f"[0:v]setpts=PTS-STARTPTS,format=rgba[v0]"]
+    else:
+        fil = [f"[0:v]scale=2304:1296:force_original_aspect_ratio=increase,crop=2304:1296,{kenburns(i)},"
+               f"eq=saturation=1.15,format=rgba[v0]"]
     # degradado inferior para leer los subtitulos
     grad = os.path.join(tmp, 'grad.png')
     if not os.path.exists(grad):
@@ -236,18 +281,18 @@ def montar(carpeta, generar_voz, tmp):
     partes, caps, t, avisos = [], [], 0.0, []
     for i, e in enumerate(g['escenas']):
         n = e['n']; tipo = e.get('tipo', 'escena')
-        img, de_banco = imagen_escena(carpeta, n, g['id'])
+        img, es_video, de_banco = media_escena(carpeta, n, g['id'])
         if de_banco:
-            avisos.append(f"escena {n:02d}: sin imagen propia, use una del banco")
+            avisos.append(f"escena {n:02d}: sin imagen/video propio, use {'un clip' if es_video else 'una imagen'} del banco")
         out = os.path.join(tmp, f'esc{n:02d}.mp4')
         audio = None
         if tipo != 'silencio' and e.get('texto'):
             audio = os.path.join(carpeta, 'voz', f'{n:02d}.mp3')
             generar_voz(e['texto'], audio)
         if tipo == 'escena':
-            d = render_escena(i, img, audio, e['texto'], e['capitulo'], tmp, out)
+            d = render_escena(i, img, audio, e['texto'], e['capitulo'], tmp, out, es_video)
         else:
-            fondo = os.path.join(tmp, f'fondo{n:02d}.jpg'); fondo_borroso(img, fondo)
+            fondo = os.path.join(tmp, f'fondo{n:02d}.jpg'); fondo_borroso(fija(img, es_video, tmp, f'fija{n:02d}.jpg'), fondo)
             capa = os.path.join(tmp, f'capa{n:02d}.png')
             if tipo == 'tarjeta':
                 png_tarjeta(e.get('titulo_tarjeta', e['capitulo']), e['filas'], capa, e.get('pie'))
@@ -298,5 +343,6 @@ def montar(carpeta, generar_voz, tmp):
         limpio.append((s, c))
     capitulos = '\n'.join(f"{mmss(s)} {c}" for s, c in limpio) if len(limpio) >= 3 else ''
     mini = g.get('miniatura', {}).get('imagen')
-    img_portada = imagen_escena(carpeta, int(mini), g['id'])[0] if mini else imagen_escena(carpeta, 1, g['id'])[0]
+    pm, pv_es, _ = media_escena(carpeta, int(mini) if mini else 1, g['id'])
+    img_portada = fija(pm, pv_es, tmp, 'portada_base.jpg')
     return final, capitulos, total, img_portada, avisos

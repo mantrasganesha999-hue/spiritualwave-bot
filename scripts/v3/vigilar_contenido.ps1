@@ -1,5 +1,5 @@
 # Corre sola cada 20 minutos. Para cada video en contenido\ que aun no se subio:
-# toma las imagenes que guardaste en su carpeta imagenes\ (con cualquier nombre), las ordena por el orden en que
+# toma las imagenes o videos cortos que guardaste en su carpeta imagenes\ (con cualquier nombre), las ordena por el orden en que
 # las guardaste, las renombra 01, 02, 03... y, cuando estan todas, las sube a GitHub para que el video se monte solo.
 Set-Location C:\SpiritualWave
 $log = 'C:\SpiritualWave\logs\vigilar.log'
@@ -12,7 +12,7 @@ foreach ($c in Get-ChildItem contenido -Directory) {
     New-Item -ItemType Directory -Force $carpImg | Out-Null
     $g = Get-Content $guion -Raw -Encoding UTF8 | ConvertFrom-Json
     $nesc = @($g.escenas).Count
-    $imgs = @(Get-ChildItem $carpImg -File | Where-Object { $_.Extension -match '^\.(png|jpe?g|webp)$' } | Sort-Object LastWriteTime, Name)
+    $imgs = @(Get-ChildItem $carpImg -File | Where-Object { $_.Extension -match '^\.(png|jpe?g|webp|mp4|mov|webm|m4v)$' } | Sort-Object LastWriteTime, Name)
     if ($imgs.Count -eq 0) { continue }
     # renombrar en orden si hace falta (las que no se llaman 01, 02...)
     $todasNumeradas = ($imgs | Where-Object { $_.BaseName -notmatch '^\d{2}$' }).Count -eq 0

@@ -1,37 +1,41 @@
-DESCRIPCIONES DE IMAGEN - 01 Janm
-Genera UNA imagen por escena, horizontal 16:9 (minimo 1920x1080) y guardala como imagenes\01.png ... imagenes\11.png
-Usa el mismo estilo en todas. La imagen 10 se usa tambien de fondo para la miniatura.
+ESCENAS DEL VIDEO 01 - Nacimiento de Ganesha (11 escenas)
 
-===== IMAGEN 01  ->  imagenes\01.png =====
+Para cada escena descarga UN VIDEO CORTO (mejor, 5 a 10 segundos, horizontal 16:9) o una imagen.
+Puedes generarlo con tu app de video IA usando la descripcion de abajo (o la imagen y luego animarla).
+Guardalos EN ORDEN (primero la escena 1, luego la 2...) en esta carpeta: imagenes\  -- con cualquier nombre.
+El sistema los ordena, los pone en bucle suave, agrega la voz, subtitulos y musica, y sube el video solo.
+Si una escena no tiene video propio, se usa un clip de Ganesha del canal.
+
+===== ESCENA 01: शुरुआत =====
 Lord Ganesha seated on a lotus throne in a glowing Himalayan temple, gentle smile, four arms, holding a modak, golden halo, mist and soft light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 02  ->  imagenes\02.png =====
+===== ESCENA 02: कैलाश पर्वत =====
 Snowy Mount Kailash at sunrise, Lord Shiva in meditation and Goddess Parvati seated beside him, attendants (ganas) in the distance, serene atmosphere. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 03  ->  imagenes\03.png =====
+===== ESCENA 03: उबटन से बालक =====
 Goddess Parvati gently shaping a small radiant boy from golden turmeric paste, the boy coming to life with a soft glow, palace interior with oil lamps. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 04  ->  imagenes\04.png =====
+===== ESCENA 04: द्वार की रक्षा =====
 A brave young boy with a wooden staff standing guard at a grand carved palace doorway on Mount Kailash, determined expression, warm evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 05  ->  imagenes\05.png =====
+===== ESCENA 05: शिव जी का आगमन =====
 Lord Shiva with trident and crescent moon arriving at the palace door, the young boy blocking the way with his staff, tense but respectful moment. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 06  ->  imagenes\06.png =====
+===== ESCENA 06: युद्ध =====
 Dramatic sky over Mount Kailash, Shiva's ganas falling back before the small boy guarding the door, Lord Shiva raising his trident, swirling clouds, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 07  ->  imagenes\07.png =====
+===== ESCENA 07: माता का दुख =====
 Goddess Parvati in grief turning into fierce power, glowing eyes, the gods bowing before her asking forgiveness, stormy divine light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 08  ->  imagenes\08.png =====
+===== ESCENA 08: देवताओं की प्रार्थना =====
 Narada and the gods with folded hands praying before a fierce glowing Goddess Parvati, sages around, divine light breaking through clouds. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 09  ->  imagenes\09.png =====
+===== ESCENA 09: हाथी का सिर =====
 Shiva's ganas returning through misty northern forests carrying the head of a one-tusked elephant, Lord Shiva waiting, sacred atmosphere, no gore. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 10  ->  imagenes\10.png =====
+===== ESCENA 10: प्रथम पूज्य =====
 Young Lord Ganesha with elephant head embraced by Parvati, Shiva blessing him, Brahma and Vishnu showering flowers from the sky, festive divine glow. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
-===== IMAGEN 11  ->  imagenes\11.png =====
+===== ESCENA 11: कथा की सीख =====
 Families in India celebrating Ganesha with diyas, flowers and modaks before a Ganesha idol at home, warm festive evening light. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark
 
