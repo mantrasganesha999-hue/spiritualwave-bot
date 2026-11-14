@@ -1,0 +1,96 @@
+{
+ "id": "06_chandra_katha",
+ "formato": "katha",
+ "idioma": "hi",
+ "publicar": "2026-11-29T13:30:00Z",
+ "publicar_texto": "domingo 29 nov 2026, 7:00 pm hora de India",
+ "titulo": "गणेश चतुर्थी पर चाँद क्यों नहीं देखते? | चंद्रमा को श्राप की कथा | Ganesh Katha",
+ "categoria": "27",
+ "miniatura": {
+  "formato": "katha",
+  "lineas": [
+   "चाँद क्यों",
+   "नहीं देखते?"
+  ],
+  "gancho": "चंद्रमा को श्राप",
+  "insignia": "कथा",
+  "paleta": "jade",
+  "imagen": "05"
+ },
+ "tags": [
+  "गणेश जी की कथा",
+  "चंद्रमा श्राप कथा",
+  "ganesh chaturthi chand kyon nahi dekhte",
+  "ganesha moon story",
+  "ganesh ji aur chandrama",
+  "syamantak mani katha",
+  "स्यमंतक मणि",
+  "ganesh katha in hindi",
+  "ganesha",
+  "गणेश"
+ ],
+ "fuente": "पुराण और लोक परंपरा; स्यमंतक मणि: भागवत पुराण, दशम स्कंध",
+ "escenas": [
+  {
+   "n": 1,
+   "capitulo": "सवाल",
+   "texto": "संकष्टी चतुर्थी पर हम रात को चंद्रमा को अर्घ्य देते हैं। पर भाद्रपद महीने की गणेश चतुर्थी पर, बड़े बुज़ुर्ग कहते हैं, आज चाँद मत देखना। ऐसा क्यों? एक ही गणेश जी, एक ही चतुर्थी, फिर चंद्रमा के लिए दो अलग नियम क्यों? इसके पीछे एक बहुत रोचक कथा है, जो पुराणों और लोक परंपरा में अलग-अलग रूपों में मिलती है। आइए, आज वह कथा सुनते हैं।",
+   "prompt_imagen": "Night sky over an Indian village with a bright full moon, a grandmother pointing upward while children look curious, oil lamps glowing. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 2,
+   "capitulo": "गणेश जी का जन्मदिन",
+   "texto": "कहते हैं, भाद्रपद महीने की शुक्ल चतुर्थी, गणेश जी का जन्मदिन था। उस दिन हर घर में उनकी पूजा हुई, और भक्तों ने बड़े प्रेम से मोदक और लड्डू का भोग लगाया। गणेश जी किसी भक्त का मन नहीं तोड़ना चाहते थे। इसलिए वे घर-घर गए, और हर जगह प्रेम से प्रसाद ग्रहण किया। रात होते-होते, उन्होंने इतने मोदक खा लिए, कि उनका पेट पहले से भी बड़ा हो गया।",
+   "prompt_imagen": "Joyful Lord Ganesha visiting devotees' homes, plates full of modaks and laddoos, families bowing with love, festive lamps. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 3,
+   "capitulo": "मूषक की सवारी",
+   "texto": "आधी रात को गणेश जी अपने वाहन, मूषक पर बैठकर, कैलाश की ओर लौट रहे थे। चाँदनी रात थी, और जंगल का रास्ता शांत था। अचानक रास्ते में एक साँप आ गया। मूषक डर गया, और उछलकर रुक गया। भारी पेट वाले गणेश जी अपना संतुलन नहीं संभाल पाए, और ज़मीन पर गिर पड़े। गिरते ही उनका पेट फट गया, और सारे मोदक इधर-उधर बिखर गए।",
+   "prompt_imagen": "Lord Ganesha riding his small mouse through a moonlit forest path, a snake appears on the road, the startled mouse jumps. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 4,
+   "capitulo": "साँप की पेटी",
+   "texto": "गणेश जी ने शांति से सारे मोदक उठाए, और वापस अपने पेट में रख लिए। फिर उसी साँप को पकड़ा, और उसे पेटी की तरह अपने पेट पर बाँध लिया, ताकि पेट फिर न खुले। इसीलिए कई चित्रों में, आप गणेश जी के पेट पर साँप बँधा हुआ देखते हैं। सब कुछ ठीक हो गया था। पर तभी, ऊपर आकाश से हँसी की आवाज़ आई।",
+   "prompt_imagen": "Lord Ganesha calmly tying a serpent around his belly like a belt, modaks gathered around him, gentle moonlight. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 5,
+   "capitulo": "चंद्रमा की हँसी",
+   "texto": "वह हँसी चंद्रमा की थी। चंद्रमा को अपनी सुंदरता पर बहुत घमंड था। उसने गणेश जी को गिरते देखा, और उनके बड़े पेट और हाथी के सिर का मज़ाक उड़ाते हुए ज़ोर-ज़ोर से हँसने लगा। गणेश जी ने ऊपर देखा। उन्हें गिरने का दुख नहीं था, पर किसी के रूप का मज़ाक उड़ाना, उन्हें बिल्कुल अच्छा नहीं लगा।",
+   "prompt_imagen": "A proud glowing moon deity laughing in the night sky, Lord Ganesha looking upward with a serious expression. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 6,
+   "capitulo": "श्राप",
+   "texto": "गणेश जी ने चंद्रमा से कहा, तुम्हें अपनी सुंदरता पर इतना घमंड है, और तुम दूसरों का मज़ाक उड़ाते हो। इसलिए आज से, जो भी इस चतुर्थी की रात तुम्हें देखेगा, उस पर झूठा कलंक लगेगा, यानी उस पर ऐसा दोष लगेगा, जो उसने किया ही नहीं। यह सुनते ही चंद्रमा का घमंड टूट गया। उसकी रोशनी फीकी पड़ गई, और वह शर्म से छिप गया।",
+   "prompt_imagen": "Lord Ganesha raising his hand to pronounce a curse, the moon dimming and hiding behind clouds in shame, dramatic sky. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 7,
+   "capitulo": "चंद्रमा की क्षमा",
+   "texto": "चंद्रमा गणेश जी के पास आया, और हाथ जोड़कर क्षमा माँगी। देवताओं ने भी गणेश जी से प्रार्थना की। गणेश जी दयालु हैं। उन्होंने कहा, मेरा वचन पूरी तरह वापस नहीं हो सकता, पर मैं इसे छोटा कर देता हूँ। यह कलंक केवल भाद्रपद शुक्ल चतुर्थी की रात तक रहेगा। बाकी हर दिन लोग तुम्हें प्रेम से देखेंगे। और संकष्टी चतुर्थी पर, लोग तुम्हारे दर्शन करके ही अपना व्रत खोलेंगे। इसीलिए संकष्टी पर चंद्रमा की पूजा होती है।",
+   "prompt_imagen": "The moon deity with folded hands seeking forgiveness before a compassionate Lord Ganesha, devas praying in the background. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 8,
+   "capitulo": "श्री कृष्ण और स्यमंतक मणि",
+   "texto": "कहते हैं, यह श्राप स्वयं भगवान श्री कृष्ण पर भी लगा। एक बार उन्होंने अनजाने में, इसी चतुर्थी की रात चंद्रमा देख लिया। कुछ समय बाद, स्यमंतक नाम की एक कीमती मणि चोरी हो गई, और लोगों ने बिना सबूत के, श्री कृष्ण पर ही चोरी का आरोप लगा दिया। श्री कृष्ण ने यह कलंक मिटाने के लिए, मणि को खोजा, और जाम्बवान से मिलकर, वह मणि वापस लाकर सबके सामने लौटा दी। स्यमंतक मणि की यह कथा, भागवत पुराण के दशम स्कंध में मिलती है।",
+   "prompt_imagen": "Lord Krishna holding a radiant Syamantaka jewel, meeting the bear-king Jambavan in a cave, warm divine glow. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 9,
+   "capitulo": "अगर चाँद दिख जाए तो?",
+   "texto": "परंपरा में माना जाता है, कि अगर गणेश चतुर्थी की रात अनजाने में चाँद दिख जाए, तो घबराना नहीं चाहिए। लोग गणेश जी से क्षमा माँगते हैं, और स्यमंतक मणि की कथा सुनते या पढ़ते हैं। इस कथा की सबसे सुंदर सीख यह है, कि किसी के रूप या कमज़ोरी पर हँसना नहीं चाहिए, और घमंड हमेशा टूटता है।",
+   "prompt_imagen": "A family sitting together by an oil lamp, an elder reading a sacred book aloud, a small Ganesha idol, peaceful night. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  },
+  {
+   "n": 10,
+   "capitulo": "समापन",
+   "texto": "तो याद रखिए, संकष्टी चतुर्थी पर चंद्रमा को अर्घ्य दें, और भाद्रपद की गणेश चतुर्थी पर, चंद्र दर्शन से बचें। अगर आपको यह कथा अच्छी लगी, तो इसे अपने परिवार के साथ ज़रूर साझा करें। जय श्री गणेश।",
+   "prompt_imagen": "Lord Ganesha smiling and blessing, crescent moon softly glowing behind him, lotus flowers, serene night. Traditional Indian devotional painting style, rich warm colors, soft golden divine light, highly detailed, cinematic composition, 16:9, no text, no letters, no watermark"
+  }
+ ],
+ "descripcion": "भाद्रपद की गणेश चतुर्थी पर चाँद देखना क्यों वर्जित माना जाता है, और संकष्टी पर चंद्रमा को अर्घ्य क्यों दिया जाता है? गणेश जी, मूषक, साँप और चंद्रमा की हँसी की कथा, और श्री कृष्ण पर लगे स्यमंतक मणि के झूठे कलंक की कथा।\n\nध्यान दें: यह कथा पुराणों और लोक परंपरा में अलग-अलग रूपों में मिलती है। स्यमंतक मणि की कथा भागवत पुराण (दशम स्कंध) में है।\n\n{CAPITULOS}\n\nWhy is seeing the moon avoided on Ganesh Chaturthi? The story of Ganesha and the Moon, narrated in Hindi.\n\nइस वीडियो की आवाज़ और चित्र AI टूल से बनाए गए हैं। Voice and images were created with AI tools.\n\n#GaneshKatha #Ganesha #GaneshChaturthi"
+}
