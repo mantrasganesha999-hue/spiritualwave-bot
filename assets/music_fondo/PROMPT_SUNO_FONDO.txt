@@ -1,0 +1,17 @@
+MUSICA DE FONDO (INSTRUMENTAL) PARA LAS KATHAS Y LAS GUIAS
+Suena debajo de la voz durante todo el video: bajita cuando hablan, fuerte en las pausas.
+
+1) Abre Suno -> Create -> activa 'Custom' y activa 'Instrumental' (sin voz).  Con el plan PAGO activo.
+2) Pega cada ESTILO en 'Style of Music'. La letra queda vacia. Genera.
+3) De cada estilo descarga LAS DOS versiones en MP3 (asi quedan 6 pistas distintas).
+4) Guardalas (con cualquier nombre) en:  C:\SpiritualWave\assets\music_fondo\
+   Listo: el sistema las sube solo y las usa en todas las kathas y guias, rotando para que no se repitan.
+
+===== ESTILO 1: Flauta del templo =====
+instrumental Indian devotional background music, soft bansuri flute melody, sitar, tanpura drone, gentle tabla, temple bells, 70 bpm, peaceful and warm, no vocals, cinematic, loopable
+
+===== ESTILO 2: Santoor de la manana =====
+instrumental Indian classical morning raga, santoor and bansuri, tanpura drone, light hand percussion, 65 bpm, calm and uplifting, no vocals, meditative
+
+===== ESTILO 3: Cuento mitologico =====
+instrumental cinematic Indian mythology storytelling score, sarangi and bansuri, soft strings, tanpura, slow frame drum, 60 bpm, mystical and emotional, no vocals, gentle dynamics

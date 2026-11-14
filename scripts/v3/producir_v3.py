@@ -110,6 +110,17 @@ def producir(carpeta):
             avisar(f"⏸ <b>{g['id']}</b>: falta la cancion de Suno. Guarda el MP3 en contenido\\{g['id']}\\musica\\ (ver PROMPT_SUNO.txt).")
             os.makedirs(os.path.dirname(marca), exist_ok=True); open(marca, 'w').write('aviso enviado\n')
         return False
+    # Katha/guia (sin cancion propia): esperar las instrumentales de Suno (assets/music_fondo) hasta 3 dias
+    # antes de la fecha de publicacion; despues se monta igual con la tanpura para no llegar tarde.
+    if not montaje.canciones(carpeta) and not montaje.musicas_fondo() and g.get('publicar'):
+        dias = (datetime.fromisoformat(g['publicar'].replace('Z', '+00:00')) - datetime.now(timezone.utc)).days
+        if dias > 3:
+            marca = os.path.join(carpeta, 'musica', 'aviso_fondo.txt')
+            if not os.path.exists(marca):
+                avisar(f"⏸ <b>{g['id']}</b>: espero la musica de fondo de Suno (assets\\music_fondo, ver PROMPT_SUNO_FONDO.txt). "
+                       f"Si no llega, se monta igual con tanpura {dias - 3} dias antes de publicarse.")
+                os.makedirs(os.path.dirname(marca), exist_ok=True); open(marca, 'w').write('aviso enviado\n')
+            return False
     falta = faltantes(carpeta, g)
     # Sin ningun clip/imagen propio -> se hace con los clips de Ganesha del canal (no se espera).
     # Con algunos propios pero incompletos -> se espera a que esten todos.

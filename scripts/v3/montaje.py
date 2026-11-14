@@ -359,11 +359,6 @@ def render_cancion(carpeta, e, semilla, tmp, salida):
 
 def tanpura(d, salida):
     """Fondo musical original: drone tipo tanpura (Sa-Pa-Sa), suave y sin voz."""
-    propia = sorted(glob.glob(os.path.join(BASE, 'assets', 'music_fondo', '*.mp3')))
-    if propia:
-        sh(['ffmpeg', '-y', '-v', 'error', '-stream_loop', '-1', '-i', random.choice(propia), '-t', f'{d:.2f}',
-            '-af', f'afade=t=in:d=3,afade=t=out:st={max(0, d - 5):.2f}:d=5', '-ar', '48000', '-ac', '2', salida])
-        return
     D = f'{d:.2f}'
     fc = ("[0:a]volume=0.55,tremolo=f=0.13:d=0.35[a];[1:a]volume=0.30,tremolo=f=0.11:d=0.45[b];"
           "[2:a]volume=0.22,tremolo=f=0.17:d=0.5[c];[3:a]volume=0.10,tremolo=f=0.10:d=0.6[e];[4:a]lowpass=f=500,volume=0.6[n];"
@@ -372,6 +367,43 @@ def tanpura(d, salida):
     sh(['ffmpeg', '-y', '-v', 'error', '-f', 'lavfi', '-i', f'sine=f=130.81:d={D}', '-f', 'lavfi', '-i', f'sine=f=196.0:d={D}',
         '-f', 'lavfi', '-i', f'sine=f=261.63:d={D}', '-f', 'lavfi', '-i', f'sine=f=392.0:d={D}',
         '-f', 'lavfi', '-i', f'anoisesrc=c=pink:a=0.015:d={D}', '-filter_complex', fc, '-ar', '48000', '-ac', '2', salida])
+
+# ---------- musica de fondo ----------
+# Mantra/aarti: la propia cancion de Suno del video suena tambien debajo de la voz (bajita cuando hablan,
+# fuerte en las pausas). Katha/chaturthi: instrumentales de Suno de assets/music_fondo (rotan por video).
+# Si no hay ninguna musica con licencia, se usa la tanpura generada.
+VOL_FONDO = 0.42      # volumen de la musica cuando NO hay voz
+def musicas_fondo():
+    c = []
+    for ext in EXT_AUD:
+        c += glob.glob(os.path.join(BASE, 'assets', 'music_fondo', f'*.{ext}'))
+    return sorted(c)
+
+def fondo_musical(carpeta, semilla, d, tmp, salida):
+    """Devuelve el nombre de la fuente usada: 'cancion', 'instrumental' o 'tanpura'."""
+    propias = canciones(carpeta)
+    lista, fuente = (propias, 'cancion') if propias else (musicas_fondo(), 'instrumental')
+    if not lista:
+        tanpura(d, salida); return 'tanpura'
+    lista = lista[:]; random.Random(semilla).shuffle(lista)
+    # se encadenan hasta cubrir el video (sin repetir seguidas), con fundidos suaves entre pistas
+    piezas, acum, k = [], 0.0, 0
+    while acum < d + 1 and k < 60:
+        piezas.append(lista[k % len(lista)]); acum += max(5.0, dur(lista[k % len(lista)]) - 3); k += 1
+    ent = []
+    for x in piezas:
+        ent += ['-i', x]
+    if len(piezas) == 1:
+        fc = '[0:a]aresample=48000,aformat=channel_layouts=stereo[m]'
+    else:
+        fc = ''.join(f'[{i}:a]aresample=48000,aformat=channel_layouts=stereo[p{i}];' for i in range(len(piezas)))
+        prev = 'p0'
+        for i in range(1, len(piezas)):
+            fc += f'[{prev}][p{i}]acrossfade=d=3:c1=tri:c2=tri[x{i}];'; prev = f'x{i}'
+        fc = fc + f'[{prev}]anull[m]'
+    fc += f';[m]atrim=0:{d:.2f},asetpts=PTS-STARTPTS,afade=t=in:d=2,afade=t=out:st={max(0, d - 5):.2f}:d=5[o]'
+    sh(['ffmpeg', '-y', '-v', 'error', *ent, '-filter_complex', fc, '-map', '[o]', '-ar', '48000', '-ac', '2', salida])
+    return fuente
 
 def mmss(s):
     s = int(round(s))
@@ -439,11 +471,17 @@ def montar(carpeta, generar_voz, tmp):
     unido = os.path.join(tmp, 'unido.mp4')
     sh(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', lista, '-c', 'copy', unido])
     total = dur(unido)
-    bed = os.path.join(tmp, 'fondo.wav'); tanpura(total, bed)
+    bed = os.path.join(tmp, 'fondo.wav')
+    fuente = fondo_musical(carpeta, g['id'], total, tmp, bed)
+    avisos.append(f'musica de fondo: {fuente}')
+    vol = float(g.get('volumen_fondo', VOL_FONDO if fuente != 'tanpura' else 0.30))
     final = os.path.join(tmp, f"{g['id']}.mp4")
+    # la voz "empuja" la musica hacia abajo (sidechain): se entiende la voz y en las pausas la musica sube
     sh(['ffmpeg', '-y', '-v', 'error', '-i', unido, '-i', bed, '-filter_complex',
-        "[1:a]volume=0.16" + ''.join(f",volume=0:enable='between(t,{a:.2f},{b:.2f})'" for a, b in sin_fondo)
-        + "[b];[0:a][b]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]",
+        "[0:a]aresample=48000,asplit=2[voz][clave];"
+        f"[1:a]volume={vol:.2f}" + ''.join(f",volume=0:enable='between(t,{a:.2f},{b:.2f})'" for a, b in sin_fondo) + "[b];"
+        "[b][clave]sidechaincompress=threshold=0.02:ratio=5:attack=20:release=600:makeup=1[bd];"
+        "[voz][bd]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]",
         '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', final])
     # capitulos: YouTube pide el primero en 0:00, al menos 3 y de 10 s o mas
     limpio = []

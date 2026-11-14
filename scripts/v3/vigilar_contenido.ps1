@@ -32,3 +32,13 @@ foreach ($c in Get-ChildItem contenido -Directory) {
     $r = git push -q origin master 2>&1
     if ($LASTEXITCODE -eq 0) { L "$($c.Name): SUBIDO a GitHub, se monta a las 3:05 am" } else { L "$($c.Name): error al subir: $r" }
 }
+
+# Musica de fondo (instrumentales de Suno para katha y guias): assets\music_fondo
+$fondo = git status --porcelain -- "assets/music_fondo"
+if ($fondo) {
+    git add "assets/music_fondo" 2>&1 | Out-Null
+    git commit -m "Musica de fondo nueva (Suno)" 2>&1 | Out-Null
+    git pull --rebase --autostash -q origin master 2>&1 | Out-Null
+    $r = git push -q origin master 2>&1
+    if ($LASTEXITCODE -eq 0) { L "music_fondo: SUBIDA a GitHub" } else { L "music_fondo: error al subir: $r" }
+}
