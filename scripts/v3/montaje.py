@@ -152,15 +152,15 @@ def png_letra(deva, translit, significado, salida):
         y += 58
     im.save(salida)
 
-def png_japa(mantra, translit, salida):
+def png_japa(mantra, translit, salida, total=108):
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     cx, cy, R = W // 2, 470, 300
     d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(255, 200, 40, 230), width=20)
-    d.text((cx, cy + 125), '/ 108', font=pv.fuente('baloo8.ttf', 68), fill=(255, 210, 120), anchor='mm')
+    d.text((cx, cy + 125), f'/ {total}', font=pv.fuente('baloo8.ttf', 68), fill=(255, 210, 120), anchor='mm')
     d.text((cx, 865), mantra, font=pv.ajustar(mantra, 'yatra.ttf', W - 200, 118, 60), fill=(255, 215, 80), anchor='mm', stroke_width=6, stroke_fill=(40, 10, 0))
     d.text((cx, 978), translit, font=pv.ajustar(translit, 'baloo8.ttf', W - 300, 54, 30), fill=(255, 255, 255), anchor='mm')
-    pv.pastilla(im, (60, 50), 'जाप · 108', pv.fuente('baloo8.ttf', 46), (255, 170, 0), (40, 10, 0))
+    pv.pastilla(im, (60, 50), f'जाप · {total}', pv.fuente('baloo8.ttf', 46), (255, 170, 0), (40, 10, 0))
     im.save(salida)
 
 def trozos(texto):
@@ -439,7 +439,7 @@ def montar(carpeta, generar_voz, tmp):
                 png_letra(e['deva'], e.get('translit', ''), e.get('significado', ''), capa)
                 d = render_estatica(fondo, capa, audio, dur(audio) + 0.8, out)
             elif tipo == 'japa':
-                png_japa(e['mantra'], e.get('translit', ''), capa)
+                png_japa(e['mantra'], e.get('translit', ''), capa, int(e.get('repeticiones', 108)))
                 rep = os.path.join(carpeta, 'voz', 'mantra.mp3')
                 generar_voz(e['mantra'], rep)
                 if audio:   # breve introduccion antes del japa

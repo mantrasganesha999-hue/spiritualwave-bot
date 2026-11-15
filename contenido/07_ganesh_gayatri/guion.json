@@ -33,7 +33,7 @@
   {
    "n": 1,
    "capitulo": "मंत्र का परिचय",
-   "texto": "ॐ एकदन्ताय विद्महे, वक्रतुण्डाय धीमहि, तन्नो दन्ती प्रचोदयात्। यह गणेश गायत्री मंत्र है। गायत्री छंद में बने ऐसे मंत्र कई देवताओं के लिए मिलते हैं, और यह मंत्र भगवान गणेश के लिए है। आज संकष्टी चतुर्थी के दिन, हम इसका अर्थ समझेंगे, और फिर शांति से इसका जाप सुनेंगे।"
+   "texto": "ॐ एकदन्ताय विद्महे, वक्रतुण्डाय धीमहि, तन्नो दन्ती प्रचोदयात्। यह गणेश गायत्री मंत्र है। गायत्री छंद में बने ऐसे मंत्र कई देवताओं के लिए मिलते हैं, और यह मंत्र भगवान गणेश के लिए है। आज संकष्टी चतुर्थी के दिन, हम इसका अर्थ समझेंगे, और फिर शांति से इसका जाप करेंगे।"
   },
   {
    "n": 2,
@@ -46,39 +46,47 @@
    "texto": "जाप के लिए सुबह या शाम का शांत समय चुनें। सीधे बैठें, आँखें बंद करें, और कुछ गहरी साँसें लें। माला हो तो हर मनके पर एक बार मंत्र बोलें। अगर माला नहीं है, तो इस वीडियो के साथ, मन ही मन जाप करें, और हर शब्द के अर्थ पर ध्यान रखें।"
   },
   {
-   "n": 4,
-   "tipo": "cancion",
-   "capitulo": "मंत्र जाप",
-   "minutos": 12,
-   "seg_estrofa": 20,
-   "letras": [
-    {
-     "deva": "ॐ एकदन्ताय विद्महे\nवक्रतुण्डाय धीमहि\nतन्नो दन्ती प्रचोदयात्",
-     "translit": "Om Ekadantaya Vidmahe, Vakratundaya Dhimahi, Tanno Danti Prachodayat",
-     "sig": "हम एक दाँत वाले को जानें, मुड़ी सूँड वाले का ध्यान करें; वे हमारी बुद्धि को प्रेरित करें"
-    },
-    {
-     "deva": "एकदन्ताय विद्महे",
-     "translit": "Ekadantaya Vidmahe",
-     "sig": "हम एक दाँत वाले भगवान को जानें"
-    },
-    {
-     "deva": "वक्रतुण्डाय धीमहि",
-     "translit": "Vakratundaya Dhimahi",
-     "sig": "हम मुड़ी हुई सूँड वाले का ध्यान करें"
-    },
-    {
-     "deva": "तन्नो दन्ती प्रचोदयात्",
-     "translit": "Tanno Danti Prachodayat",
-     "sig": "वे गणेश जी हमारी बुद्धि को सही दिशा दें"
-    }
-   ]
+   "tipo": "letra",
+   "capitulo": "मंत्र पाठ",
+   "deva": "एकदन्ताय विद्महे",
+   "translit": "Ekadantaya Vidmahe",
+   "significado": "हम एक दाँत वाले भगवान को जानें",
+   "texto": "एकदन्ताय विद्महे।",
+   "n": 4
   },
   {
-   "n": 5,
+   "tipo": "letra",
+   "capitulo": "मंत्र पाठ",
+   "deva": "वक्रतुण्डाय धीमहि",
+   "translit": "Vakratundaya Dhimahi",
+   "significado": "हम मुड़ी हुई सूँड वाले का ध्यान करें",
+   "texto": "वक्रतुण्डाय धीमहि।",
+   "n": 5
+  },
+  {
+   "tipo": "letra",
+   "capitulo": "मंत्र पाठ",
+   "deva": "तन्नो दन्ती प्रचोदयात्",
+   "translit": "Tanno Danti Prachodayat",
+   "significado": "वे गणेश जी हमारी बुद्धि को सही दिशा दें",
+   "texto": "तन्नो दन्ती प्रचोदयात्।",
+   "n": 6
+  },
+  {
+   "tipo": "japa",
+   "capitulo": "जाप की शुरुआत",
+   "mantra": "ॐ एकदन्ताय विद्महे। वक्रतुण्डाय धीमहि। तन्नो दन्ती प्रचोदयात्॥",
+   "translit": "Om Ekadantaya Vidmahe, Vakratundaya Dhimahi, Tanno Danti Prachodayat",
+   "repeticiones": 21,
+   "capitulo_japa": "जाप 21 बार",
+   "texto": "अब आँखें बंद करें, और साथ में इक्कीस बार जाप करें। स्क्रीन पर गिनती चलती रहेगी।",
+   "n": 7
+  },
+  {
+   "n": 8,
    "capitulo": "समापन",
    "texto": "जाप के बाद, कुछ पल चुप बैठें, और मन की शांति को महसूस करें। आज रात चंद्रोदय के बाद, संकष्टी का व्रत खोलना न भूलें। जय श्री गणेश।"
   }
  ],
- "descripcion": "गणेश गायत्री मंत्र, हर शब्द के अर्थ के साथ, और फिर शांत जाप।\n\nॐ एकदन्ताय विद्महे। वक्रतुण्डाय धीमहि। तन्नो दन्ती प्रचोदयात्॥\nOm Ekadantaya Vidmahe, Vakratundaya Dhimahi, Tanno Danti Prachodayat\n\nअर्थ: हम एक दाँत वाले भगवान को जानें, मुड़ी हुई सूँड वाले का ध्यान करें; वे दन्ती (गणेश जी) हमारी बुद्धि को प्रेरित करें।\nMeaning: May we know the one-tusked Lord and meditate on the one with the curved trunk; may Danti (Ganesha) inspire our intellect.\n\n{CAPITULOS}\n\nकथन की आवाज़ और गायन AI टूल से बनाए गए हैं (गायन: Suno)। Narration voice and singing were created with AI tools (singing: Suno).\n\n#GaneshGayatriMantra #GaneshMantra #Ganesha"
+ "descripcion": "गणेश गायत्री मंत्र, हर शब्द के अर्थ के साथ, और फिर शांत जाप।\n\nॐ एकदन्ताय विद्महे। वक्रतुण्डाय धीमहि। तन्नो दन्ती प्रचोदयात्॥\nOm Ekadantaya Vidmahe, Vakratundaya Dhimahi, Tanno Danti Prachodayat\n\nअर्थ: हम एक दाँत वाले भगवान को जानें, मुड़ी हुई सूँड वाले का ध्यान करें; वे दन्ती (गणेश जी) हमारी बुद्धि को प्रेरित करें।\nMeaning: May we know the one-tusked Lord and meditate on the one with the curved trunk; may Danti (Ganesha) inspire our intellect.\n\n{CAPITULOS}\n\nकथन और पाठ की आवाज़, और पृष्ठभूमि संगीत, AI टूल से बनाए गए हैं। Narration, recitation voice and background music were created with AI tools.\n\n#GaneshGayatriMantra #GaneshMantra #Ganesha"
 }
