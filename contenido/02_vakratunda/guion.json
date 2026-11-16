@@ -3,7 +3,7 @@
  "formato": "mantra",
  "publicar": "2026-11-20T13:30:00Z",
  "publicar_texto": "viernes 20 nov 2026, 7:00 pm hora de India",
- "titulo": "वक्रतुण्ड महाकाय श्लोक | अर्थ सहित | Vakratunda Mahakaya Lyrics & Meaning",
+ "titulo": "वक्रतुण्ड महाकाय श्लोक | अर्थ सहित | Vakratunda Mahakaya Lyrics & Meaning | ध्यान संगीत",
  "categoria": "10",
  "miniatura": {
   "formato": "mantra",
@@ -31,53 +31,39 @@
  "escenas": [
   {
    "n": 1,
-   "capitulo": "श्लोक का परिचय",
-   "texto": "वक्रतुण्ड महाकाय, सूर्यकोटि समप्रभ। निर्विघ्नं कुरु मे देव, सर्वकार्येषु सर्वदा। यह भगवान गणेश का सबसे प्रसिद्ध श्लोक है। घर हो या मंदिर, पूजा हो या कोई नया काम, बहुत से लोग इसे सबसे पहले बोलते हैं। आज हम इस श्लोक का अर्थ शब्द दर शब्द समझेंगे, और फिर इसका पाठ और जाप करेंगे।"
+   "capitulo": "परिचय",
+   "texto": "वक्रतुण्ड महाकाय, सूर्यकोटि समप्रभ। निर्विघ्नं कुरु मे देव, सर्वकार्येषु सर्वदा। यह गणेश जी का सबसे प्रसिद्ध श्लोक है, जिसे हर नए काम से पहले बोला जाता है। अब शांत संगीत के साथ, स्क्रीन पर श्लोक और उसका अर्थ पढ़ें, और मन ही मन जाप करें।"
   },
   {
    "n": 2,
-   "capitulo": "शब्द दर शब्द अर्थ",
-   "texto": "वक्रतुण्ड का अर्थ है, घुमावदार सूँड वाले। महाकाय का अर्थ है, विशाल शरीर वाले। सूर्यकोटि समप्रभ, यानी करोड़ों सूर्यों के समान तेज वाले। निर्विघ्नं कुरु मे देव, यानी हे देव, मेरे मार्ग को विघ्नों से मुक्त करें। और सर्वकार्येषु सर्वदा, यानी मेरे सभी कार्यों में, हमेशा। पूरे श्लोक में भक्त गणेश जी से प्रार्थना करता है, कि उसके हर काम में उनकी कृपा बनी रहे।"
+   "tipo": "cancion",
+   "capitulo": "श्लोक और ध्यान संगीत",
+   "minutos": 10,
+   "seg_estrofa": 15,
+   "letras": [
+    {
+     "deva": "वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ\nनिर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा",
+     "translit": "Vakratunda Mahakaya Suryakoti Samaprabha, Nirvighnam Kuru Me Deva Sarvakaryeshu Sarvada",
+     "sig": "हे घुमावदार सूँड और विशाल शरीर वाले प्रभु, मेरे सभी कार्यों को सदा विघ्नों से मुक्त करें"
+    },
+    {
+     "deva": "वक्रतुण्ड महाकाय\nसूर्यकोटि समप्रभ",
+     "translit": "Vakratunda Mahakaya Suryakoti Samaprabha",
+     "sig": "हे घुमावदार सूँड और विशाल शरीर वाले, करोड़ों सूर्यों के समान तेज वाले प्रभु"
+    },
+    {
+     "deva": "निर्विघ्नं कुरु मे देव\nसर्वकार्येषु सर्वदा",
+     "translit": "Nirvighnam Kuru Me Deva Sarvakaryeshu Sarvada",
+     "sig": "हे देव, मेरे सभी कार्यों को सदा विघ्नों से मुक्त करें"
+    }
+   ]
   },
   {
    "n": 3,
-   "capitulo": "कैसे बोलें",
-   "texto": "इस श्लोक को बोलने का कोई कठिन नियम नहीं है। सुबह स्नान के बाद, या कोई नया काम शुरू करने से पहले, शांत मन से बैठें। चाहें तो एक दीपक जलाएँ। श्लोक को धीरे, और साफ़ उच्चारण के साथ बोलें। बहुत से लोग इसे ग्यारह, इक्कीस या एक सौ आठ बार जपते हैं। अब पहले हर पंक्ति को ध्यान से सुनें।"
-  },
-  {
-   "tipo": "letra",
-   "capitulo": "श्लोक पाठ",
-   "deva": "वक्रतुण्ड महाकाय\nसूर्यकोटि समप्रभ",
-   "translit": "Vakratunda Mahakaya Suryakoti Samaprabha",
-   "significado": "हे घुमावदार सूँड और विशाल शरीर वाले, करोड़ों सूर्यों के समान तेज वाले प्रभु",
-   "texto": "वक्रतुण्ड महाकाय, सूर्यकोटि समप्रभ।",
-   "n": 4
-  },
-  {
-   "tipo": "letra",
-   "capitulo": "श्लोक पाठ",
-   "deva": "निर्विघ्नं कुरु मे देव\nसर्वकार्येषु सर्वदा",
-   "translit": "Nirvighnam Kuru Me Deva Sarvakaryeshu Sarvada",
-   "significado": "हे देव, मेरे सभी कार्यों को सदा विघ्नों से मुक्त करें",
-   "texto": "निर्विघ्नं कुरु मे देव, सर्वकार्येषु सर्वदा।",
-   "n": 5
-  },
-  {
-   "tipo": "japa",
-   "capitulo": "जाप की शुरुआत",
-   "mantra": "वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ। निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥",
-   "translit": "Vakratunda Mahakaya Suryakoti Samaprabha, Nirvighnam Kuru Me Deva Sarvakaryeshu Sarvada",
-   "repeticiones": 21,
-   "capitulo_japa": "जाप 21 बार",
-   "texto": "अब आँखें बंद करें, और साथ में इक्कीस बार जाप करें। स्क्रीन पर गिनती चलती रहेगी।",
-   "n": 6
-  },
-  {
-   "n": 7,
    "capitulo": "समापन",
-   "texto": "आशा है यह श्लोक आपके दिन की शुभ शुरुआत बने। इसका अर्थ अपने परिवार के साथ भी साझा करें। जय श्री गणेश।"
+   "texto": "जय श्री गणेश। अगर यह संगीत आपको शांति दे, तो इसे अपने परिवार के साथ ज़रूर साझा करें।"
   }
  ],
  "idioma": "hi",
- "descripcion": "भगवान गणेश का प्रसिद्ध श्लोक, वक्रतुण्ड महाकाय, शब्द दर शब्द अर्थ के साथ, और फिर शांत पाठ।\n\nवक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।\nनिर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥\n\nVakratunda Mahakaya Suryakoti Samaprabha\nNirvighnam Kuru Me Deva Sarvakaryeshu Sarvada\n\nअर्थ: हे घुमावदार सूँड और विशाल शरीर वाले, करोड़ों सूर्यों के समान तेज वाले प्रभु, मेरे सभी कार्यों को सदा विघ्नों से मुक्त करें।\nMeaning: O Lord with the curved trunk and mighty form, radiant like millions of suns, keep all my undertakings free of obstacles, always.\n\nकैसे बोलें: सुबह या किसी नए काम से पहले, शांत मन से, 11, 21 या 108 बार।\n\n{CAPITULOS}\n\nकथन और पाठ की आवाज़, और पृष्ठभूमि संगीत, AI टूल से बनाए गए हैं। Narration, recitation voice and background music were created with AI tools.\n\n#VakratundaMahakaya #GaneshMantra #Ganesha"
+ "descripcion": "भगवान गणेश का प्रसिद्ध श्लोक, वक्रतुण्ड महाकाय, शब्द दर शब्द अर्थ के साथ, और फिर ध्यान संगीत के साथ, स्क्रीन पर अर्थ सहित।\n\nवक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।\nनिर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥\n\nVakratunda Mahakaya Suryakoti Samaprabha\nNirvighnam Kuru Me Deva Sarvakaryeshu Sarvada\n\nअर्थ: हे घुमावदार सूँड और विशाल शरीर वाले, करोड़ों सूर्यों के समान तेज वाले प्रभु, मेरे सभी कार्यों को सदा विघ्नों से मुक्त करें।\nMeaning: O Lord with the curved trunk and mighty form, radiant like millions of suns, keep all my undertakings free of obstacles, always.\n\nकैसे बोलें: सुबह या किसी नए काम से पहले, शांत मन से, 11, 21 या 108 बार।\n\n{CAPITULOS}\n\nपरिचय की आवाज़ और संगीत AI टूल से बनाए गए हैं। Intro voice and music were created with AI tools.\n\n#VakratundaMahakaya #GaneshMantra #Ganesha"
 }

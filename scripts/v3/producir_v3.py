@@ -104,7 +104,7 @@ def subir(yt, archivo, portada, g, descripcion):
 
 def producir(carpeta):
     g = json.load(open(os.path.join(carpeta, 'guion.json'), encoding='utf-8'))
-    if any(e.get('tipo') == 'cancion' for e in g['escenas']) and not montaje.canciones(carpeta):
+    if any(e.get('tipo') == 'cancion' for e in g['escenas']) and not montaje.canciones(carpeta) and not montaje.musicas_fondo():
         marca = os.path.join(carpeta, 'musica', 'aviso_enviado.txt')
         if not os.path.exists(marca):   # se avisa una sola vez
             avisar(f"⏸ <b>{g['id']}</b>: falta la cancion de Suno. Guarda el MP3 en contenido\\{g['id']}\\musica\\ (ver PROMPT_SUNO.txt).")

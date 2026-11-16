@@ -309,8 +309,11 @@ def clip_10s(video, tmp):
 
 def render_cancion(carpeta, e, semilla, tmp, salida):
     songs = canciones(carpeta)
+    if not songs:   # sin cancion propia del video: tus canciones/instrumentales de Suno de assets/music_fondo
+        songs = musicas_fondo()[:]
+        random.Random(semilla + '-musica').shuffle(songs)
     if not songs:
-        raise RuntimeError("falta la cancion en la carpeta musica/")
+        raise RuntimeError("no hay musica: ni en musica/ del video ni en assets/music_fondo")
     T = float(e.get('minutos', 12)) * 60
     # audio: las versiones de la cancion alternadas hasta cubrir T, con 1.5 s de respiro entre vueltas
     wavs = []
@@ -324,7 +327,7 @@ def render_cancion(carpeta, e, semilla, tmp, salida):
     la = os.path.join(tmp, 'songs.txt'); open(la, 'w').write(''.join(f"file '{w}'\n" for w in lst))
     audio = os.path.join(tmp, 'cancion_larga.wav')
     sh(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', la, '-t', f'{T:.2f}',
-        '-af', f'afade=t=out:st={T - 6:.2f}:d=6', '-ar', '48000', '-ac', '2', audio])
+        '-af', f'afade=t=out:st={T - 6:.2f}:d=6,loudnorm=I=-16:TP=-1.5:LRA=11', '-ar', '48000', '-ac', '2', audio])
     # video: clips del canal, uno distinto cada 10 s, en orden barajado fijo por video
     clips = banco_clips()
     if not clips:
@@ -372,7 +375,7 @@ def tanpura(d, salida):
 # Mantra/aarti: la propia cancion de Suno del video suena tambien debajo de la voz (bajita cuando hablan,
 # fuerte en las pausas). Katha/chaturthi: instrumentales de Suno de assets/music_fondo (rotan por video).
 # Si no hay ninguna musica con licencia, se usa la tanpura generada.
-VOL_FONDO = 0.42      # volumen de la musica cuando NO hay voz
+VOL_FONDO = 0.55      # musica (normalizada a -16 LUFS) a ~-5 dB; la voz la baja ~6 dB mas al hablar
 def musicas_fondo():
     c = []
     for ext in EXT_AUD:
@@ -401,7 +404,7 @@ def fondo_musical(carpeta, semilla, d, tmp, salida):
         for i in range(1, len(piezas)):
             fc += f'[{prev}][p{i}]acrossfade=d=3:c1=tri:c2=tri[x{i}];'; prev = f'x{i}'
         fc = fc + f'[{prev}]anull[m]'
-    fc += f';[m]atrim=0:{d:.2f},asetpts=PTS-STARTPTS,afade=t=in:d=2,afade=t=out:st={max(0, d - 5):.2f}:d=5[o]'
+    fc += f';[m]atrim=0:{d:.2f},asetpts=PTS-STARTPTS,afade=t=in:d=2,afade=t=out:st={max(0, d - 5):.2f}:d=5,loudnorm=I=-16:TP=-2:LRA=11[o]'
     sh(['ffmpeg', '-y', '-v', 'error', *ent, '-filter_complex', fc, '-map', '[o]', '-ar', '48000', '-ac', '2', salida])
     return fuente
 
@@ -480,7 +483,7 @@ def montar(carpeta, generar_voz, tmp):
     sh(['ffmpeg', '-y', '-v', 'error', '-i', unido, '-i', bed, '-filter_complex',
         "[0:a]aresample=48000,asplit=2[voz][clave];"
         f"[1:a]volume={vol:.2f}" + ''.join(f",volume=0:enable='between(t,{a:.2f},{b:.2f})'" for a, b in sin_fondo) + "[b];"
-        "[b][clave]sidechaincompress=threshold=0.02:ratio=5:attack=20:release=600:makeup=1[bd];"
+        "[b][clave]sidechaincompress=threshold=0.04:ratio=3:attack=20:release=500:makeup=1[bd];"
         "[voz][bd]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]",
         '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', final])
     # capitulos: YouTube pide el primero en 0:00, al menos 3 y de 10 s o mas

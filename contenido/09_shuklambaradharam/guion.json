@@ -32,52 +32,38 @@
  "escenas": [
   {
    "n": 1,
-   "capitulo": "श्लोक का परिचय",
-   "texto": "शुक्लाम्बरधरं विष्णुं, शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत्, सर्वविघ्नोपशान्तये। यह छोटा सा संस्कृत श्लोक, दक्षिण भारत में और कई परंपराओं में, किसी भी पूजा, पढ़ाई या नए काम की शुरुआत में बोला जाता है। आज हम इसका अर्थ समझेंगे, और फिर शांति से इसका पाठ करेंगे।"
+   "capitulo": "परिचय",
+   "texto": "शुक्लाम्बरधरं विष्णुं, शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत्, सर्वविघ्नोपशान्तये। यह श्लोक हर अच्छे काम की शुरुआत में बोला जाता है। अब शांत संगीत के साथ, स्क्रीन पर श्लोक और उसका अर्थ पढ़ें।"
   },
   {
    "n": 2,
-   "capitulo": "श्लोक का अर्थ",
-   "texto": "शुक्लाम्बरधरं का अर्थ है, सफ़ेद वस्त्र धारण करने वाले। विष्णुं का अर्थ है, जो सब जगह व्याप्त हैं। शशिवर्णं, यानी चंद्रमा जैसे उज्ज्वल रंग वाले। चतुर्भुजम्, यानी चार भुजाओं वाले। प्रसन्नवदनं, यानी प्रसन्न मुख वाले। ध्यायेत्, यानी उनका ध्यान करें, और सर्वविघ्नोपशान्तये, यानी सभी विघ्नों की शांति के लिए।"
+   "tipo": "cancion",
+   "capitulo": "श्लोक और ध्यान संगीत",
+   "minutos": 10,
+   "seg_estrofa": 15,
+   "letras": [
+    {
+     "deva": "शुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्\nप्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये",
+     "translit": "Shuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye",
+     "sig": "सफ़ेद वस्त्र वाले, चंद्र जैसे उज्ज्वल, प्रसन्न मुख वाले का, सब विघ्नों की शांति के लिए ध्यान करें"
+    },
+    {
+     "deva": "शुक्लाम्बरधरं विष्णुं\nशशिवर्णं चतुर्भुजम्",
+     "translit": "Shuklambaradharam Vishnum, Shashivarnam Chaturbhujam",
+     "sig": "सफ़ेद वस्त्र वाले, सर्वव्यापी, चंद्र जैसे उज्ज्वल, चार भुजाओं वाले"
+    },
+    {
+     "deva": "प्रसन्नवदनं ध्यायेत्\nसर्वविघ्नोपशान्तये",
+     "translit": "Prasannavadanam Dhyayet, Sarvavighnopashantaye",
+     "sig": "प्रसन्न मुख वाले का ध्यान करें, सब विघ्नों की शांति के लिए"
+    }
+   ]
   },
   {
    "n": 3,
-   "capitulo": "गणेश जी का श्लोक क्यों?",
-   "texto": "इस श्लोक में विष्णु शब्द आता है, इसलिए कुछ लोग इसे भगवान विष्णु का श्लोक मानते हैं। पर परंपरा में इसे अधिकतर गणेश जी के ध्यान के लिए बोला जाता है, क्योंकि वे विघ्नों को शांत करने वाले देवता हैं। यहाँ विष्णु का अर्थ है, जो हर जगह व्याप्त हैं। आप इसे पढ़ाई, यात्रा या किसी नए काम से पहले, एक बार हाथ जोड़कर बोल सकते हैं।"
-  },
-  {
-   "tipo": "letra",
-   "capitulo": "श्लोक पाठ",
-   "deva": "शुक्लाम्बरधरं विष्णुं\nशशिवर्णं चतुर्भुजम्",
-   "translit": "Shuklambaradharam Vishnum, Shashivarnam Chaturbhujam",
-   "significado": "सफ़ेद वस्त्र वाले, सर्वव्यापी, चंद्र जैसे उज्ज्वल, चार भुजाओं वाले",
-   "texto": "शुक्लाम्बरधरं विष्णुं, शशिवर्णं चतुर्भुजम्।",
-   "n": 4
-  },
-  {
-   "tipo": "letra",
-   "capitulo": "श्लोक पाठ",
-   "deva": "प्रसन्नवदनं ध्यायेत्\nसर्वविघ्नोपशान्तये",
-   "translit": "Prasannavadanam Dhyayet, Sarvavighnopashantaye",
-   "significado": "प्रसन्न मुख वाले का ध्यान करें, सब विघ्नों की शांति के लिए",
-   "texto": "प्रसन्नवदनं ध्यायेत्, सर्वविघ्नोपशान्तये।",
-   "n": 5
-  },
-  {
-   "tipo": "japa",
-   "capitulo": "जाप की शुरुआत",
-   "mantra": "शुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये॥",
-   "translit": "Shuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye",
-   "repeticiones": 21,
-   "capitulo_japa": "जाप 21 बार",
-   "texto": "अब आँखें बंद करें, और साथ में इक्कीस बार जाप करें। स्क्रीन पर गिनती चलती रहेगी।",
-   "n": 6
-  },
-  {
-   "n": 7,
    "capitulo": "समापन",
-   "texto": "इस श्लोक को याद कर लें, और हर अच्छे काम की शुरुआत में एक बार बोलें। जय श्री गणेश।"
+   "texto": "जय श्री गणेश। अगर यह संगीत आपको शांति दे, तो इसे अपने परिवार के साथ ज़रूर साझा करें।"
   }
  ],
- "descripcion": "शुक्लाम्बरधरं विष्णुं, गणेश जी के ध्यान का संस्कृत श्लोक, हर शब्द के अर्थ के साथ, और फिर शांत पाठ।\n\nशुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये॥\nShuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye\n\nअर्थ: सफ़ेद वस्त्र धारण करने वाले, सर्वव्यापी, चंद्रमा जैसे उज्ज्वल, चार भुजाओं वाले, प्रसन्न मुख वाले देव का, सभी विघ्नों की शांति के लिए ध्यान करें।\nMeaning: Meditate on the all-pervading one, clad in white, bright as the moon, four-armed, with a pleasant face, for the removal of all obstacles.\n\n{CAPITULOS}\n\nकथन और पाठ की आवाज़, और पृष्ठभूमि संगीत, AI टूल से बनाए गए हैं। Narration, recitation voice and background music were created with AI tools.\n\n#Shuklambaradharam #GaneshaShloka #Ganesha"
+ "descripcion": "शुक्लाम्बरधरं विष्णुं, गणेश जी के ध्यान का संस्कृत श्लोक, हर शब्द के अर्थ के साथ, और फिर ध्यान संगीत के साथ, स्क्रीन पर अर्थ सहित।\n\nशुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये॥\nShuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye\n\nअर्थ: सफ़ेद वस्त्र धारण करने वाले, सर्वव्यापी, चंद्रमा जैसे उज्ज्वल, चार भुजाओं वाले, प्रसन्न मुख वाले देव का, सभी विघ्नों की शांति के लिए ध्यान करें।\nMeaning: Meditate on the all-pervading one, clad in white, bright as the moon, four-armed, with a pleasant face, for the removal of all obstacles.\n\n{CAPITULOS}\n\nपरिचय की आवाज़ और संगीत AI टूल से बनाए गए हैं। Intro voice and music were created with AI tools.\n\n#Shuklambaradharam #GaneshaShloka #Ganesha"
 }
