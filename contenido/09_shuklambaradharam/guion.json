@@ -32,14 +32,9 @@
  "escenas": [
   {
    "n": 1,
-   "capitulo": "परिचय",
-   "texto": "शुक्लाम्बरधरं विष्णुं, शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत्, सर्वविघ्नोपशान्तये। यह श्लोक हर अच्छे काम की शुरुआत में बोला जाता है। अब शांत संगीत के साथ, स्क्रीन पर श्लोक और उसका अर्थ पढ़ें।"
-  },
-  {
-   "n": 2,
    "tipo": "cancion",
    "capitulo": "श्लोक और ध्यान संगीत",
-   "minutos": 10,
+   "minutos": 20,
    "seg_estrofa": 15,
    "letras": [
     {
@@ -57,13 +52,15 @@
      "translit": "Prasannavadanam Dhyayet, Sarvavighnopashantaye",
      "sig": "प्रसन्न मुख वाले का ध्यान करें, सब विघ्नों की शांति के लिए"
     }
-   ]
-  },
-  {
-   "n": 3,
-   "capitulo": "समापन",
-   "texto": "जय श्री गणेश। अगर यह संगीत आपको शांति दे, तो इसे अपने परिवार के साथ ज़रूर साझा करें।"
+   ],
+   "titulo_pantalla": {
+    "lineas": [
+     "शुक्लाम्बरधरं",
+     "विष्णुं"
+    ],
+    "sub": "हर शुभ काम से पहले का गणेश श्लोक · अर्थ सहित"
+   }
   }
  ],
- "descripcion": "शुक्लाम्बरधरं विष्णुं, गणेश जी के ध्यान का संस्कृत श्लोक, हर शब्द के अर्थ के साथ, और फिर ध्यान संगीत के साथ, स्क्रीन पर अर्थ सहित।\n\nशुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये॥\nShuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye\n\nअर्थ: सफ़ेद वस्त्र धारण करने वाले, सर्वव्यापी, चंद्रमा जैसे उज्ज्वल, चार भुजाओं वाले, प्रसन्न मुख वाले देव का, सभी विघ्नों की शांति के लिए ध्यान करें।\nMeaning: Meditate on the all-pervading one, clad in white, bright as the moon, four-armed, with a pleasant face, for the removal of all obstacles.\n\n{CAPITULOS}\n\nपरिचय की आवाज़ और संगीत AI टूल से बनाए गए हैं। Intro voice and music were created with AI tools.\n\n#Shuklambaradharam #GaneshaShloka #Ganesha"
+ "descripcion": "शुक्लाम्बरधरं विष्णुं, गणेश जी के ध्यान का संस्कृत श्लोक, हर शब्द के अर्थ के साथ, और फिर ध्यान संगीत के साथ, स्क्रीन पर अर्थ सहित।\n\nशुक्लाम्बरधरं विष्णुं शशिवर्णं चतुर्भुजम्। प्रसन्नवदनं ध्यायेत् सर्वविघ्नोपशान्तये॥\nShuklambaradharam Vishnum Shashivarnam Chaturbhujam, Prasannavadanam Dhyayet Sarvavighnopashantaye\n\nअर्थ: सफ़ेद वस्त्र धारण करने वाले, सर्वव्यापी, चंद्रमा जैसे उज्ज्वल, चार भुजाओं वाले, प्रसन्न मुख वाले देव का, सभी विघ्नों की शांति के लिए ध्यान करें।\nMeaning: Meditate on the all-pervading one, clad in white, bright as the moon, four-armed, with a pleasant face, for the removal of all obstacles.\n\nसंगीत AI टूल की मदद से बनाया गया है; श्लोक और अर्थ पारंपरिक ग्रंथों पर आधारित हैं। Music was made with the help of AI tools; texts and meanings follow traditional sources.\n\n#Shuklambaradharam #GaneshaShloka #Ganesha"
 }

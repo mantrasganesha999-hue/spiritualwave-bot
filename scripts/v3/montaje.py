@@ -295,6 +295,22 @@ def png_estrofa(deva, translit, significado, salida):
         y += 56
     im.save(salida)
 
+def png_titulo(lineas, sub, salida):
+    """Titulo grande al inicio (sin voz): el mantra en devanagari + una linea de contexto."""
+    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    alto = 120 * len(lineas) + (80 if sub else 0) + 90
+    y0 = (H - alto) // 2
+    d.rounded_rectangle([170, y0, W - 170, y0 + alto], radius=40, fill=(20, 6, 0, 175), outline=(255, 195, 70, 220), width=4)
+    y = y0 + 95
+    for ln in lineas:
+        d.text((W // 2, y), ln, font=pv.ajustar(ln, 'baloo8.ttf', W - 460, 112, 60), fill=(255, 215, 90), anchor='mm',
+               stroke_width=4, stroke_fill=(60, 20, 0))
+        y += 120
+    if sub:
+        d.text((W // 2, y + 5), sub, font=pv.ajustar(sub, 'hind7.ttf', W - 460, 50, 32), fill=(255, 255, 255), anchor='mm')
+    im.save(salida)
+
 _CLIPS_LISTOS = {}
 def clip_10s(video, tmp):
     if video in _CLIPS_LISTOS:
@@ -347,13 +363,20 @@ def render_cancion(carpeta, e, semilla, tmp, salida):
     entradas += ['-i', os.path.join(tmp, 'marca.png')]
     fil = ["[0:v]format=rgba[v0]", "[v0][2:v]overlay=0:20[v1]"]
     ult = 'v1'
+    off, n_in = 0.0, 3
+    tp = e.get('titulo_pantalla')
+    if tp:   # titulo grande los primeros 9 s (reemplaza la intro hablada)
+        off = 9.0
+        pt = os.path.join(tmp, 'titulo_cancion.png'); png_titulo(tp.get('lineas', []), tp.get('sub', ''), pt)
+        entradas += ['-i', pt]
+        fil.append(f"[{ult}][{n_in}:v]overlay=0:0:enable='between(t,0.4,{off - 0.4:.2f})'[tt]"); ult = 'tt'; n_in += 1
     ciclo = seg * max(1, len(letras))
     for k, L in enumerate(letras):
         p = os.path.join(tmp, f'estrofa{k}.png')
         png_estrofa(L['deva'], L.get('translit', ''), L.get('sig', ''), p)
         entradas += ['-i', p]
         a, b = k * seg, (k + 1) * seg
-        fil.append(f"[{ult}][{3 + k}:v]overlay=0:0:enable='between(mod(t,{ciclo:.2f}),{a + 0.3:.2f},{b - 0.3:.2f})'[l{k}]")
+        fil.append(f"[{ult}][{n_in + k}:v]overlay=0:0:enable='gte(t,{off:.2f})*between(mod(t-{off:.2f},{ciclo:.2f}),{a + 0.3:.2f},{b - 0.3:.2f})'[l{k}]")
         ult = f'l{k}'
     fil.append(f"[{ult}]fade=t=in:st=0:d=0.6,fade=t=out:st={T - 1.5:.2f}:d=1.5,format=yuv420p[vout]")
     sh(['ffmpeg', '-y', '-v', 'error', *entradas, '-filter_complex', ';'.join(fil), '-map', '[vout]', '-map', '1:a',
@@ -437,10 +460,10 @@ def montar(carpeta, generar_voz, tmp):
             capa = os.path.join(tmp, f'capa{n:02d}.png')
             if tipo == 'tarjeta':
                 png_tarjeta(e.get('titulo_tarjeta', e['capitulo']), e['filas'], capa, e.get('pie'))
-                d = render_estatica(fondo, capa, audio, dur(audio) + 0.8, out)
+                d = render_estatica(fondo, capa, audio, dur(audio) + 0.8 if audio else float(e.get('segundos', 12)), out)
             elif tipo == 'letra':
                 png_letra(e['deva'], e.get('translit', ''), e.get('significado', ''), capa)
-                d = render_estatica(fondo, capa, audio, dur(audio) + 0.8, out)
+                d = render_estatica(fondo, capa, audio, dur(audio) + 0.8 if audio else float(e.get('segundos', 12)), out)
             elif tipo == 'japa':
                 png_japa(e['mantra'], e.get('translit', ''), capa, int(e.get('repeticiones', 108)))
                 rep = os.path.join(carpeta, 'voz', 'mantra.mp3')
